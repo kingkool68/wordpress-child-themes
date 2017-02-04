@@ -1,0 +1,52 @@
+{
+  "name": "zadie-heimlich",
+  "version": "0.1.0",
+  "description": "Zadie Heimlich's Site",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "del": "^2.2.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "latest",
+    "colors": "latest",
+    "del": "latest",
+    "gulp": "latest",
+    "gulp-autoprefixer": "latest",
+    "gulp-clean-css": "latest",
+    "gulp-clone": "latest",
+    "gulp-concat": "latest",
+    "gulp-cssnano": "latest",
+    "gulp-if": "latest",
+    "gulp-jshint": "latest",
+    "gulp-notify": "latest",
+    "gulp-phpcbf": "latest",
+    "gulp-phpcs": "latest",
+    "gulp-rename": "latest",
+    "gulp-sass": "latest",
+    "gulp-sourcemaps": "latest",
+    "gulp-uglify": "latest",
+    "gulp-util": "latest",
+    "jshint": "latest",
+    "jshint-stylish": "^2.2.1",
+    "merge-stream": "^1.0.1",
+    "run-sequence": "latest",
+    "yargs": "latest"
+  },
+  "scripts": {
+    "build": "gulp build",
+    "postinstall": "gulp build",
+    "phpcs": "gulp phpcs",
+    "phpcbf": "gulp phpcbf",
+    "watch": "gulp watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kingkool68/zadieheimlich.git"
+  },
+  "author": "Russell Heimlich",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kingkool68/zadieheimlich/issues"
+  },
+  "homepage": "https://github.com/kingkool68/zadieheimlich#readme"
+}
