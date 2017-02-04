@@ -24,7 +24,7 @@ var isProduction = !!(argv.production);
 
 // Browsers to target when prefixing CSS.
 var COMPATIBILITY = [
-  'last 2 versions',
+  'last 10 versions',
   'ie >= 6',
   'Android >= 2.3'
 ];
@@ -66,7 +66,6 @@ gulp.task('sass', function() {
     var fixedDestination = function(file) {
         var newPath = file.path.split('/scss/')[0];
         newPath += '/css';
-        console.log( newPath );
         return newPath;
     }
 
