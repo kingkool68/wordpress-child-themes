@@ -1,5 +1,5 @@
 <?php
-function zah_archive_headings( $post ) {
+function daddio_archive_headings( $post ) {
 	global $wp_query;
 	$obj = get_queried_object();
 	$heading = '';
@@ -69,4 +69,4 @@ function zah_archive_headings( $post ) {
 	<?php
 	}
 }
-add_action( 'zah_before_content', 'zah_archive_headings' );
+add_action( 'daddio_before_content', 'daddio_archive_headings' );

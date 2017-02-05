@@ -11,17 +11,17 @@
 			}
 			?>
 			
-			<?php do_action( 'zah_attachment_before_article', $post ); ?>
+			<?php do_action( 'daddio_attachment_before_article', $post ); ?>
 			
 			<article class="attachment-<?php echo $attachment_type; ?>">
 				
-				<?php do_action( 'zah_attachment_before_template_part', $post ); ?>
+				<?php do_action( 'daddio_attachment_before_template_part', $post ); ?>
 				<?php get_template_part( 'attachment', $attachment_type ); ?>
-				<?php do_action( 'zah_attachment_after_template_part', $post ); ?>
+				<?php do_action( 'daddio_attachment_after_template_part', $post ); ?>
 			
 			</article>
 			
-			<?php do_action( 'zah_attachment_after_article', $post ); ?>
+			<?php do_action( 'daddio_attachment_after_article', $post ); ?>
 			
 			<?php
 		endwhile;

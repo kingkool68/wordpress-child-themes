@@ -11,7 +11,7 @@ get_header();
 	<div id="content">
 		<article class="page">
 			<h1 class="title">Nothing happened on <?php echo $the_date; ?></h1>
-			<?php do_action( 'zah_content_footer', $post ); ?>
+			<?php do_action( 'daddio_content_footer', $post ); ?>
 		</article>
 	</div>
 

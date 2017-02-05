@@ -9,7 +9,7 @@ class On_This_Day {
 		add_action( 'template_redirect', array( $this, 'template_redirect' ) );
 		add_filter( 'template_include', array( $this, 'template_include' ) );
 		add_action( 'pre_get_posts', array( $this, 'pre_get_posts' ), 9 );
-		add_action( 'zah_before_content', array( $this, 'zah_before_content' ) );
+		add_action( 'daddio_before_content', array( $this, 'daddio_before_content' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
 	}
 
@@ -146,19 +146,19 @@ class On_This_Day {
 	}
 
 	public function redirect_to_current_date() {
-		$redirect_to = get_site_url() . '/' . $this->pagename . '/' . current_time('m') . '/' . current_time('d') . '/';
+		$redirect_to = get_site_url() . '/' . $this->pagename . '/' . current_time( 'm' ) . '/' . current_time( 'd' ) . '/';
 		wp_redirect( $redirect_to );
 		die();
 	}
 
-	public function zah_before_content() {
+	public function daddio_before_content() {
 		if ( $this->is_on_this_day() ) {
 			get_template_part( 'content', 'on-this-day-switch-date-form' );
 		}
 	}
 
 	public function wp_enqueue_scripts() {
-		wp_register_script( 'on-this-day', get_template_directory_uri() . '/js/on-this-day.js', array('jquery'), NULL, true );
+		wp_register_script( 'on-this-day', get_template_directory_uri() . '/js/on-this-day.js', array( 'jquery' ), null, true );
 	}
 }
 new On_This_Day();

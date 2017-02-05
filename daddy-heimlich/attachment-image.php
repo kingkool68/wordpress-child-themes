@@ -1,4 +1,4 @@
-	<?php do_action( 'zah_content_header', $post ); ?>
+	<?php do_action( 'daddio_content_header', $post ); ?>
 
 		<div class="inner">
 
@@ -19,4 +19,4 @@
 			</div>
 		</div>
 
-		<?php do_action( 'zah_content_footer', $post ); ?>
+		<?php do_action( 'daddio_content_footer', $post ); ?>

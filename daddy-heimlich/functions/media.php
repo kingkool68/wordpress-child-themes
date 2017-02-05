@@ -6,13 +6,13 @@ add_image_size( '480-wide', 480 );
 add_image_size( '640-wide', 640 );
 add_image_size( '800-wide', 800 );
 
-function zah_image_size_names_choose($sizes) {
+function daddio_image_size_names_choose($sizes) {
 	$addsizes = array(
 		'350-wide' => '350 Wide'
 	);
 	return array_merge($sizes, $addsizes);
 }
-add_filter('image_size_names_choose', 'zah_image_size_names_choose');
+add_filter('image_size_names_choose', 'daddio_image_size_names_choose');
 
 function html5_img_caption_shortcode($string, $attr, $content = null) {
     extract(shortcode_atts(array(
@@ -63,22 +63,22 @@ function wrap_video_embeds_to_make_them_responsive($return, $data, $url) {
 }
 add_filter('oembed_dataparse', 'wrap_video_embeds_to_make_them_responsive', 10, 3);
 
-function zah_attachment_link( $link, $post_id ) {
+function daddio_attachment_link( $link, $post_id ) {
 	$post = get_post( $post_id );
 	$new_link = get_site_url() . '/attachment/' . $post->post_name . '/';
 	return $new_link;
 }
-add_filter( 'attachment_link', 'zah_attachment_link', 2, 10 );
+add_filter( 'attachment_link', 'daddio_attachment_link', 2, 10 );
 
-function zah_set_video_element_preload_to_none( $out, $pairs, $atts, $shortcode ) {
+function daddio_set_video_element_preload_to_none( $out, $pairs, $atts, $shortcode ) {
 	$out['preload'] = 'none';
 
 	return $out;
 }
-add_filter( 'shortcode_atts_video', 'zah_set_video_element_preload_to_none', 10, 4 );
+add_filter( 'shortcode_atts_video', 'daddio_set_video_element_preload_to_none', 10, 4 );
 
 
-function zah_post_gallery( $nothing, $attr ) {
+function daddio_post_gallery( $nothing, $attr ) {
 	$post = get_post();
 
 	static $instance = 0;
@@ -147,7 +147,7 @@ function zah_post_gallery( $nothing, $attr ) {
 	if ( is_feed() ) {
 		$output = "\n";
 		foreach ( $attachments as $att_id => $attachment ) {
-			$output .= zah_get_attachment_link( $att_id, $atts['size'], true ) . "\n";
+			$output .= daddio_get_attachment_link( $att_id, $atts['size'], true ) . "\n";
 		}
 		return $output;
 	}
@@ -191,11 +191,11 @@ function zah_post_gallery( $nothing, $attr ) {
 		}
 
 		if ( ! empty( $atts['link'] ) && 'file' === $atts['link'] ) {
-			$image_output = zah_get_attachment_link( $id, $atts['size'], false, false, false, $attr );
+			$image_output = daddio_get_attachment_link( $id, $atts['size'], false, false, false, $attr );
 		} elseif ( ! empty( $atts['link'] ) && 'none' === $atts['link'] ) {
 			$image_output = wp_get_attachment_image( $id, $atts['size'], false, $attr );
 		} else {
-			$image_output = zah_get_attachment_link( $id, $atts['size'], true, false, false, $attr );
+			$image_output = daddio_get_attachment_link( $id, $atts['size'], true, false, false, $attr );
 		}
 
 		$output .= "$image_output";
@@ -206,7 +206,7 @@ function zah_post_gallery( $nothing, $attr ) {
 
 	return $output;
 }
-add_filter( 'post_gallery', 'zah_post_gallery', 10, 2 );
+add_filter( 'post_gallery', 'daddio_post_gallery', 10, 2 );
 
 /* Helpers */
 //media_sideload_image() would be so much better if it simply returned the attachment ID instead of HTML
@@ -243,7 +243,7 @@ function media_sideload_image_return_id( $file, $post_id, $desc = null, $post_da
 	}
 }
 
-function zah_get_attachment_link( $id = 0, $size = 'thumbnail', $permalink = false, $icon = false, $text = false, $attr = '' ) {
+function daddio_get_attachment_link( $id = 0, $size = 'thumbnail', $permalink = false, $icon = false, $text = false, $attr = '' ) {
 	$id = intval( $id );
 	$_post = get_post( $id );
 	$parent_post = get_post();
@@ -253,7 +253,7 @@ function zah_get_attachment_link( $id = 0, $size = 'thumbnail', $permalink = fal
 
 	if ( $permalink ) {
 		//$url = get_attachment_link( $_post->ID );
-		$url = zah_post_gallery_link( $parent_post->ID, $_post->post_name );
+		$url = daddio_post_gallery_link( $parent_post->ID, $_post->post_name );
 	}
 
 	if ( $text ) {
@@ -282,7 +282,7 @@ function zah_get_attachment_link( $id = 0, $size = 'thumbnail', $permalink = fal
 	return apply_filters( 'wp_get_attachment_link', "<a href='$url'>$link_text</a>", $id, $size, $permalink, $icon, $text );
 }
 
-function zah_svg_icon( $icon = '' ) {
+function daddio_svg_icon( $icon = '' ) {
 	if( !$icon ) {
 		return;
 	}
@@ -291,7 +291,7 @@ function zah_svg_icon( $icon = '' ) {
 	return '<svg class="icon icon-' . $icon . '" role="img"><use xlink:href="#icon-' . $icon . '"></use></svg>';
 }
 
-function zah_the_instagram_media( $post_id = 0 ) {
+function daddio_the_instagram_media( $post_id = 0 ) {
 	$post_id = absint( $post_id );
 	if ( ! $post_id ) {
 		$post_id = '';

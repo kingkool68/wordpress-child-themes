@@ -16,7 +16,7 @@ CREATE TABLE `wp_3_rsvps` (
 
  */
 
-function zah_redirect_rsvp_vanity_url() {
+function daddio_redirect_rsvp_vanity_url() {
 	global $wp_query;
 	if ( !is_404() ) {
 		return;
@@ -27,19 +27,19 @@ function zah_redirect_rsvp_vanity_url() {
 		die();
 	}
 }
-add_action( 'wp', 'zah_redirect_rsvp_vanity_url' );
+add_action( 'wp', 'daddio_redirect_rsvp_vanity_url' );
 
-function zah_add_rsvp_form_to_the_content( $content ) {
+function daddio_add_rsvp_form_to_the_content( $content ) {
 	if ( ! is_page( 'rsvp-zadies-second-birthday-party' ) ) {
 		return $content;
 	}
 
 	if ( isset( $_GET['attending'] ) && $_GET['attending'] == 'yes' ) {
-		return zah_show_rsvp_response_page( 'yes' );
+		return daddio_show_rsvp_response_page( 'yes' );
 	}
 
 	if ( isset( $_GET['attending'] ) && $_GET['attending'] == 'no' ) {
-		return zah_show_rsvp_response_page( 'no' );
+		return daddio_show_rsvp_response_page( 'no' );
 	}
 
 $the_form = <<<'EOD'
@@ -82,9 +82,9 @@ $the_form = <<<'EOD'
 EOD;
 	return $the_form . $content;
 }
-add_filter( 'the_content', 'zah_add_rsvp_form_to_the_content' );
+add_filter( 'the_content', 'daddio_add_rsvp_form_to_the_content' );
 
-function zah_rsvp_process_form() {
+function daddio_rsvp_process_form() {
 	global $wpdb;
 	if ( !isset( $_GET['submitted'] ) || empty( $_POST ) ) {
 		return;
@@ -176,9 +176,9 @@ function zah_rsvp_process_form() {
 	wp_safe_redirect( $url );
 	die();
 }
-add_action( 'init', 'zah_rsvp_process_form' );
+add_action( 'init', 'daddio_rsvp_process_form' );
 
-function zah_show_rsvp_response_page( $status = 'no' ) {
+function daddio_show_rsvp_response_page( $status = 'no' ) {
 	if ( $status == 'yes' ) {
 $content = <<<'EOD'
 	<h2 class="birthday-rsvp-title">Great! We'll see you there.</h2>

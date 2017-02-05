@@ -2,24 +2,36 @@
 
 use \ForceUTF8\Encoding;
 
-class ZAH_Instagram {
+class Daddio_Instagram {
 
 	var $whitelisted_usernames = array( 'naudebynature', 'kingkool68', 'lilzadiebug' );
 	var $subscription_errors = array();
 
-	public function __construct() {
+	/**
+	 * Get an instance of this class
+	 */
+	public static function get_instance() {
+		static $instance = null;
+		if ( null === $instance ) {
+			// Late static binding (PHP 5.3+)
+			$instance = new static();
+			$instance->setup_hooks();
+		}
+		return $instance;
+	}
+
+	public function setup_hooks() {
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
-		add_action( 'wp_ajax_zah_instagram_manual_sync', array( $this, 'manual_sync_ajax_callback' ) );
+		add_action( 'wp_ajax_daddio_instagram_manual_sync', array( $this, 'manual_sync_ajax_callback' ) );
 		add_action( 'pre_get_posts', array( $this, 'pre_get_posts' ) );
 		add_action( 'manage_posts_custom_column' , array( $this, 'manage_posts_custom_column' ) );
 		add_action( 'restrict_manage_posts', array( $this, 'add_no_tags_filter' ) );
 		add_action( 'pre_get_posts', array( $this, 'get_posts_with_no_tags' ) );
+		add_action( 'wp_dashboard_setup', array( $this, 'wp_dashboard_setup' ) );
 
 		add_filter( 'the_content', array( $this, 'the_content' ) );
 		add_filter( 'manage_instagram_posts_columns', array( $this, 'manage_instagram_posts_columns' ) );
-
-		add_action( 'wp_dashboard_setup', array( $this, 'wp_dashboard_setup' ) );
 	}
 
 	function init() {
@@ -117,7 +129,7 @@ class ZAH_Instagram {
 						update_the_page( resp.data );
 						if( next_max_id = resp.data.next_max_id ) {
 							send_the_ajax_request({
-								'action': 'zah_instagram_manual_sync',
+								'action': 'daddio_instagram_manual_sync',
 								'date-limit': dateLimit,
 								'next_max_id': next_max_id
 							});
@@ -131,7 +143,7 @@ class ZAH_Instagram {
 
 				//Kick things off...
 				send_the_ajax_request({
-					'action': 'zah_instagram_manual_sync',
+					'action': 'daddio_instagram_manual_sync',
 					'date-limit': dateLimit
 				});
 
@@ -600,12 +612,10 @@ class ZAH_Instagram {
 		remove_filter( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
 	}
 }
+Daddio_Instagram::get_instance();
 
 /* Global helper functions */
 function get_instagram_username( $post_id = false ) {
-	global $zah_instagram;
-	return $zah_instagram->get_instagram_username( $post_id );
+	$daddio_instagram = Daddio_Instagram::get_instance();
+	return $daddio_instagram->get_instagram_username( $post_id );
 }
-
-global $zah_instagram;
-$zah_instagram = new ZAH_Instagram();

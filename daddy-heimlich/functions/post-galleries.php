@@ -1,5 +1,5 @@
 <?php
-function zah_post_gallery_generate_rewrite_rules($wp_rewrite) {
+function daddio_post_gallery_generate_rewrite_rules($wp_rewrite) {
 	$new_rules = array(
 		'([^/]+)/gallery/([^/]+)?/size/([^/]+)/?' => 'index.php?name=$matches[1]&post_gallery=1&attachment=$matches[2]&size=$matches[3]',
 		'([^/]+)/gallery/([^/]+)?/?' => 'index.php?name=$matches[1]&post_gallery=1&attachment=$matches[2]',
@@ -8,17 +8,17 @@ function zah_post_gallery_generate_rewrite_rules($wp_rewrite) {
 
 	$wp_rewrite->rules = $new_rules + $wp_rewrite->rules;
 }
-add_filter( 'generate_rewrite_rules', 'zah_post_gallery_generate_rewrite_rules' );
+add_filter( 'generate_rewrite_rules', 'daddio_post_gallery_generate_rewrite_rules' );
 
-function zah_post_gallery_query_vars( $query_vars ) {
+function daddio_post_gallery_query_vars( $query_vars ) {
 	$query_vars[] = 'post_gallery';
 	$query_vars[] = 'size';
 	return $query_vars;
 }
-add_filter( 'query_vars', 'zah_post_gallery_query_vars' );
+add_filter( 'query_vars', 'daddio_post_gallery_query_vars' );
 
 // URLs like /category/gallery/ wouldn't work because our rewrite rules tell WordPress this is a post_gallery when it is really not intended that way. This function sets everything right. Sort of.
-function zah_post_gallery_parse_request( $query ) {
+function daddio_post_gallery_parse_request( $query ) {
 	if( !isset( $query->query_vars['name'] ) ) {
 		return;
 	}
@@ -29,26 +29,26 @@ function zah_post_gallery_parse_request( $query ) {
 		$query->query_vars['category_name'] = 'gallery';
 	}
 }
-add_action( 'parse_request', 'zah_post_gallery_parse_request' );
+add_action( 'parse_request', 'daddio_post_gallery_parse_request' );
 
-function zah_post_gallery_redirect_canonical($redirect_url, $requested_url) {
+function daddio_post_gallery_redirect_canonical($redirect_url, $requested_url) {
 	if( is_post_gallery() ) {
 		return false;
 	}
  return $redirect_url;
 }
-add_filter( 'redirect_canonical','zah_post_gallery_redirect_canonical', 10, 2 );
+add_filter( 'redirect_canonical','daddio_post_gallery_redirect_canonical', 10, 2 );
 
-function zah_post_gallery_template_redirect() {
+function daddio_post_gallery_template_redirect() {
 	if( is_post_gallery() && !get_query_var('attachment') ) {
 		$post = get_post();
 		wp_redirect( get_permalink( $post->ID ), 301 );
 		die();
 	}
 }
-add_action( 'template_redirect', 'zah_post_gallery_template_redirect' );
+add_action( 'template_redirect', 'daddio_post_gallery_template_redirect' );
 
-function zah_post_gallery_template_include( $orig_template ) {
+function daddio_post_gallery_template_include( $orig_template ) {
 	if( is_post_gallery() ) {
 		if( $new_template = get_attachment_template() ) {
 			return $new_template;
@@ -61,26 +61,26 @@ function zah_post_gallery_template_include( $orig_template ) {
 
 	return $orig_template;
 }
-add_filter( 'template_include', 'zah_post_gallery_template_include' );
+add_filter( 'template_include', 'daddio_post_gallery_template_include' );
 
-function zah_post_gallery_pre_get_posts( $query ) {
+function daddio_post_gallery_pre_get_posts( $query ) {
 	if( is_post_gallery() && get_query_var('attachment') && $query->is_main_query() ) {
 		$query->set('original_name', get_query_var('name') );
 		$query->set('name', get_query_var('attachment') );
 	}
 }
-add_action( 'pre_get_posts', 'zah_post_gallery_pre_get_posts' );
+add_action( 'pre_get_posts', 'daddio_post_gallery_pre_get_posts' );
 
 
 
 
 /* Hooks & Filters */
-function zah_gallery_before_template_part( $post ) {
+function daddio_gallery_before_template_part( $post ) {
 	if( !is_post_gallery() ) {
 		return;
 	}
 
-	$nav = zah_post_gallery_get_nav();
+	$nav = daddio_post_gallery_get_nav();
 	$parent_post = $nav->parent;
 ?>
 
@@ -88,14 +88,14 @@ function zah_gallery_before_template_part( $post ) {
 
 <?php
 }
-add_action( 'zah_attachment_before_template_part', 'zah_gallery_before_template_part' );
+add_action( 'daddio_attachment_before_template_part', 'daddio_gallery_before_template_part' );
 
-function zah_gallery_after_article( $post ) {
+function daddio_gallery_after_article( $post ) {
 	if( !is_post_gallery() ) {
 		return;
 	}
 
-	$nav = zah_post_gallery_get_nav();
+	$nav = daddio_post_gallery_get_nav();
 	$parent_post = $nav->parent;
 
 	wp_enqueue_script( 'post-gallery' );
@@ -110,25 +110,25 @@ function zah_gallery_after_article( $post ) {
 <input type="hidden" id="post-gallery-urls" value="<?php esc_attr_e( implode(' ', $nav->attachments ) ); ?>">
 <?php
 }
-//add_action( 'zah_attachment_before_article', 'zah_gallery_after_article' );
-add_action( 'zah_attachment_after_article', 'zah_gallery_after_article' );
+//add_action( 'daddio_attachment_before_article', 'daddio_gallery_after_article' );
+add_action( 'daddio_attachment_after_article', 'daddio_gallery_after_article' );
 
 // Add noindex to pages that have the size query var added
-function zah_post_gallery_wpseo_head($thing1) {
+function daddio_post_gallery_wpseo_head($thing1) {
 	if( is_post_gallery() && get_query_var('size') )
 	echo '<meta name="robots" content="noindex">' . "\n";
 }
-add_action( 'wpseo_head', 'zah_post_gallery_wpseo_head' );
+add_action( 'wpseo_head', 'daddio_post_gallery_wpseo_head' );
 
-function zah_post_gallery_opengraph_type( $type ) {
+function daddio_post_gallery_opengraph_type( $type ) {
 	if( wp_attachment_is_image() ) {
 		return 'image';
 	}
 	return $type;
 }
-// add_filter( 'wpseo_opengraph_type', 'zah_post_gallery_opengraph_type' );
+// add_filter( 'wpseo_opengraph_type', 'daddio_post_gallery_opengraph_type' );
 
-function zah_post_gallery_opengraph_image( $src ) {
+function daddio_post_gallery_opengraph_image( $src ) {
 	if( wp_attachment_is_image() ) {
 		$img = wp_get_attachment_image_src( get_the_ID(), 'large' );
 		$src = $img[0];
@@ -136,18 +136,18 @@ function zah_post_gallery_opengraph_image( $src ) {
 
 	return $src;
 }
-// add_filter( 'wpseo_opengraph_image', 'zah_post_gallery_opengraph_image' );
+// add_filter( 'wpseo_opengraph_image', 'daddio_post_gallery_opengraph_image' );
 
-function zah_post_gallery_canonical( $canonical ) {
+function daddio_post_gallery_canonical( $canonical ) {
 	global $post;
 	if( is_post_gallery() ) {
-		$nav = zah_post_gallery_get_nav();
+		$nav = daddio_post_gallery_get_nav();
 		//pre_dump( $nav );
-		return zah_post_gallery_link( $nav->parent->ID, $post->post_name );
+		return daddio_post_gallery_link( $nav->parent->ID, $post->post_name );
 	}
 	return $canonical;
 }
-add_filter( 'wpseo_canonical', 'zah_post_gallery_canonical' );
+add_filter( 'wpseo_canonical', 'daddio_post_gallery_canonical' );
 
 
 /* Helper Functions */
@@ -159,7 +159,7 @@ function is_post_gallery() {
 	return false;
 }
 
-function zah_get_post_by_slug( $the_slug ) {
+function daddio_get_post_by_slug( $the_slug ) {
 	global $wpdb;
 	if( !$the_slug ) {
 		return array();
@@ -183,7 +183,7 @@ function zah_get_post_by_slug( $the_slug ) {
 	return $posts[0];
 }
 
-function zah_post_gallery_get_gallery_posts( $post_id = 0 ) {
+function daddio_post_gallery_get_gallery_posts( $post_id = 0 ) {
 	if( !is_post_gallery() || !get_query_var('attachment') ) {
 		return array();
 	}
@@ -247,20 +247,20 @@ function zah_post_gallery_get_gallery_posts( $post_id = 0 ) {
 			'post_name' => $post->post_name,
 			'post_title' => $post->post_title,
 			'post_url' => get_permalink( $post->ID ),
-			'post_gallery_url' => zah_post_gallery_link( $parent_post->ID, $post->post_name )
+			'post_gallery_url' => daddio_post_gallery_link( $parent_post->ID, $post->post_name )
 		);
 	endforeach;
 
 	return $output;
 }
 
-function zah_post_gallery_get_nav() {
+function daddio_post_gallery_get_nav() {
 	global $wp;
-	if( isset( $wp->zah_post_gallery_get_nav ) ) {
-		return $wp->zah_post_gallery_get_nav;
+	if( isset( $wp->daddio_post_gallery_get_nav ) ) {
+		return $wp->daddio_post_gallery_get_nav;
 	}
 
-	$posts = zah_post_gallery_get_gallery_posts();
+	$posts = daddio_post_gallery_get_gallery_posts();
 	if( !$posts ) {
 		return array();
 	}
@@ -297,17 +297,17 @@ function zah_post_gallery_get_nav() {
 	$output = (object) array(
 		'attachments' => $attachments,
 		'parent' => get_post( $posts->parent_id ),
-		'next_permalink' => zah_post_gallery_link( $posts->parent_id, $next_slug ),
-		'prev_permalink' => zah_post_gallery_link( $posts->parent_id, $prev_slug ),
+		'next_permalink' => daddio_post_gallery_link( $posts->parent_id, $next_slug ),
+		'prev_permalink' => daddio_post_gallery_link( $posts->parent_id, $prev_slug ),
 		'total' => $total_attachments,
 		'current' => $current + 1
 	);
-	$wp->zah_post_gallery_get_nav = $output;
+	$wp->daddio_post_gallery_get_nav = $output;
 
 	return $output;
 }
 
-function zah_post_gallery_link( $parent_id = FALSE, $attachment_slug = FALSE ) {
+function daddio_post_gallery_link( $parent_id = FALSE, $attachment_slug = FALSE ) {
 	if( !$parent_id || !$attachment_slug ) {
 		return '';
 	}

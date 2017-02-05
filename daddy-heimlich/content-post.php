@@ -1,6 +1,6 @@
 <article class="article post">
 
-	<?php do_action( 'zah_content_header', $post ); ?>
+	<?php do_action( 'daddio_content_header', $post ); ?>
 
 	<h1 class="title">
 		<?php if( !is_singular() ) { ?>
@@ -15,6 +15,6 @@
 		<?php the_content(); ?>
 	</div>
 
-	<?php do_action( 'zah_content_footer', $post ); ?>
+	<?php do_action( 'daddio_content_footer', $post ); ?>
 
 </article>
