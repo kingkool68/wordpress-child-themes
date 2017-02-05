@@ -31,7 +31,7 @@ header .site-title a:focus {
 	background-color: $site-title-bg-color;
 	color: $site-title-color;
 }
-header .zadies-current-age {
+header .childs-current-age {
 	color: $childs-current-age-color;
 	float: right;
 	font-size: em(25px);
@@ -58,22 +58,20 @@ header .zadies-current-age {
 		font-size: 100%;
 	}
 	header .site-title,
-	header .zadies-current-age {
+	header .childs-current-age {
 		float: none;
 		text-align: left;
 	}
-	header .zadies-current-age {
+	header .childs-current-age {
 		padding-left: em(10px);
+		margin-top: 0;
+		text-align: left;
+		font-size: em(15px);
 	}
 	header .site-title {
 		font-size: em(30px);
 	}
 	header .site-title a {
 		display: inline-block;
-	}
-	header .zadies-current-age {
-		margin-top: 0;
-		text-align: left;
-		font-size: em(15px);
 	}
 }

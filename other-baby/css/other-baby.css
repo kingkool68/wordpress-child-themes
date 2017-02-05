@@ -658,7 +658,7 @@ header .site-title a:focus {
   background-color: rgba(180, 127, 182, 0.5);
   color: #409d3f; }
 
-header .zadies-current-age {
+header .childs-current-age {
   color: #85bd84;
   float: right;
   font-size: 1.5625em;
@@ -681,19 +681,18 @@ header .zadies-current-age {
   header {
     font-size: 100%; }
   header .site-title,
-  header .zadies-current-age {
+  header .childs-current-age {
     float: none;
     text-align: left; }
-  header .zadies-current-age {
-    padding-left: 0.625em; }
+  header .childs-current-age {
+    padding-left: 0.625em;
+    margin-top: 0;
+    text-align: left;
+    font-size: 0.9375em; }
   header .site-title {
     font-size: 1.875em; }
   header .site-title a {
-    display: inline-block; }
-  header .zadies-current-age {
-    margin-top: 0;
-    text-align: left;
-    font-size: 0.9375em; } }
+    display: inline-block; } }
 
 .has-js .holder,
 .has-js #magic-shield,

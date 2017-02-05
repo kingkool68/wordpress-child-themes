@@ -43,7 +43,7 @@
 	<header class="clearfix">
 		<div class="holder">
 			<h1 class="site-title"><a href="<?php echo get_site_url(); ?>" data-ga-category="nav" data-ga-label="Site Title: <?php echo esc_attr( get_bloginfo('name') );?>"><?php bloginfo('name') ?></a></h1>
-			<p class="zadies-current-age"><?php echo get_childs_current_age(); ?> old.</p>
+			<p class="childs-current-age"><?php echo get_childs_current_age(); ?> old.</p>
 		</div>
 	</header>
 
