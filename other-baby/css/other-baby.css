@@ -475,8 +475,8 @@ html {
           box-sizing: border-box;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   font-weight: 300;
-  background-color: red;
-  background-image: url("");
+  background-color: #0BDA51;
+  background-image: url("../img/symphony-purple.png");
   background-repeat: repeat;
   background-attachment: fixed; }
 
@@ -488,18 +488,18 @@ html {
 
 a {
   text-decoration: none;
-  color: red;
-  border-bottom: 0.15em dotted red;
+  color: #10810e;
+  border-bottom: 0.15em dotted #10810e;
   -webkit-transition: all 0.35s ease;
   transition: all 0.35s ease; }
 
 a:hover,
 a:focus {
-  color: red;
-  border-bottom-color: red; }
+  color: #b3fab2;
+  border-bottom-color: #b3fab2; }
 
 a:focus {
-  outline-color: red; }
+  outline-color: #b3fab2; }
 
 p {
   font-size: 1.125em;
@@ -588,7 +588,7 @@ article.instagram .wp-video {
 
 .gallery a:hover img,
 .gallery a:focus img {
-  border-color: red; }
+  border-color: #b3fab2; }
 
 @media (max-width: 47.5em) {
   .gallery {
@@ -607,7 +607,7 @@ article.instagram .wp-video {
 
 /* Override the video player color defaults */
 article.instagram .mejs-controls .mejs-time-rail .mejs-time-current {
-  background-color: red; }
+  background-color: #0BDA51; }
 
 /* SVG Icons */
 .icon {
@@ -627,7 +627,7 @@ article.instagram .mejs-controls .mejs-time-rail .mejs-time-current {
 
 header {
   background-color: #fff;
-  background-image: url("");
+  background-image: url("../img/symphony-light-purple.png");
   background-repeat: repeat;
   background-attachment: fixed;
   padding: 0.3125em 0;
@@ -645,7 +645,7 @@ header .site-title {
 header .site-title,
 header .site-title a {
   border-bottom-width: 0;
-  color: red;
+  color: #0BDA51;
   display: block; }
 
 header .site-title a {
@@ -654,12 +654,12 @@ header .site-title a {
 
 header .site-title a:hover,
 header .site-title a:focus {
-  background-color: red;
-  background-color: red;
-  color: red; }
+  background-color: #82b681;
+  background-color: rgba(180, 127, 182, 0.5);
+  color: #409d3f; }
 
 header .zadies-current-age {
-  color: red;
+  color: #85bd84;
   float: right;
   font-size: 1.5625em;
   margin-top: 1.6em;
@@ -718,8 +718,8 @@ header .zadies-current-age {
   bottom: 0;
   right: -25em;
   padding: 2em 1.25em 0;
-  background-color: red;
-  background-image: url("");
+  background-color: #0BDA51;
+  background-image: url("../img/symphony-purple.png");
   background-repeat: repeat;
   -webkit-box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5);
           box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5); }
@@ -765,7 +765,7 @@ header .zadies-current-age {
 
 .more-menu li a {
   border: 0 none;
-  border-top: 0.25em solid red;
+  border-top: 0.25em solid #76c681;
   border-top-color: rgba(255, 255, 255, 0.5);
   color: #fff;
   font-size: 1.6em;
@@ -776,7 +776,7 @@ header .zadies-current-age {
 
 .more-menu li a:hover,
 .more-menu li a:focus {
-  background-color: red;
+  background-color: #82b681;
   background-color: rgba(180, 127, 182, 0.5); }
 
 .more-menu .social-links {
@@ -794,7 +794,7 @@ header .zadies-current-age {
 
 .more-menu .social-links a:hover,
 .more-menu .social-links a:focus {
-  color: red;
+  color: #82b681;
   color: rgba(180, 127, 182, 0.5); }
 
 #magic-shield {
@@ -814,7 +814,7 @@ header .zadies-current-age {
   clear: both;
   padding-bottom: 0;
   padding: 0;
-  background-color: red;
+  background-color: #82b681;
   background-color: rgba(180, 127, 182, 0.5); }
 
 .new-menu .holder {
@@ -839,7 +839,7 @@ header .zadies-current-age {
 
 .new-menu a:hover,
 .new-menu a:focus {
-  background-color: red; }
+  background-color: #0BDA51; }
 
 @media (max-width: 48.75em) {
   .new-menu li {
@@ -870,9 +870,9 @@ nav {
 .rounded-button,
 .addtocalendar .atcb-link {
   display: block;
-  border: 0.08333em solid red;
+  border: 0.08333em solid #82b681;
   border-radius: 0.625em;
-  background-color: red;
+  background-color: #027000;
   color: #fff;
   font-size: 1.125em;
   text-align: center;
@@ -883,7 +883,7 @@ nav {
 .rounded-button:focus,
 .addtocalendar .atcb-link:hover,
 .addtocalendar .atcb-link:focus {
-  background-color: red;
+  background-color: #82b681;
   color: #fff; }
 
 h1,
@@ -904,7 +904,7 @@ h2 {
   margin-bottom: 0.2em; }
 
 article {
-  border-top: 0.3125em solid red;
+  border-top: 0.3125em solid #76c681;
   border-top-color: rgba(255, 255, 255, 0.5);
   padding: 1.875em 0 3.125em; }
 
@@ -928,9 +928,9 @@ article .title a {
 
 article .title a:hover,
 article .title a:focus {
-  background-color: red;
+  background-color: #82b681;
   background-color: rgba(180, 127, 182, 0.5);
-  color: red; }
+  color: #b3fab2; }
 
 article .time-stamp {
   font-size: 1.25em;
@@ -1003,7 +1003,7 @@ article.post .title a {
     padding-bottom: 0.3125em; } }
 
 section.archive {
-  border-bottom: 0.3125em solid red;
+  border-bottom: 0.3125em solid #76c681;
   border-bottom-color: rgba(255, 255, 255, 0.5);
   font-family: 'Crete Round', Arial, Helvetica, sans-serif;
   padding: 1.125em 2.375em; }
