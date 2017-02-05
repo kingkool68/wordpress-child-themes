@@ -906,7 +906,7 @@ h2 {
   border-top: 0.3125em solid #76c681;
   border-top-color: rgba(255, 255, 255, 0.5);
   padding: 1.875em 0 3.125em; }
-  .article :first-of-type {
+  .article:first-of-type {
     border-top: 0 none; }
   .article .inner {
     max-width: 40.625em;

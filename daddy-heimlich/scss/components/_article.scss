@@ -3,7 +3,7 @@
 	border-top-color: $divider-color-rgba;
 	padding: em(30px) 0 em(50px);
 
-	:first-of-type {
+	&:first-of-type {
 		border-top: 0 none;
 	}
 
