@@ -187,7 +187,7 @@ gulp.task('clean', function(done) {
 
 gulp.task('clean:javascript', function() {
   return del([
-      'js/*.min.js'
+      // 'js/*.min.js'
     ]);
 });
 
