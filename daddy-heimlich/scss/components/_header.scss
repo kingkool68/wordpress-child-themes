@@ -1,6 +1,6 @@
 header {
 	background-color: #fff;
-	background-image: url(../../img/symphony-light-purple.png);
+	background-image: url($white-bg-image);
 	background-repeat: repeat;
 	background-attachment: fixed;
 	padding: em(5px) 0;
@@ -18,7 +18,7 @@ header .site-title {
 header .site-title,
 header .site-title a {
 	border-bottom-width: 0;
-	color: #7b0e7f;
+	color: $primary-color;
 	display: block;
 }
 header .site-title a {
@@ -27,12 +27,12 @@ header .site-title a {
 }
 header .site-title a:hover,
 header .site-title a:focus {
-	background-color: #B47FB6;
-	background-color: rgba(180, 127, 182, 0.5);
-	color: #9B3F9E;
+	background-color: $light-accent-color;
+	background-color: $site-title-bg-color;
+	color: $site-title-color;
 }
 header .zadies-current-age {
-	color: #BB85BD;
+	color: $childs-current-age-color;
 	float: right;
 	font-size: em(25px);
 	margin-top: em(40px, 25px);

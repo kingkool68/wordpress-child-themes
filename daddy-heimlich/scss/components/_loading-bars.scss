@@ -11,8 +11,8 @@
 	display: inline-block;
 	margin: 0 em(4px);
 	height: 100%;
-	width: em(120px);
-	border-radius: em(100);
+	width: em(12px);
+	border-radius: em(100px, 10px);
 	animation: stretchdelay 1.2s infinite ease-in-out;
 }
 .loading-bars .rect2 {

@@ -43,7 +43,8 @@ var PATHS = {
 	  'js/analytics.js'
   ],
   scss: [
-      '../other-baby/scss/*.scss'
+      '../other-baby/scss/*.scss',
+      '../zadie-heimlich/scss/*.scss'
   ],
   phpcs: [
     '**/*.php',
@@ -193,7 +194,8 @@ gulp.task('clean:javascript', function() {
 
 gulp.task('clean:css', function() {
   return del([
-      '../other-baby/css/*'
+      '../other-baby/css/*',
+      '../zadie-heimlich/css/*'
   ], {force: true});
 });
 
@@ -209,7 +211,7 @@ gulp.task('default', ['build'], function() {
   }
 
   // Sass Watch
-  gulp.watch(['scss/**/*.scss'], ['clean:css', 'sass'])
+  gulp.watch(['../**/scss/**/*.scss'], ['clean:css', 'sass'])
     .on('change', function(event) {
       logFileChange(event);
     });

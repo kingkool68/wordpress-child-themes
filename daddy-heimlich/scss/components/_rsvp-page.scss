@@ -1,16 +1,16 @@
 form {
 	font-family: 'Crete Round', Arial, Helvetica, sans-serif;
-	max-width: 35em;
-	margin: 0 auto 5.5em;
+	max-width: em(350px);
+	margin: 0 auto em(55px);
 }
 fieldset {
-	padding: 1em 0 3.5em;
+	padding: em(10px) 0 em(35px);
 }
 label,
 legend {
 	display: block;
-	font-size: 1.8em;
-	padding-bottom: 0.55em;
+	font-size: em(18px);
+	padding-bottom: em(5.5px, 18px);
 }
 form .full {
 	width: 100%;
@@ -21,50 +21,46 @@ form .rounded-button {
 }
 form.rsvp input,
 form.rsvp textarea {
-	-webkit-border-radius: 0.3em;
-	-moz-border-radius: 0.3em;
-	-ms-border-radius: 0.3em;
-	-o-border-radius: 0.3em;
 	border-radius: 0.3em;
 }
 form.rsvp legend {
-	padding-bottom: 0.222em;
+	padding-bottom: em(2.22px, 18px);
 }
 form.rsvp .name input,
 form.rsvp textarea {
-	font-size: 1.8em;
-	padding: 0.2em 0.4em;
+	font-size: em(18px);
+	padding: em(2px, 18px) em(4px, 18px);
 }
 form.rsvp .attendance label,
 form.rsvp .how-many label {
 	float: left;
-	padding: 0 1em;
+	padding: 0 em(10px, 18px);
 }
 form.rsvp .attendance input {
-	margin-right: 0.75em;
+	margin-right: em(7.5px, 18px);
 }
 form.rsvp .how-many input {
-	margin-right: 0.25em;
+	margin-right: em(2.5px, 18px);
 }
 article .birthday-rsvp-title {
-	font-size: 3em;
+	font-size: em(30px);
 }
 
 /* Add to Calendar Overrides */
 article .addtocalendar {
-	font-size: 1.2em;
-	margin: 0.5em 0 2.5em;
+	font-size: em(12px);
+	margin: em(5px, 12px) 0 em(25px, 12px);
 }
 .addtocalendar .atcb-list,
 .addtocalendar .atcb-item {
 	background-color: #fff;
 }
 .addtocalendar .atcb-item-link {
-	padding: 0.2em 0.5em;
+	padding: em(2px, 12px) em(5px, 12px);
 	border-style: solid;
 }
-@media (max-width:35em) { /* 560px / 16 */
+@media ( max-width: em(560px) ) {
 	article .birthday-rsvp-title {
-		padding-top: 1em;
+		padding-top: em(10px, 30px);
 	}
 }

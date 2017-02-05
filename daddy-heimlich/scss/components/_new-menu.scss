@@ -2,7 +2,7 @@
 	clear: both;
 	padding-bottom: 0;
 	padding: 0;
-	background-color: #B47FB6;
+	background-color: $light-accent-color;
 	background-color: rgba(180, 127, 182, 0.5);
 }
 .new-menu .holder {
@@ -27,7 +27,7 @@
 }
 .new-menu a:hover,
 .new-menu a:focus {
-	background-color: #7b0e7f;
+	background-color: $primary-color;
 }
 @media( max-width: em(780px) ) {
 	.new-menu li {

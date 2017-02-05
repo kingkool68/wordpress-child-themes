@@ -1,6 +1,6 @@
 section.archive {
-	border-bottom: em(5px) solid #C678BD;
-	border-bottom-color: rgba(255, 255, 255, 0.5);
+	border-bottom: em(5px) solid $divider-color;
+	border-bottom-color: $divider-color-rgba;
 	font-family: 'Crete Round', Arial, Helvetica, sans-serif;
 	padding: em(18px) em(38px);
 }
@@ -11,7 +11,7 @@ section.archive {
 .archive .subheading {
 	font-size: em(20px);
     position: relative;
-    top: em(9px, 20px);
+    top: em(18px, 20px);
     float: right;
 }
 

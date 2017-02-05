@@ -1,6 +1,6 @@
 article {
-	border-top: em(5px) solid #C678BD;
-	border-top-color: rgba(255, 255, 255, 0.5);
+	border-top: em(5px) solid $divider-color;
+	border-top-color: $divider-color-rgba;
 	padding: em(30px) 0 em(50px);
 }
 article .inner {
@@ -23,9 +23,9 @@ article .title a {
 }
 article .title a:hover,
 article .title a:focus {
-	background-color: #B47FB6;
+	background-color: $light-accent-color;
 	background-color: rgba(180, 127, 182, 0.5);
-	color: #F8B1FA;
+	color: $link-hover-color;
 }
 article .time-stamp {
 	font-size: em(20px);
@@ -65,22 +65,23 @@ article.post .title a {
 		font-size: em(35px);
 	}
 	article .birthday-rsvp-title {
-		font-size: 2.2em;
+		font-size: em(22px);
 	}
 	article .addtocalendar {
-		font-size: 1em;
+		font-size: em(10px);
 	}
 }
 @media (max-width: em(820px) ) {
 	article .title {
-		font-size: 3.2em;
+		font-size: em(32px);
 	}
 	article .birthday-rsvp-title {
-		font-size: 2em;
+		font-size: em(20px);
 	}
 }
 @media (max-width: em(760px) ) {
-	article.post .inner p, article.page .inner p {
+	article.post .inner p,
+	article.page .inner p {
 		padding-left: 0;
 	}
 }

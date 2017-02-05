@@ -4,18 +4,19 @@ nav {
 .rounded-button,
 .addtocalendar .atcb-link {
 	display: block;
-	border: em(1.5px, 18px) solid #B47FB6;
+	border: em(1.5px, 18px) solid $light-accent-color;
 	border-radius: em(10px);
-	background-color: #6B006F;
+	background-color: $button-bg-color;
 	color: #fff;
 	font-size: em(18px);
 	text-align: center;
+	text-shadow: none;
 	padding: em(8px, 18px);
 }
 .rounded-button:hover,
 .rounded-button:focus,
 .addtocalendar .atcb-link:hover,
 .addtocalendar .atcb-link:focus {
-	background-color: #B47FB6;
+	background-color: $light-accent-color;
 	color: #fff;
 }

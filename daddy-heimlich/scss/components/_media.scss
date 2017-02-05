@@ -66,7 +66,7 @@ article.instagram .wp-video {
 }
 .gallery a:hover img,
 .gallery a:focus img {
-	border-color: #F8B1FA
+	border-color: $link-hover-color;
 }
 @media( max-width: em(760px) ) {
 	.gallery {

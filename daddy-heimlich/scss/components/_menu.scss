@@ -18,8 +18,9 @@
 	bottom: 0;
 	right: em(400px) * -1;
 	padding: em(32px) em(20px) 0;
-	background-color: #7b0e7f;
-	background-image: url(../../img/symphony-purple.png);
+	background-color: $primary-color;
+	background-image: url($main-bg-image);
+	background-repeat: repeat;
 	box-shadow: em(10px) 0 em(25px) em(13px) rgba(0, 0, 0, 0.5);
 }
 .admin-bar.has-js .more-menu {
@@ -63,8 +64,8 @@
 }
 .more-menu li a {
 	border: 0 none;
-	border-top: 0.25em solid #C678BD;
-	border-top-color: rgba(255, 255, 255, 0.5);
+	border-top: 0.25em solid $divider-color;
+	border-top-color: $divider-color-rgba;
 	color: #fff;
 	font-size: em(19.2px, 12px);
 	padding: em(9.6px, 19.2px) 0 em(9.6px, 19.2px) em(28.8px, 19.2px);
@@ -74,7 +75,7 @@
 }
 .more-menu li a:hover,
 .more-menu li a:focus {
-	background-color: #B47FB6;
+	background-color: $light-accent-color;
 	background-color: rgba(180, 127, 182, 0.5);
 }
 .more-menu .social-links {
@@ -92,7 +93,7 @@
 }
 .more-menu .social-links a:hover,
 .more-menu .social-links a:focus {
-	color: #B47FB6;
+	color: $light-accent-color;
 	color: rgba(180, 127, 182, 0.5);
 }
 #magic-shield {

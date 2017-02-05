@@ -419,7 +419,7 @@ Use .hidden to visual hide an element but still making it accessible to screen r
 /* Constrains content */
 .holder {
   margin: 0 auto;
-  max-width: 65.625em;
+  max-width: 68.125em;
   padding: 0 1.25em 3.125em;
   color: #fff;
   z-index: 1; }
@@ -475,8 +475,8 @@ html {
           box-sizing: border-box;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   font-weight: 300;
-  background-color: #7b0e7f;
-  background-image: url(../../img/symphony-purple.png);
+  background-color: red;
+  background-image: url("");
   background-repeat: repeat;
   background-attachment: fixed; }
 
@@ -488,18 +488,18 @@ html {
 
 a {
   text-decoration: none;
-  color: #C568C8;
-  border-bottom: 0.15em dotted #C568C8;
+  color: red;
+  border-bottom: 0.15em dotted red;
   -webkit-transition: all 0.35s ease;
   transition: all 0.35s ease; }
 
 a:hover,
 a:focus {
-  color: #F8B1FA;
-  border-bottom-color: #F8B1FA; }
+  color: red;
+  border-bottom-color: red; }
 
 a:focus {
-  outline-color: #F8B1FA; }
+  outline-color: red; }
 
 p {
   font-size: 1.125em;
@@ -588,7 +588,7 @@ article.instagram .wp-video {
 
 .gallery a:hover img,
 .gallery a:focus img {
-  border-color: #F8B1FA; }
+  border-color: red; }
 
 @media (max-width: 47.5em) {
   .gallery {
@@ -607,7 +607,7 @@ article.instagram .wp-video {
 
 /* Override the video player color defaults */
 article.instagram .mejs-controls .mejs-time-rail .mejs-time-current {
-  background-color: #7b0e7f; }
+  background-color: red; }
 
 /* SVG Icons */
 .icon {
@@ -627,7 +627,7 @@ article.instagram .mejs-controls .mejs-time-rail .mejs-time-current {
 
 header {
   background-color: #fff;
-  background-image: url(../../img/symphony-light-purple.png);
+  background-image: url("");
   background-repeat: repeat;
   background-attachment: fixed;
   padding: 0.3125em 0;
@@ -645,7 +645,7 @@ header .site-title {
 header .site-title,
 header .site-title a {
   border-bottom-width: 0;
-  color: #7b0e7f;
+  color: red;
   display: block; }
 
 header .site-title a {
@@ -654,12 +654,12 @@ header .site-title a {
 
 header .site-title a:hover,
 header .site-title a:focus {
-  background-color: #B47FB6;
-  background-color: rgba(180, 127, 182, 0.5);
-  color: #9B3F9E; }
+  background-color: red;
+  background-color: red;
+  color: red; }
 
 header .zadies-current-age {
-  color: #BB85BD;
+  color: red;
   float: right;
   font-size: 1.5625em;
   margin-top: 1.6em;
@@ -718,8 +718,9 @@ header .zadies-current-age {
   bottom: 0;
   right: -25em;
   padding: 2em 1.25em 0;
-  background-color: #7b0e7f;
-  background-image: url(../../img/symphony-purple.png);
+  background-color: red;
+  background-image: url("");
+  background-repeat: repeat;
   -webkit-box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5);
           box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5); }
 
@@ -764,7 +765,7 @@ header .zadies-current-age {
 
 .more-menu li a {
   border: 0 none;
-  border-top: 0.25em solid #C678BD;
+  border-top: 0.25em solid red;
   border-top-color: rgba(255, 255, 255, 0.5);
   color: #fff;
   font-size: 1.6em;
@@ -775,7 +776,7 @@ header .zadies-current-age {
 
 .more-menu li a:hover,
 .more-menu li a:focus {
-  background-color: #B47FB6;
+  background-color: red;
   background-color: rgba(180, 127, 182, 0.5); }
 
 .more-menu .social-links {
@@ -793,7 +794,7 @@ header .zadies-current-age {
 
 .more-menu .social-links a:hover,
 .more-menu .social-links a:focus {
-  color: #B47FB6;
+  color: red;
   color: rgba(180, 127, 182, 0.5); }
 
 #magic-shield {
@@ -813,7 +814,7 @@ header .zadies-current-age {
   clear: both;
   padding-bottom: 0;
   padding: 0;
-  background-color: #B47FB6;
+  background-color: red;
   background-color: rgba(180, 127, 182, 0.5); }
 
 .new-menu .holder {
@@ -838,7 +839,7 @@ header .zadies-current-age {
 
 .new-menu a:hover,
 .new-menu a:focus {
-  background-color: #7b0e7f; }
+  background-color: red; }
 
 @media (max-width: 48.75em) {
   .new-menu li {
@@ -869,19 +870,20 @@ nav {
 .rounded-button,
 .addtocalendar .atcb-link {
   display: block;
-  border: 0.08333em solid #B47FB6;
+  border: 0.08333em solid red;
   border-radius: 0.625em;
-  background-color: #6B006F;
+  background-color: red;
   color: #fff;
   font-size: 1.125em;
   text-align: center;
+  text-shadow: none;
   padding: 0.44444em; }
 
 .rounded-button:hover,
 .rounded-button:focus,
 .addtocalendar .atcb-link:hover,
 .addtocalendar .atcb-link:focus {
-  background-color: #B47FB6;
+  background-color: red;
   color: #fff; }
 
 h1,
@@ -902,7 +904,7 @@ h2 {
   margin-bottom: 0.2em; }
 
 article {
-  border-top: 0.3125em solid #C678BD;
+  border-top: 0.3125em solid red;
   border-top-color: rgba(255, 255, 255, 0.5);
   padding: 1.875em 0 3.125em; }
 
@@ -926,9 +928,9 @@ article .title a {
 
 article .title a:hover,
 article .title a:focus {
-  background-color: #B47FB6;
+  background-color: red;
   background-color: rgba(180, 127, 182, 0.5);
-  color: #F8B1FA; }
+  color: red; }
 
 article .time-stamp {
   font-size: 1.25em;
@@ -967,18 +969,19 @@ article.post .title a {
   article .title {
     font-size: 2.1875em; }
   article .birthday-rsvp-title {
-    font-size: 2.2em; }
+    font-size: 1.375em; }
   article .addtocalendar {
-    font-size: 1em; } }
+    font-size: 0.625em; } }
 
 @media (max-width: 51.25em) {
   article .title {
-    font-size: 3.2em; }
+    font-size: 2em; }
   article .birthday-rsvp-title {
-    font-size: 2em; } }
+    font-size: 1.25em; } }
 
 @media (max-width: 47.5em) {
-  article.post .inner p, article.page .inner p {
+  article.post .inner p,
+  article.page .inner p {
     padding-left: 0; } }
 
 @media (max-width: 35em) {
@@ -1000,7 +1003,7 @@ article.post .title a {
     padding-bottom: 0.3125em; } }
 
 section.archive {
-  border-bottom: 0.3125em solid #C678BD;
+  border-bottom: 0.3125em solid red;
   border-bottom-color: rgba(255, 255, 255, 0.5);
   font-family: 'Crete Round', Arial, Helvetica, sans-serif;
   padding: 1.125em 2.375em; }
@@ -1012,7 +1015,7 @@ section.archive {
 .archive .subheading {
   font-size: 1.25em;
   position: relative;
-  top: 0.45em;
+  top: 0.9em;
   float: right; }
 
 @media (max-width: 42.5em) {
@@ -1052,17 +1055,17 @@ section.archive {
 
 form {
   font-family: 'Crete Round', Arial, Helvetica, sans-serif;
-  max-width: 35em;
-  margin: 0 auto 5.5em; }
+  max-width: 21.875em;
+  margin: 0 auto 3.4375em; }
 
 fieldset {
-  padding: 1em 0 3.5em; }
+  padding: 0.625em 0 2.1875em; }
 
 label,
 legend {
   display: block;
-  font-size: 1.8em;
-  padding-bottom: 0.55em; }
+  font-size: 1.125em;
+  padding-bottom: 0.30556em; }
 
 form .full {
   width: 100%; }
@@ -1076,44 +1079,43 @@ form.rsvp textarea {
   border-radius: 0.3em; }
 
 form.rsvp legend {
-  padding-bottom: 0.222em; }
+  padding-bottom: 0.12333em; }
 
 form.rsvp .name input,
 form.rsvp textarea {
-  font-size: 1.8em;
-  padding: 0.2em 0.4em; }
+  font-size: 1.125em;
+  padding: 0.11111em 0.22222em; }
 
 form.rsvp .attendance label,
 form.rsvp .how-many label {
   float: left;
-  padding: 0 1em; }
+  padding: 0 0.55556em; }
 
 form.rsvp .attendance input {
-  margin-right: 0.75em; }
+  margin-right: 0.41667em; }
 
 form.rsvp .how-many input {
-  margin-right: 0.25em; }
+  margin-right: 0.13889em; }
 
 article .birthday-rsvp-title {
-  font-size: 3em; }
+  font-size: 1.875em; }
 
 /* Add to Calendar Overrides */
 article .addtocalendar {
-  font-size: 1.2em;
-  margin: 0.5em 0 2.5em; }
+  font-size: 0.75em;
+  margin: 0.41667em 0 2.08333em; }
 
 .addtocalendar .atcb-list,
 .addtocalendar .atcb-item {
   background-color: #fff; }
 
 .addtocalendar .atcb-item-link {
-  padding: 0.2em 0.5em;
+  padding: 0.16667em 0.41667em;
   border-style: solid; }
 
 @media (max-width: 35em) {
-  /* 560px / 16 */
   article .birthday-rsvp-title {
-    padding-top: 1em; } }
+    padding-top: 0.33333em; } }
 
 .attachment article {
   padding-bottom: 0.625em; }
@@ -1157,8 +1159,8 @@ article.attachment-image img {
   display: inline-block;
   margin: 0 0.25em;
   height: 100%;
-  width: 7.5em;
-  border-radius: 6.25em;
+  width: 0.75em;
+  border-radius: 10em;
   -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
           animation: stretchdelay 1.2s infinite ease-in-out; }
 

@@ -2,8 +2,8 @@ html {
   box-sizing: border-box;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   font-weight: 300;
-  background-color: #7b0e7f;
-  background-image: url(../../img/symphony-purple.png);
+  background-color: $primary-color;
+  background-image: url($main-bg-image);
   background-repeat: repeat;
   background-attachment: fixed;
 }
@@ -16,18 +16,18 @@ html {
 
 a {
     text-decoration: none;
-    color: #C568C8;
-    border-bottom: 0.15em dotted #C568C8;
+    color: $link-color;
+    border-bottom: 0.15em dotted $link-color;
     transition: all 0.35s ease;
 }
 
 a:hover,
 a:focus {
-	color:#F8B1FA;
-	border-bottom-color:#F8B1FA;
+	color: $link-hover-color;
+	border-bottom-color: $link-hover-color;
 }
 a:focus {
-	outline-color:#F8B1FA;
+	outline-color: $link-hover-color;
 }
 p {
 	font-size: em(18px);
