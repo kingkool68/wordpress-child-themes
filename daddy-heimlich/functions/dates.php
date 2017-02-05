@@ -1,63 +1,119 @@
 <?php
-// My own human time diff function from http://www.php.net/manual/en/ref.datetime.php#90989
-function rh_human_time_diff( $levels = 2, $from, $to = false ) {
-	if( !$to ) {
-		$to = current_time('U');
+class Daddio_Dates {
+
+	/**
+	 * Get an instance of this class
+	 */
+	public static function get_instance() {
+		static $instance = null;
+		if ( null === $instance ) {
+			// Late static binding (PHP 5.3+)
+			$instance = new static();
+			$instance->setup_hooks();
+		}
+		return $instance;
 	}
-	$blocks = array(
-		array('name'=>'year','amount'	=>	60*60*24*365	),
-		array('name'=>'month','amount'	=>	60*60*24*31	),
-		array('name'=>'week','amount'	=>	60*60*24*7	),
-		array('name'=>'day','amount'	=>	60*60*24	),
-		array('name'=>'hour','amount'	=>	60*60		),
-		array('name'=>'minute','amount'	=>	60		),
-		array('name'=>'second','amount'	=>	1		)
-	);
 
-	$diff = abs($from-$to);
+	public function setup_hooks() {
+		add_filter( 'the_time', array( $this, 'filter_the_time' ) );
+	}
 
-	$current_level = 1;
-	$result = array();
-	foreach($blocks as $block)
-		{
-		if ($current_level > $levels) {break;}
-		if ($diff/$block['amount'] >= 1)
-			{
-			$amount = floor($diff/$block['amount']);
-			if ($amount>1) {$plural='s';} else {$plural='';}
-			$result[] = $amount.' '.$block['name'].$plural;
-			$diff -= $amount*$block['amount'];
-			$current_level++;
+	public function filter_the_time( $time = '' ) {
+		return preg_replace( '/(\d+):(\d+) (am|pm)/i', '<span class="time">$1<span class="colon">:</span>$2 <span class="am-pm">$3</span></span>', $time );
+	}
+
+	/**
+	 * My own human time diff function from http://www.php.net/manual/en/ref.datetime.php#90989
+	 *
+	 * @param  integer $levels [description]
+	 * @param  [type]  $from   [description]
+	 * @param  boolean $to     [description]
+	 * @return [type]          [description]
+	 */
+	public function human_time_diff( $levels = 2, $from, $to = false ) {
+		if ( ! $to ) {
+			$to = current_time( 'U' );
+		}
+		$blocks = array(
+			array( 'name' => 'year',   'amount' => 60 * 60 * 24 * 365 ),
+			array( 'name' => 'month',  'amount' => 60 * 60 * 24 * 31 ),
+			array( 'name' => 'week',   'amount' => 60 * 60 * 24 * 7 ),
+			array( 'name' => 'day',    'amount' => 60 * 60 * 24 ),
+			array( 'name' => 'hour',   'amount' => 60 * 60 ),
+			array( 'name' => 'minute', 'amount' => 60 ),
+			array( 'name' => 'second', 'amount' => 1 ),
+		);
+
+		$diff = abs( $from - $to );
+
+		$current_level = 1;
+		$result = array();
+		foreach ( $blocks as $block ) {
+			if ( $current_level > $levels ) { break; }
+			if ( $diff / $block['amount'] >= 1 ) {
+				$amount = floor( $diff / $block['amount'] );
+				$plural = '';
+				if ( $amount > 1 ) {
+					$plural = 's';
+				}
+				$result[] = $amount . ' ' . $block['name'] . $plural;
+				$diff -= $amount * $block['amount'];
+				$current_level++;
 			}
 		}
-	return implode(' ',$result);
-}
 
-function zah_fancy_time( $time ) {
-	return preg_replace('/(\d+):(\d+) (am|pm)/i', '<span class="time">$1<span class="colon">:</span>$2 <span class="am-pm">$3</span></span>', $time);
-}
-add_filter('the_time', 'zah_fancy_time');
-
-function get_childs_birthday() {
-	return strtotime('2014-12-28 7:04PM');
-}
-
-function childs_birthday_diff( $levels = 2 ) {
-	return rh_human_time_diff( $levels,  get_childs_birthday(), get_the_time('U') );
-}
-
-function get_childs_current_age( $levels = 2 ) {
-	return rh_human_time_diff( $levels,  get_childs_birthday() );
-}
-
-function how_old_was_child() {
-	if( get_the_time('U') < get_childs_birthday() ) {
-		return childs_birthday_diff() . ' before Zadie was born.';
+		return implode( ' ', $result );
 	}
 
-	return 'Zadie was ' . childs_birthday_diff() . ' old.';
+	public function get_childs_birthday() {
+		return strtotime( '2014-12-28 7:04PM' );
+	}
+
+	public function get_childs_birthday_diff( $levels = 2 ) {
+		return $this->human_time_diff( $levels,  get_childs_birthday(), get_the_time( 'U' ) );
+	}
+
+	public function get_childs_current_age( $levels = 2 ) {
+		return $this->human_time_diff( $levels,  get_childs_birthday() );
+	}
+
+	public function how_old_was_child() {
+		if ( get_the_time( 'U' ) < $this->get_childs_birthday() ) {
+			return $this->get_childs_birthday_diff() . ' before Zadie was born.';
+		}
+		return 'Zadie was ' . $this->get_childs_birthday_diff() . ' old.';
+	}
+
+	public function get_child_time_format() {
+		return get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+	}
+}
+Daddio_Dates::get_instance();
+
+/**
+ * Helper Functions
+ */
+function how_old_was_child() {
+	$instance = Daddio_Dates::get_instance();
+	return $instance->how_old_was_child();
+}
+
+function get_childs_current_age() {
+	$instance = Daddio_Dates::get_instance();
+	return $instance->get_childs_current_age();
+}
+
+function get_childs_birthday() {
+	$instance = Daddio_Dates::get_instance();
+	return $instance->get_childs_birthday();
+}
+
+function get_childs_birthday_diff() {
+	$instance = Daddio_Dates::get_instance();
+	return $instance->get_childs_birthday_diff();
 }
 
 function get_child_time_format() {
-	return get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+	$instance = Daddio_Dates::get_instance();
+	return $instance->get_child_time_format();
 }
