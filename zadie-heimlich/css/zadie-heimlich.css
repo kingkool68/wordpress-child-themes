@@ -1,0 +1,27 @@
+/*
+Bundle core WordPress stylesheets to save on requests
+../../../../ = the site root
+*/
+@import url(../../../../wp-includes/js/mediaelement/mediaelementplayer.min.css);
+@import url(../../../../wp-includes/js/mediaelement/wp-mediaelement.css);
+@import url(chunks/wp-emoji.css);
+
+/* Zadie Heimlich Chunks */
+@import url(chunks/reset.css);
+@import url(chunks/form-reset.css);
+@import url(chunks/helpers.css);
+@import url(chunks/general.css);
+@import url(chunks/headings.css);
+@import url(chunks/media.css);
+@import url(chunks/video.css);
+@import url(chunks/svg-icons.css);
+@import url(chunks/header.css);
+@import url(chunks/menu.css);
+@import url(chunks/new-menu.css);
+@import url(chunks/article.css);
+@import url(chunks/archive.css);
+@import url(chunks/on-this-day.css);
+@import url(chunks/rsvp-page.css);
+@import url(chunks/attachments.css);
+@import url(chunks/nav.css);
+@import url(chunks/loading-bars.css);

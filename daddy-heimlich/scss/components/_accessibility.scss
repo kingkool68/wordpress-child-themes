@@ -1,0 +1,29 @@
+// For text that needs to be hidden visually but still available to screen readers
+// See https://make.wordpress.org/accessibility/2015/02/09/hiding-text-for-screen-readers-with-wordpress-core/
+.screen-reader-text {
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  overflow: hidden;
+  position: absolute !important;
+  width: 1px;
+}
+
+.screen-reader-text:focus {
+  clip: auto !important;
+  display: block;
+  height: auto;
+  left: 5px;
+  top: 5px;
+  width: auto;
+  z-index: 100; // Above WP toolbar
+}
+
+.skip-to-content-link {
+  background-color: #ef8923;
+  color: #fff;
+  padding: em(12px);
+}
+
+.admin-bar .skip-to-content-link {
+  z-index: 999999;
+}

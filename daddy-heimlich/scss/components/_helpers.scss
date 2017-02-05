@@ -1,0 +1,30 @@
+/*
+Use .hidden to visual hide an element but still making it accessible to screen readers.
+#top is the ID of the Skip link.
+ */
+#top {
+	left: -999em;
+	position: absolute;
+	top: auto;
+	_top: -999em; /* IE6 https://learntech.imsu.ox.ac.uk/blog/?p=494 */
+}
+
+/* If the skip link is focused using the keyboard then show it. */
+#top:focus {
+	position: static;
+	font-size: 1.5em;
+	background-color: #FFFFD5;
+	display: block;
+	font-weight: 700;
+	color: #000;
+	padding: 2px 15px 5px;
+}
+
+/* Constrains content */
+.holder {
+	margin: 0 auto;
+	max-width: em(1050px);
+	padding: 0 em(20px) em(50px);
+	color: #fff;
+	z-index: 1;
+}

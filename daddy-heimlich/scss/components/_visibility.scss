@@ -1,0 +1,28 @@
+// Hide visually and from screen readers
+.hide,
+.has-js .hide-if-js {
+	display: none!important;
+}
+
+// Hide visually and from screen readers, but maintain layout
+.invisible { visibility: hidden !important; }
+
+// Use .hidden to visually hide an element but still make it accessible to screen readers.
+.hidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+// For visually hiding text yet still making it accessible to screen readers
+// via http://www.zeldman.com/2012/03/01/replacing-the-9999px-hack-new-image-replacement/
+.alt-text {
+	text-indent: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+}

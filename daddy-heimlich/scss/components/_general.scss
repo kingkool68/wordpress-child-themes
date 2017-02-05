@@ -1,0 +1,51 @@
+html {
+  box-sizing: border-box;
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  font-weight: 300;
+  background-color: #7b0e7f;
+  background-image: url(../../img/symphony-purple.png);
+  background-repeat: repeat;
+  background-attachment: fixed;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: #C568C8;
+    border-bottom: 0.15em dotted #C568C8;
+    transition: all 0.35s ease;
+}
+
+a:hover,
+a:focus {
+	color:#F8B1FA;
+	border-bottom-color:#F8B1FA;
+}
+a:focus {
+	outline-color:#F8B1FA;
+}
+p {
+	font-size: em(18px);
+	line-height: 1.5;
+}
+strong,
+b {
+	font-weight:700;
+}
+em,
+i {
+	font-weight:500;
+}
+
+ul li {
+    list-style-type: disc;
+}
+
+ol li {
+    list-style-type: decimal;
+}

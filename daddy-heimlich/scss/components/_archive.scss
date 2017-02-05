@@ -1,0 +1,31 @@
+section.archive {
+	border-bottom: em(5px) solid #C678BD;
+	border-bottom-color: rgba(255, 255, 255, 0.5);
+	font-family: 'Crete Round', Arial, Helvetica, sans-serif;
+	padding: em(18px) em(38px);
+}
+.archive .heading {
+	padding: 0 em(5px) 0 0;
+	display: inline-block;
+}
+.archive .subheading {
+	font-size: em(20px);
+    position: relative;
+    top: em(9px, 20px);
+    float: right;
+}
+
+@media( max-width: em(680px) ) {
+	section.archive {
+		text-align: center;
+	}
+	.archive .heading {
+		font-size: em(38px);
+		padding-right: 0;
+		padding-bottom: em(7.6px, 38px);
+	}
+	.archive .subheading {
+		float: none;
+		position: static;
+	}
+}

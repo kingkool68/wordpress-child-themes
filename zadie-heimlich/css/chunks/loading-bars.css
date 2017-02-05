@@ -1,0 +1,45 @@
+/* Loading Bars via http://tobiasahlin.com/spinkit/ */
+
+.loading-bars {
+	height: 12em;
+	margin: auto;
+	text-align: center;
+	padding-bottom: 1em;
+}
+.loading-bars div {
+	background-color: #fff;
+	display: inline-block;
+	margin: 0 0.4em;
+	height: 100%;
+	width: 1.2em;
+	border-radius: 10em;
+	animation: stretchdelay 1.2s infinite ease-in-out;
+}
+.loading-bars .rect2 {
+	animation-delay: -1.1s;
+}
+.loading-bars .rect3 {
+	animation-delay: -1.0s;
+}
+.loading-bars .rect4 {
+	animation-delay: -0.9s;
+}
+.loading-bars .rect5 {
+	animation-delay: -0.8s;
+}
+@-webkit-keyframes stretchdelay {
+	0%, 40%, 100% {
+		transform: scaleY(0.4);
+	}
+	20% {
+		transform: scaleY(1.0);
+	}
+}
+@keyframes stretchdelay {
+	0%, 40%, 100% {
+		transform: scaleY(0.4);
+	}
+	20% {
+		transform: scaleY(1.0);
+	}
+}

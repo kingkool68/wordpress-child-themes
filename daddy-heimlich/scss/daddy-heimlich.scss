@@ -1,0 +1,40 @@
+@charset 'UTF-8';
+
+@import 'base/functions';
+@import 'base/variables';
+
+/*
+Bundle core WordPress stylesheets to save on requests
+../../../../ = the site root
+*/
+@import '../../../../wp-includes/js/mediaelement/mediaelementplayer.min.css';
+@import '../../../../wp-includes/js/mediaelement/wp-mediaelement.css';
+@import 'components/wp-emoji';
+
+// Base theme components
+@import 'components/reset';
+@import 'components/form-reset';
+
+@import 'components/utilities';
+@import 'components/helpers';
+@import 'components/accessibility';
+@import 'components/visibility';
+@import 'components/general';
+
+@import 'components/media';
+@import 'components/video';
+@import 'components/svg-icons';
+
+@import 'components/header';
+@import 'components/menu';
+@import 'components/new-menu';
+@import 'components/nav';
+
+@import 'components/headings';
+@import 'components/article';
+@import 'components/archive';
+@import 'components/on-this-day';
+@import 'components/rsvp-page';
+@import 'components/attachments';
+
+@import 'components/loading-bars';

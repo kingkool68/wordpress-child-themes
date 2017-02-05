@@ -1,0 +1,21 @@
+nav {
+	padding-bottom: em(35px);
+}
+.rounded-button,
+.addtocalendar .atcb-link {
+	display: block;
+	border: em(1.5px, 18px) solid #B47FB6;
+	border-radius: em(10px);
+	background-color: #6B006F;
+	color: #fff;
+	font-size: em(18px);
+	text-align: center;
+	padding: em(8px, 18px);
+}
+.rounded-button:hover,
+.rounded-button:focus,
+.addtocalendar .atcb-link:hover,
+.addtocalendar .atcb-link:focus {
+	background-color: #B47FB6;
+	color: #fff;
+}
