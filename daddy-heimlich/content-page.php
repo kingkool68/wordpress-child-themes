@@ -1,4 +1,4 @@
-<article class="page">
+<article class="article page">
 
 	<?php //do_action( 'zah_content_header', $post ); ?>
 	<h1 class="title"><?php the_title(); ?></h1>

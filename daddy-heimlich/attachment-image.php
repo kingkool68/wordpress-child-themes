@@ -1,5 +1,3 @@
-
-
 	<?php do_action( 'zah_content_header', $post ); ?>
 
 		<div class="inner">
@@ -22,5 +20,3 @@
 		</div>
 
 		<?php do_action( 'zah_content_footer', $post ); ?>
-
-</article>

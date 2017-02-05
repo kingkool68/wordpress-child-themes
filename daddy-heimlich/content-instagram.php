@@ -1,4 +1,4 @@
-<article class="instagram">
+<article class="article instagram">
 
 	<?php do_action( 'zah_content_header', $post ); ?>
 

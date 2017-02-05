@@ -1,4 +1,4 @@
-<article class="post">
+<article class="article post">
 
 	<?php do_action( 'zah_content_header', $post ); ?>
 
@@ -10,7 +10,7 @@
 		<?php } ?>
 	</h1>
 	<h2 class="time-stamp"><time datetime="<?php echo get_post_time( 'c', true ) ?>"><?php the_time( get_child_time_format() ); ?></time> <b>&bull;</b> <span class="how-old-was-zadie"><?php echo how_old_was_child(); ?></span></h2>
-	
+
 	<div class="inner">
 		<?php the_content(); ?>
 	</div>
