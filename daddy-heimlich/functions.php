@@ -59,18 +59,18 @@ include 'vendor/ForceUTF8/Encoding.php';
 $files_to_include = array(
 	'admin.php',
 	'scripts-styles.php',
-	'dates.php',
+	'class-daddio-dates.php',
 	'media.php',
 	'archive.php',
 	'menu.php',
 	'post-galleries.php',
-	'instagram.php',
+	'class-daddio-instagram.php',
 	'rsvp.php',
 	'infinite-scroll.php',
 	'on-this-day.php',
 	// 'cli-commands.php',
 );
-$dir = get_stylesheet_directory() . '/functions/';
+$dir = get_template_directory() . '/functions/';
 foreach ( $files_to_include as $filename ) {
 	$file = $dir . $filename;
 	if ( file_exists( $file ) ) {
