@@ -475,8 +475,8 @@ html {
           box-sizing: border-box;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   font-weight: 300;
-  background-color: #8dc86f;
-  background-image: url("../img/symphony-green.png");
+  background-color: #4f9826;
+  background-image: url("../img/symphony-money-green.png");
   background-repeat: repeat;
   background-attachment: fixed; }
 
@@ -488,8 +488,8 @@ html {
 
 a {
   text-decoration: none;
-  color: #10810e;
-  border-bottom: 0.15em dotted #10810e;
+  color: #76c681;
+  border-bottom: 0.15em dotted #76c681;
   -webkit-transition: all 0.35s ease;
   transition: all 0.35s ease; }
 
@@ -607,7 +607,7 @@ article.instagram .wp-video {
 
 /* Override the video player color defaults */
 article.instagram .mejs-controls .mejs-time-rail .mejs-time-current {
-  background-color: #8dc86f; }
+  background-color: #4f9826; }
 
 /* SVG Icons */
 .icon {
@@ -645,7 +645,7 @@ header .site-title {
 header .site-title,
 header .site-title a {
   border-bottom-width: 0;
-  color: #8dc86f;
+  color: #4f9826;
   display: block; }
 
 header .site-title a {
@@ -663,7 +663,7 @@ header .childs-current-age {
   float: right;
   font-size: 1.5625em;
   margin-top: 1.6em;
-  font-family: "Crete Round", Arial, Helvetica, sans-serif; }
+  font-family: "Shrikhand", Arial, Helvetica, sans-serif; }
 
 @media (max-width: 62.5em) {
   header {
@@ -717,8 +717,8 @@ header .childs-current-age {
   bottom: 0;
   right: -25em;
   padding: 2em 1.25em 0;
-  background-color: #8dc86f;
-  background-image: url("../img/symphony-green.png");
+  background-color: #4f9826;
+  background-image: url("../img/symphony-money-green.png");
   background-repeat: repeat;
   -webkit-box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5);
           box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5); }
@@ -769,7 +769,7 @@ header .childs-current-age {
   color: #fff;
   font-size: 1.6em;
   padding: 0.5em 0 0.5em 1.5em;
-  font-family: "Crete Round", Arial, Helvetica, sans-serif;
+  font-family: "Shrikhand", Arial, Helvetica, sans-serif;
   text-align: left;
   display: block; }
 
@@ -838,7 +838,7 @@ header .childs-current-age {
 
 .new-menu a:hover,
 .new-menu a:focus {
-  background-color: #8dc86f; }
+  background-color: #4f9826; }
 
 @media (max-width: 48.75em) {
   .new-menu li {
@@ -891,7 +891,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Crete Round", Arial, Helvetica, sans-serif; }
+  font-family: "Shrikhand", Arial, Helvetica, sans-serif; }
 
 h1 {
   font-size: 2.8125em;
@@ -996,7 +996,7 @@ h2 {
 section.archive {
   border-bottom: 0.3125em solid #76c681;
   border-bottom-color: rgba(255, 255, 255, 0.5);
-  font-family: "Crete Round", Arial, Helvetica, sans-serif;
+  font-family: "Shrikhand", Arial, Helvetica, sans-serif;
   padding: 1.125em 2.375em; }
 
 .archive .heading {
@@ -1045,7 +1045,7 @@ section.archive {
     width: 100%; } }
 
 form {
-  font-family: "Crete Round", Arial, Helvetica, sans-serif;
+  font-family: "Shrikhand", Arial, Helvetica, sans-serif;
   max-width: 21.875em;
   margin: 0 auto 3.4375em; }
 
@@ -1186,5 +1186,12 @@ article.attachment-image img {
   20% {
     -webkit-transform: scaleY(1);
             transform: scaleY(1); } }
+
+h1 {
+  font-weight: 400; }
+
+header .site-title {
+  text-transform: none;
+  font-weight: 400; }
 
 /*# sourceMappingURL=other-baby.css.map */

@@ -5,7 +5,7 @@ function babby_wp_enqueue_scripts() {
 	if( isset( $_GET['debug-css'] ) || ( function_exists( 'rh_is_dev' ) && rh_is_dev() ) ) {
 		$css_suffix = '.css';
 	}
-	wp_register_style( 'zah-google-fonts', 'https://fonts.googleapis.com/css?family=Crete+Round:400,400italic|Playfair+Display:400,400i,700,700i,900,900i|Open+Sans:300italic,700italic,300,700', array(), NULL, 'all' );
+	wp_register_style( 'zah-google-fonts', 'https://fonts.googleapis.com/css?family=Crete+Round:400,400italic|Shrikhand|Open+Sans:300italic,700italic,300,700', array(), NULL, 'all' );
 	wp_enqueue_style( 'other-baby', get_stylesheet_directory_uri() . '/css/other-baby' . $css_suffix, array('zah-google-fonts'), NULL, 'all' );
 }
 add_action( 'wp_enqueue_scripts', 'babby_wp_enqueue_scripts' );

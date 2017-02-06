@@ -1,0 +1,4 @@
+symphony.png is from https://www.toptal.com/designers/subtlepatterns/symphony/
+Primary color: #4f9826
+Multiply for primary Background Color
+Color for white background (50% opacity)
