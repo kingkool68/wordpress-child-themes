@@ -157,7 +157,7 @@ class Daddio_Instagram {
 		?>
 		<div class="wrap">
 			<h1>Manaully Sync Instagram</h1>
-			<p>Make sure all of the Instagram photos tagged with <strong>#ZadieAlyssa</strong> are saved as posts on this site. Nothing will be overwritten, only missing Instagram photos will be added.</p>
+			<p>Make sure all of the Instagram photos tagged with <strong>#<?php echo CHILD_INSTAGRAM_HASHTAG; ?></strong> are saved as posts on this site. Nothing will be overwritten, only missing Instagram photos will be added.</p>
 			<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=zah-instagram-sync&action=manual-sync' ) );?>" method="post">
 
 				<table class="form-table">
@@ -184,7 +184,7 @@ class Daddio_Instagram {
 		if ( isset($_POST['next_max_id']) ) {
 			$max_id = trim( $_POST['next_max_id'] );
 		}
-		$resp = $this->fetch_instagram_tag( 'zadiealyssa', $max_id );
+		$resp = $this->fetch_instagram_tag( CHILD_INSTAGRAM_HASHTAG, $max_id );
 		$nodes = $resp->entry_data->TagPage[0]->tag->media->nodes;
 		$last_node = end( $nodes );
 
@@ -439,7 +439,7 @@ class Daddio_Instagram {
 		return json_decode( $json );
 	}
 
-	public function fetch_instagram_tag( $tag = 'zadiealyssa', $max_id = NULL, $min_id = NULL ) {
+	public function fetch_instagram_tag( $tag = '', $max_id = null, $min_id = null ) {
 		$args = array();
 		if ( $max_id ) {
 			$args['max_id'] = $max_id;
@@ -566,7 +566,7 @@ class Daddio_Instagram {
 		return $inserted;
 	}
 
-	public function get_instagram_username( $post_id = FALSE ) {
+	public function get_instagram_username( $post_id = false ) {
 		if ( $post_id ) {
 			$post_id = intval( $post_id );
 		}
@@ -583,7 +583,7 @@ class Daddio_Instagram {
 		return $output;
 	}
 
-	public function does_instagram_permalink_exist( $permalink ) {
+	public function does_instagram_permalink_exist( $permalink = '' ) {
 		global $wpdb;
 
 		$parts = parse_url( $permalink );
@@ -599,7 +599,7 @@ class Daddio_Instagram {
 		$post = get_post( $post_id );
 		$img = wp_get_attachment_image_src( $attachment_id, 'medium' );
 
-		$subject = '#ZadieAlyssa: Pending post from ' . $this->get_instagram_username( $post_id );
+		$subject = '#' . CHILD_INSTAGRAM_HASHTAG . ': Pending post from ' . $this->get_instagram_username( $post_id );
 		$html = '';
 		$html .= '<p><a href="' . $post->guid . '" target="_blank"><img src="' . $img[0] . '" width="' . $img[1] . '" height="' . $img[2] . '"></a><p>';
 		$html .= '<p>Edit this post at <a href="' . get_edit_post_link( $post_id ) . '" target="_blank">' . get_edit_post_link( $post_id ) . '</a></p>';
