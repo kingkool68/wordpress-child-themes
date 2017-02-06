@@ -37,8 +37,8 @@ function daddio_menu_footer() {
 			?>
 			<p class="social-links">
 				<a href="https://github.com/kingkool68/zadieheimlich" class="github" title="The code that powers this site is on GitHub" data-ga-category="nav" data-ga-label="GitHub Icon"><?php echo daddio_svg_icon( 'github' ); ?></a>
-				<a href="https://www.instagram.com/lilzadiebug/" class="instagram" rel="me" title="Follow Zadie on Instagram @LilZadieBug" data-ga-category="nav" data-ga-label="Instagram Icon"><?php echo daddio_svg_icon( 'instagram' ); ?></a>
-				<a href="https://www.facebook.com/media/set/?set=ft.10101891838917048&type=1" title="Zadie's on Facebook" data-ga-category="nav" data-ga-label="Facebook Icon"><?php echo daddio_svg_icon( 'facebook' ); ?></a>
+				<a href="https://www.instagram.com/<?php echo esc_attr( CHILD_INSTAGRAM_HANDLE ); ?>/" class="instagram" rel="me" title="Follow <?php echo esc_attr( CHILD_NAME ); ?> on Instagram @<?php echo esc_attr( CHILD_INSTAGRAM_HANDLE ); ?>" data-ga-category="nav" data-ga-label="Instagram Icon"><?php echo daddio_svg_icon( 'instagram' ); ?></a>
+				<a href="<?php echo esc_url( CHILD_FACEBOOK_URL ); ?>" title="<?php echo esc_attr( CHILD_NAME ); ?> is on Facebook" data-ga-category="nav" data-ga-label="Facebook Icon"><?php echo daddio_svg_icon( 'facebook' ); ?></a>
 			</p>
 		</section>
 	</nav>

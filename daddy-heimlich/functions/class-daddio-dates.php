@@ -66,7 +66,7 @@ class Daddio_Dates {
 	}
 
 	public function get_childs_birthday() {
-		return strtotime( '2014-12-28 7:04PM' );
+		return strtotime( CHILD_DATE_OF_BIRTH );
 	}
 
 	public function get_childs_birthday_diff( $levels = 2 ) {
@@ -79,9 +79,9 @@ class Daddio_Dates {
 
 	public function how_old_was_child() {
 		if ( get_the_time( 'U' ) < $this->get_childs_birthday() ) {
-			return $this->get_childs_birthday_diff() . ' before Zadie was born.';
+			return $this->get_childs_birthday_diff() . ' before ' . CHILD_NAME . ' was born.';
 		}
-		return 'Zadie was ' . $this->get_childs_birthday_diff() . ' old.';
+		return CHILD_NAME . ' was ' . $this->get_childs_birthday_diff() . ' old.';
 	}
 
 	public function get_child_time_format() {
