@@ -1,0 +1,4 @@
+symphony.png is from https://www.toptal.com/designers/subtlepatterns/symphony/
+Primary color: #7b0e7f
+Linear Burn for primary Background Color
+Color for white background
