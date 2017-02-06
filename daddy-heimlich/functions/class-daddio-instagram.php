@@ -5,7 +5,6 @@ use \ForceUTF8\Encoding;
 class Daddio_Instagram {
 
 	var $whitelisted_usernames = array( 'naudebynature', 'kingkool68', 'lilzadiebug' );
-	var $subscription_errors = array();
 
 	/**
 	 * Get an instance of this class
@@ -36,39 +35,39 @@ class Daddio_Instagram {
 
 	function init() {
 		$labels = array(
-			'name'				=> 'Instagram',
-			'singular_name'	   => 'Instagram',
-			'menu_name'		   => 'Instagram',
-			'parent_item_colon'   => 'Parent Instagram:',
-			'all_items'		   => 'All Instagram Posts',
-			'view_item'		   => 'View Instagram',
-			'add_new_item'		=> 'Add New Instagram',
-			'add_new'			 => 'Add New',
-			'edit_item'		   => 'Edit Instagram',
-			'update_item'		 => 'Update Instagram',
-			'search_items'		=> 'Search Instagram',
-			'not_found'		   => 'Not found',
-			'not_found_in_trash'  => 'Not found in Trash',
+			'name'               => 'Instagram',
+			'singular_name'      => 'Instagram',
+			'menu_name'          => 'Instagram',
+			'parent_item_colon'  => 'Parent Instagram:',
+			'all_items'          => 'All Instagram Posts',
+			'view_item'          => 'View Instagram',
+			'add_new_item'       => 'Add New Instagram',
+			'add_new'            => 'Add New',
+			'edit_item'          => 'Edit Instagram',
+			'update_item'        => 'Update Instagram',
+			'search_items'       => 'Search Instagram',
+			'not_found'          => 'Not found',
+			'not_found_in_trash' => 'Not found in Trash',
 		);
 		$args = array(
-			'label'			   => 'instagram',
-			'description'		 => 'Instagram posts',
-			'labels'			  => $labels,
-			'supports'			=> array( 'title', 'editor', 'thumbnail', 'comments' ),
-			'taxonomies'		  => array( 'category', 'post_tag' ),
-			'hierarchical'		=> false,
-			'public'			  => true,
-			'show_ui'			 => true,
-			'show_in_menu'		=> true,
+			'label'               => 'instagram',
+			'description'         => 'Instagram posts',
+			'labels'              => $labels,
+			'supports'            => array( 'title', 'editor', 'thumbnail', 'comments' ),
+			'taxonomies'          => array( 'category', 'post_tag' ),
+			'hierarchical'        => false,
+			'public'              => true,
+			'show_ui'             => true,
+			'show_in_menu'        => true,
 			'show_in_nav_menus'   => true,
 			'show_in_admin_bar'   => true,
-			'menu_position'	   => 5,
-			'menu_icon'		   => 'dashicons-camera',
-			'can_export'		  => true,
-			'has_archive'		 => true,
+			'menu_position'       => 5,
+			'menu_icon'           => 'dashicons-camera',
+			'can_export'          => true,
+			'has_archive'         => true,
 			'exclude_from_search' => false,
 			'publicly_queryable'  => true,
-			'capability_type'	 => 'page',
+			'capability_type'     => 'page',
 		);
 		register_post_type( 'instagram', $args );
 	}
