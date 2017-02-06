@@ -475,8 +475,8 @@ html {
           box-sizing: border-box;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   font-weight: 300;
-  background-color: #0BDA51;
-  background-image: url("../img/symphony-purple.png");
+  background-color: #8dc86f;
+  background-image: url("../img/symphony-green.png");
   background-repeat: repeat;
   background-attachment: fixed; }
 
@@ -607,7 +607,7 @@ article.instagram .wp-video {
 
 /* Override the video player color defaults */
 article.instagram .mejs-controls .mejs-time-rail .mejs-time-current {
-  background-color: #0BDA51; }
+  background-color: #8dc86f; }
 
 /* SVG Icons */
 .icon {
@@ -627,7 +627,7 @@ article.instagram .mejs-controls .mejs-time-rail .mejs-time-current {
 
 header {
   background-color: #fff;
-  background-image: url("../img/symphony-light-purple.png");
+  background-image: url("../img/symphony-light-green.png");
   background-repeat: repeat;
   background-attachment: fixed;
   padding: 0.3125em 0;
@@ -645,7 +645,7 @@ header .site-title {
 header .site-title,
 header .site-title a {
   border-bottom-width: 0;
-  color: #0BDA51;
+  color: #8dc86f;
   display: block; }
 
 header .site-title a {
@@ -655,7 +655,7 @@ header .site-title a {
 header .site-title a:hover,
 header .site-title a:focus {
   background-color: #82b681;
-  background-color: rgba(180, 127, 182, 0.5);
+  background-color: rgba(130, 182, 129, 0.5);
   color: #409d3f; }
 
 header .childs-current-age {
@@ -663,7 +663,7 @@ header .childs-current-age {
   float: right;
   font-size: 1.5625em;
   margin-top: 1.6em;
-  font-family: 'Crete Round', Arial, Helvetica, sans-serif; }
+  font-family: "Crete Round", Arial, Helvetica, sans-serif; }
 
 @media (max-width: 62.5em) {
   header {
@@ -717,8 +717,8 @@ header .childs-current-age {
   bottom: 0;
   right: -25em;
   padding: 2em 1.25em 0;
-  background-color: #0BDA51;
-  background-image: url("../img/symphony-purple.png");
+  background-color: #8dc86f;
+  background-image: url("../img/symphony-green.png");
   background-repeat: repeat;
   -webkit-box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5);
           box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5); }
@@ -769,14 +769,14 @@ header .childs-current-age {
   color: #fff;
   font-size: 1.6em;
   padding: 0.5em 0 0.5em 1.5em;
-  font-family: 'Crete Round', Arial, Helvetica, sans-serif;
+  font-family: "Crete Round", Arial, Helvetica, sans-serif;
   text-align: left;
   display: block; }
 
 .more-menu li a:hover,
 .more-menu li a:focus {
   background-color: #82b681;
-  background-color: rgba(180, 127, 182, 0.5); }
+  background-color: rgba(130, 182, 129, 0.5); }
 
 .more-menu .social-links {
   padding-top: 0.46875em;
@@ -794,7 +794,7 @@ header .childs-current-age {
 .more-menu .social-links a:hover,
 .more-menu .social-links a:focus {
   color: #82b681;
-  color: rgba(180, 127, 182, 0.5); }
+  color: rgba(130, 182, 129, 0.5); }
 
 #magic-shield {
   background-color: rgba(255, 255, 255, 0);
@@ -814,7 +814,7 @@ header .childs-current-age {
   padding-bottom: 0;
   padding: 0;
   background-color: #82b681;
-  background-color: rgba(180, 127, 182, 0.5); }
+  background-color: rgba(130, 182, 129, 0.5); }
 
 .new-menu .holder {
   padding-bottom: 0; }
@@ -838,7 +838,7 @@ header .childs-current-age {
 
 .new-menu a:hover,
 .new-menu a:focus {
-  background-color: #0BDA51; }
+  background-color: #8dc86f; }
 
 @media (max-width: 48.75em) {
   .new-menu li {
@@ -891,7 +891,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Crete Round', Arial, Helvetica, sans-serif; }
+  font-family: "Crete Round", Arial, Helvetica, sans-serif; }
 
 h1 {
   font-size: 2.8125em;
@@ -923,7 +923,7 @@ h2 {
   .article .title a:hover,
   .article .title a:focus {
     background-color: #82b681;
-    background-color: rgba(180, 127, 182, 0.5);
+    background-color: rgba(130, 182, 129, 0.5);
     color: #b3fab2; }
   .article .time-stamp {
     font-size: 1.25em;
@@ -996,7 +996,7 @@ h2 {
 section.archive {
   border-bottom: 0.3125em solid #76c681;
   border-bottom-color: rgba(255, 255, 255, 0.5);
-  font-family: 'Crete Round', Arial, Helvetica, sans-serif;
+  font-family: "Crete Round", Arial, Helvetica, sans-serif;
   padding: 1.125em 2.375em; }
 
 .archive .heading {
@@ -1045,7 +1045,7 @@ section.archive {
     width: 100%; } }
 
 form {
-  font-family: 'Crete Round', Arial, Helvetica, sans-serif;
+  font-family: "Crete Round", Arial, Helvetica, sans-serif;
   max-width: 21.875em;
   margin: 0 auto 3.4375em; }
 

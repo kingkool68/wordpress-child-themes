@@ -69,14 +69,14 @@
 	color: #fff;
 	font-size: em(19.2px, 12px);
 	padding: em(9.6px, 19.2px) 0 em(9.6px, 19.2px) em(28.8px, 19.2px);
-	font-family: 'Crete Round', Arial, Helvetica, sans-serif;
+	font-family: $headline-font;
 	text-align: left;
 	display: block;
 }
 .more-menu li a:hover,
 .more-menu li a:focus {
 	background-color: $light-accent-color;
-	background-color: rgba(180, 127, 182, 0.5);
+	background-color: $site-title-bg-color;
 }
 .more-menu .social-links {
 	padding-top: em(7.5px);
@@ -94,7 +94,7 @@
 .more-menu .social-links a:hover,
 .more-menu .social-links a:focus {
 	color: $light-accent-color;
-	color: rgba(180, 127, 182, 0.5);
+	color: $site-title-bg-color;
 }
 #magic-shield {
 	background-color: rgba(255, 255, 255, 0);

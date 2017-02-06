@@ -1,7 +1,7 @@
 section.archive {
 	border-bottom: em(5px) solid $divider-color;
 	border-bottom-color: $divider-color-rgba;
-	font-family: 'Crete Round', Arial, Helvetica, sans-serif;
+	font-family: $headline-font;
 	padding: em(18px) em(38px);
 }
 .archive .heading {

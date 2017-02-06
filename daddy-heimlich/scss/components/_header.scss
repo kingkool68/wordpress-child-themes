@@ -36,7 +36,7 @@ header .childs-current-age {
 	float: right;
 	font-size: em(25px);
 	margin-top: em(40px, 25px);
-	font-family: 'Crete Round', Arial, Helvetica, sans-serif;
+	font-family: $headline-font;
 }
 @media(max-width: em(1000px) ) {
 	header {

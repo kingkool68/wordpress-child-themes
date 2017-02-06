@@ -1,12 +1,11 @@
-$headline-font: 'Playfair Display', Arial, Helvetica, sans-serif !default;
+// $headline-font: 'Playfair Display', Arial, Helvetica, sans-serif !default;
 
 // Background Images
-$main-bg-image: '../img/symphony-purple.png';
-$white-bg-image: '../img/symphony-light-purple.png';
+$main-bg-image: '../img/symphony-green.png';
+$white-bg-image: '../img/symphony-light-green.png';
 
 // Colors
-// $primary-color:            #68cc66; // Set the hue to 119 via http://hslpicker.com/
-$primary-color:            #0BDA51;
+$primary-color:            #8dc86f;
 $button-bg-color:          #027000;
 $link-color:               #10810e;
 $link-hover-color:         #b3fab2;
@@ -15,6 +14,6 @@ $light-accent-color:       #82b681;
 $divider-color:            #76c681;
 $divider-color-rgba:       rgba(255, 255, 255, 0.5);
 
-$site-title-bg-color:      rgba(180, 127, 182, 0.5);
+$site-title-bg-color:      rgba(130, 182, 129, 0.5);
 $site-title-color:         #409d3f;
 $childs-current-age-color: #85bd84;
