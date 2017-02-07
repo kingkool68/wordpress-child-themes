@@ -1,6 +1,6 @@
 html {
   box-sizing: border-box;
-  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  font-family: $sans-serif-font;
   font-weight: 300;
   background-color: $primary-color;
   background-image: url($main-bg-image);

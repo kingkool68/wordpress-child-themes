@@ -473,7 +473,7 @@ Use .hidden to visual hide an element but still making it accessible to screen r
 html {
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
-  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
   font-weight: 300;
   background-color: #4f9826;
   background-image: url("../img/symphony-money-green.png");
@@ -627,7 +627,7 @@ article.instagram .mejs-controls .mejs-time-rail .mejs-time-current {
 
 header {
   background-color: #fff;
-  background-image: url("../img/symphony-light-green.png");
+  background-image: url("../img/symphony.png");
   background-repeat: repeat;
   background-attachment: fixed;
   padding: 0.3125em 0;
@@ -1193,5 +1193,13 @@ h1 {
 header .site-title {
   text-transform: none;
   font-weight: 400; }
+
+.article .time-stamp {
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  font-style: normal; }
+
+.article .colon {
+  position: relative;
+  top: -0.1em; }
 
 /*# sourceMappingURL=other-baby.css.map */
