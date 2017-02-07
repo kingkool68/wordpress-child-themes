@@ -57,7 +57,7 @@ include 'vendor/ForceUTF8/Encoding.php';
 
 // Include our own libraries
 $files_to_include = array(
-	'admin.php',
+	'class-daddio-admin.php',
 	'scripts-styles.php',
 	'class-daddio-dates.php',
 	'media.php',
