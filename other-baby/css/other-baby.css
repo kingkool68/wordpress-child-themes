@@ -893,13 +893,8 @@ h5,
 h6 {
   font-family: "Shrikhand", Arial, Helvetica, sans-serif; }
 
-h1 {
-  font-size: 2.8125em;
-  font-weight: 700; }
-
 h2 {
   font-size: 1.25em;
-  font-style: italic;
   margin-bottom: 0.2em; }
 
 .article {
@@ -1194,9 +1189,12 @@ header .site-title {
   text-transform: none;
   font-weight: 400; }
 
+h1 {
+  font-size: 2.5em;
+  font-weight: 400; }
+
 .article .time-stamp {
-  font-family: "Open Sans", Helvetica, Arial, sans-serif;
-  font-style: normal; }
+  font-family: "Open Sans", Helvetica, Arial, sans-serif; }
 
 .article .colon {
   position: relative;

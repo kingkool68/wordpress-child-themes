@@ -1,8 +1,9 @@
-@import 'components/_variables.scss';
+@import 'base/_variables.scss';
 
 // Import the styles from the parent theme
 @import '../../daddy-heimlich/scss/daddy-heimlich.scss';
 
 // Local overrides
 @import 'components/_header.scss';
+@import 'components/_headings.scss';
 @import 'components/_article.scss';
