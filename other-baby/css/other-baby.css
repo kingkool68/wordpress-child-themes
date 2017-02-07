@@ -959,12 +959,6 @@ h2 {
   .article .addtocalendar {
     font-size: 0.625em; } }
 
-@media (max-width: 51.25em) {
-  .article .title {
-    font-size: 2em; }
-  .article .birthday-rsvp-title {
-    font-size: 1.25em; } }
-
 @media (max-width: 47.5em) {
   .post .inner p,
   .page .inner p {
@@ -1199,5 +1193,9 @@ h1 {
 .article .colon {
   position: relative;
   top: -0.1em; }
+
+@media (max-width: 51.25em) {
+  .article .title {
+    font-size: 1.5625em; } }
 
 /*# sourceMappingURL=other-baby.css.map */
