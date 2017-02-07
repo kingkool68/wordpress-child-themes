@@ -488,18 +488,18 @@ html {
 
 a {
   text-decoration: none;
-  color: #76c681;
-  border-bottom: 0.15em dotted #76c681;
+  color: #83c973;
+  border-bottom: 0.15em dotted #83c973;
   -webkit-transition: all 0.35s ease;
   transition: all 0.35s ease; }
 
 a:hover,
 a:focus {
-  color: #b3fab2;
-  border-bottom-color: #b3fab2; }
+  color: #c7fab2;
+  border-bottom-color: #c7fab2; }
 
 a:focus {
-  outline-color: #b3fab2; }
+  outline-color: #c7fab2; }
 
 p {
   font-size: 1.125em;
@@ -588,7 +588,7 @@ article.instagram .wp-video {
 
 .gallery a:hover img,
 .gallery a:focus img {
-  border-color: #b3fab2; }
+  border-color: #c7fab2; }
 
 @media (max-width: 47.5em) {
   .gallery {
@@ -917,9 +917,8 @@ h2 {
     display: inline-block; }
   .article .title a:hover,
   .article .title a:focus {
-    background-color: #82b681;
     background-color: rgba(130, 182, 129, 0.5);
-    color: #b3fab2; }
+    color: #c7fab2; }
   .article .time-stamp {
     font-size: 1.25em;
     margin-bottom: 1.2em;

@@ -1,10 +1,13 @@
-.article .time-stamp {
-	font-family: $sans-serif-font;
-}
+.article {
 
-.article .colon {
-	position: relative;
-	top: -0.1em;
+	.time-stamp {
+		font-family: $sans-serif-font;
+	}
+
+	.colon {
+		position: relative;
+		top: -0.1em;
+	}
 }
 
 @media (max-width: em(820px) ) {
@@ -13,6 +16,6 @@
 		.title {
 			font-size: em(25px);
 		}
-		
+
 	}
 }

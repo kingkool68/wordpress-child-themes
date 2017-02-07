@@ -495,11 +495,11 @@ a {
 
 a:hover,
 a:focus {
-  color: #F8B1FA;
-  border-bottom-color: #F8B1FA; }
+  color: #fed9ff;
+  border-bottom-color: #fed9ff; }
 
 a:focus {
-  outline-color: #F8B1FA; }
+  outline-color: #fed9ff; }
 
 p {
   font-size: 1.125em;
@@ -588,7 +588,7 @@ article.instagram .wp-video {
 
 .gallery a:hover img,
 .gallery a:focus img {
-  border-color: #F8B1FA; }
+  border-color: #fed9ff; }
 
 @media (max-width: 47.5em) {
   .gallery {
@@ -917,9 +917,8 @@ h2 {
     display: inline-block; }
   .article .title a:hover,
   .article .title a:focus {
-    background-color: #B47FB6;
     background-color: rgba(180, 127, 182, 0.5);
-    color: #F8B1FA; }
+    color: #fed9ff; }
   .article .time-stamp {
     font-size: 1.25em;
     margin-bottom: 1.2em;
