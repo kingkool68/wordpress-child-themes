@@ -716,7 +716,7 @@ header .childs-current-age {
   top: 0;
   bottom: 0;
   right: -25em;
-  padding: 2em 1.25em 0;
+  padding: 1em 1.25em 0;
   background-color: #4f9826;
   background-image: url("../img/symphony-money-green.png");
   background-repeat: repeat;
@@ -724,7 +724,7 @@ header .childs-current-age {
           box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5); }
 
 .admin-bar.has-js .more-menu {
-  padding-top: 3.90625em; }
+  padding-top: 3em; }
 
 .nav-open .more-menu {
   right: 0; }

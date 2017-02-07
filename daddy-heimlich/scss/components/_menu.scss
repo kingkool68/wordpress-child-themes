@@ -17,14 +17,14 @@
 	top: 0;
 	bottom: 0;
 	right: em(400px) * -1;
-	padding: em(32px) em(20px) 0;
+	padding: em(16px) em(20px) 0;
 	background-color: $primary-color;
 	background-image: url($main-bg-image);
 	background-repeat: repeat;
 	box-shadow: em(10px) 0 em(25px) em(13px) rgba(0, 0, 0, 0.5);
 }
 .admin-bar.has-js .more-menu {
-	padding-top: em(62.5px);
+	padding-top: em(48px);
 }
 .nav-open .more-menu {
 	right: 0;
