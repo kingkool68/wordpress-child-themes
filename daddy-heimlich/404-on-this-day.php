@@ -9,7 +9,7 @@ get_header();
 ?>
 	<?php get_template_part( 'content', 'on-this-day-switch-date-form' ); ?>
 	<div id="content">
-		<article class="page">
+		<article class="article page">
 			<h1 class="title">Nothing happened on <?php echo $the_date; ?></h1>
 			<?php do_action( 'daddio_content_footer', $post ); ?>
 		</article>
