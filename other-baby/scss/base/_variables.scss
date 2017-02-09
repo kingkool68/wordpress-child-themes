@@ -1,11 +1,11 @@
 $headline-font: 'Shrikhand', Arial, Helvetica, sans-serif !default;
 
 // Background Images
-$main-bg-image: '../img/symphony-money-green.png';
+$main-bg-image: '../img/symphony.png';
 $white-bg-image: '../img/symphony.png';
 
 // Colors
-$primary-color:            #4f9826;
+$primary-color:            #027223; //#026e02
 $button-bg-color:          #027000;
 $link-color:               #83c973;
 $link-hover-color:         #c7fab2;
@@ -17,3 +17,7 @@ $divider-color-rgba:       rgba(255, 255, 255, 0.5);
 $site-title-bg-color:      rgba(130, 182, 129, 0.5);
 $site-title-color:         #409d3f;
 $childs-current-age-color: #85bd84;
+
+html {
+	background-blend-mode: multiply;
+}
