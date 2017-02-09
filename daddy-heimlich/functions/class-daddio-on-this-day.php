@@ -1,9 +1,22 @@
 <?php
-class On_This_Day {
+class Daddio_On_This_Day {
 
 	private $pagename = 'on-this-day';
 
-	public function __construct() {
+	/**
+	 * Get an instance of this class
+	 */
+	public static function get_instance() {
+		static $instance = null;
+		if ( null === $instance ) {
+			// Late static binding (PHP 5.3+)
+			$instance = new static();
+			$instance->setup_hooks();
+		}
+		return $instance;
+	}
+
+	public function setup_hooks() {
 		add_filter( 'query_vars', array( $this, 'query_vars' ) );
 		add_filter( 'rewrite_rules_array', array( $this, 'filter_rewrite_rules_array' ) );
 		add_action( 'template_redirect', array( $this, 'template_redirect' ) );
@@ -39,7 +52,7 @@ class On_This_Day {
 
 		if ( $day && $month ) {
 			$days_in_month = 31;
-			switch(  $month ) {
+			switch (  $month ) {
 				// 30 days
 				case '04':
 				case '06':
@@ -91,7 +104,7 @@ class On_This_Day {
 		if ( $month && $day && is_404() ) {
 			$template_paths = array(
 				'404-' . $this->pagename . '.php',
-				'404.php'
+				'404.php',
 			);
 			if ( $new_template = locate_template( $template_paths ) ) {
 				return $new_template;
@@ -161,4 +174,4 @@ class On_This_Day {
 		wp_register_script( 'on-this-day', get_template_directory_uri() . '/js/on-this-day.js', array( 'jquery' ), null, true );
 	}
 }
-new On_This_Day();
+Daddio_On_This_Day::get_instance();

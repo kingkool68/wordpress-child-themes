@@ -67,7 +67,7 @@ $files_to_include = array(
 	'class-daddio-instagram.php',
 	'rsvp.php',
 	'class-daddio-infinite-scroll.php',
-	'on-this-day.php',
+	'class-daddio-on-this-day.php',
 	// 'cli-commands.php',
 );
 $dir = get_template_directory() . '/functions/';
