@@ -62,7 +62,7 @@ $files_to_include = array(
 	'class-daddio-dates.php',
 	'media.php',
 	'class-daddio-archive.php',
-	'menu.php',
+	'class-daddio-menus.php',
 	'class-daddio-post-galleries.php',
 	'class-daddio-instagram.php',
 	'rsvp.php',
