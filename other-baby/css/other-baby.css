@@ -1,9 +1,12 @@
+@import url(../../../../wp-includes/js/mediaelement/mediaelementplayer.min.css);
+@import url(../../../../wp-includes/js/mediaelement/wp-mediaelement.css);
+html {
+  background-blend-mode: multiply; }
+
 /*
 Bundle core WordPress stylesheets to save on requests
 ../../../../ = the site root
 */
-@import url(../../../../wp-includes/js/mediaelement/mediaelementplayer.min.css);
-@import url(../../../../wp-includes/js/mediaelement/wp-mediaelement.css);
 /* Add this to our main stylesheet to prevent a small style tag from being injected into the <head> of the page */
 img.wp-smiley,
 img.emoji {
@@ -475,8 +478,8 @@ html {
           box-sizing: border-box;
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
   font-weight: 300;
-  background-color: #4f9826;
-  background-image: url("../img/symphony-money-green.png");
+  background-color: #027223;
+  background-image: url("../img/symphony.png");
   background-repeat: repeat;
   background-attachment: fixed; }
 
@@ -584,7 +587,9 @@ article.instagram .wp-video {
 
 .gallery img {
   float: left;
-  margin: 0.625em; }
+  margin: 0.625em;
+  -webkit-transition: border-color .35s ease;
+  transition: border-color .35s ease; }
 
 .gallery a:hover img,
 .gallery a:focus img {
@@ -607,7 +612,7 @@ article.instagram .wp-video {
 
 /* Override the video player color defaults */
 article.instagram .mejs-controls .mejs-time-rail .mejs-time-current {
-  background-color: #4f9826; }
+  background-color: #027223; }
 
 /* SVG Icons */
 .icon {
@@ -645,7 +650,7 @@ header .site-title {
 header .site-title,
 header .site-title a {
   border-bottom-width: 0;
-  color: #4f9826;
+  color: #027223;
   display: block; }
 
 header .site-title a {
@@ -717,8 +722,8 @@ header .childs-current-age {
   bottom: 0;
   right: -25em;
   padding: 1em 1.25em 0;
-  background-color: #4f9826;
-  background-image: url("../img/symphony-money-green.png");
+  background-color: #027223;
+  background-image: url("../img/symphony.png");
   background-repeat: repeat;
   -webkit-box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5);
           box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5); }
@@ -838,7 +843,7 @@ header .childs-current-age {
 
 .new-menu a:hover,
 .new-menu a:focus {
-  background-color: #4f9826; }
+  background-color: #027223; }
 
 @media (max-width: 48.75em) {
   .new-menu li {

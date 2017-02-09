@@ -63,6 +63,7 @@ article.instagram .wp-video {
 .gallery img {
 	float: left;
 	margin: em(10px);
+	transition : border-color .35s ease;
 }
 .gallery a:hover img,
 .gallery a:focus img {
