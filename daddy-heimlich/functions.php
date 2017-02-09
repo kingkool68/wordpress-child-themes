@@ -66,7 +66,7 @@ $files_to_include = array(
 	'post-galleries.php',
 	'class-daddio-instagram.php',
 	'rsvp.php',
-	'infinite-scroll.php',
+	'class-daddio-infinite-scroll.php',
 	'on-this-day.php',
 	// 'cli-commands.php',
 );
