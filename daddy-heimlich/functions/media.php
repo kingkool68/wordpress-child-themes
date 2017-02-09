@@ -253,7 +253,7 @@ function daddio_get_attachment_link( $id = 0, $size = 'thumbnail', $permalink = 
 
 	if ( $permalink ) {
 		//$url = get_attachment_link( $_post->ID );
-		$url = daddio_post_gallery_link( $parent_post->ID, $_post->post_name );
+		$url = daddio_get_post_gallery_link( $parent_post->ID, $_post->post_name );
 	}
 
 	if ( $text ) {
