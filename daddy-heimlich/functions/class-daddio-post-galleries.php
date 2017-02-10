@@ -31,6 +31,7 @@ class Daddio_Post_Galleries {
 		add_filter( 'redirect_canonical', array( $this, 'filter_redirect_canonical' ), 10, 2 );
 		add_filter( 'template_include', array( $this, 'filter_template_include' ) );
 		add_filter( 'wpseo_canonical', array( $this, 'filter_wpseo_canonical' ) );
+		add_filter( 'post_gallery', array( $this, 'filter_post_gallery' ), 10, 2 );
 	}
 
 	public function action_init() {
@@ -293,6 +294,138 @@ class Daddio_Post_Galleries {
 			return '';
 		}
 		return get_permalink( $parent_id ) . 'gallery/' . $attachment_slug . '/';
+	}
+
+	public function filter_post_gallery( $nothing, $attr = array() ) {
+		$post = get_post();
+
+		static $instance = 0;
+		$instance++;
+
+		if ( ! empty( $attr['ids'] ) ) {
+			// 'ids' is explicitly ordered, unless you specify otherwise.
+			if ( empty( $attr['orderby'] ) ) {
+				$attr['orderby'] = 'post__in';
+			}
+			$attr['include'] = $attr['ids'];
+		}
+
+		$atts = shortcode_atts( array(
+			'order'      => 'ASC',
+			'orderby'    => 'menu_order ID',
+			'id'         => $post ? $post->ID : 0,
+			'columns'    => 3,
+			'size'       => 'thumbnail',
+			'include'    => '',
+			'exclude'    => '',
+			'link'       => '',
+		), $attr, 'gallery' );
+
+		$id = intval( $atts['id'] );
+
+		if ( ! empty( $atts['include'] ) ) {
+
+			$_attachments = get_posts( array(
+				'include' => $atts['include'],
+				'post_status' => 'inherit',
+				'post_type' => 'attachment',
+				'post_mime_type' => 'image',
+				'order' => $atts['order'],
+				'orderby' => $atts['orderby'],
+			) );
+
+			$attachments = array();
+			foreach ( $_attachments as $key => $val ) {
+				$attachments[ $val->ID ] = $_attachments[ $key ];
+			}
+
+		} elseif ( ! empty( $atts['exclude'] ) ) {
+
+			$attachments = get_children( array(
+				'post_parent' => $id,
+				'exclude' => $atts['exclude'],
+				'post_status' => 'inherit',
+				'post_type' => 'attachment',
+				'post_mime_type' => 'image',
+				'order' => $atts['order'],
+				'orderby' => $atts['orderby'],
+			) );
+
+		} else {
+			$attachments = get_children( array(
+				'post_parent' => $id,
+				'post_status' => 'inherit',
+				'post_type' => 'attachment',
+				'post_mime_type' => 'image',
+				'order' => $atts['order'],
+				'orderby' => $atts['orderby'],
+			) );
+
+		}
+
+		if ( empty( $attachments ) ) {
+			return '';
+		}
+
+		if ( is_feed() ) {
+			$output = "\n";
+			foreach ( $attachments as $att_id => $attachment ) {
+				$output .= daddio_get_attachment_link( $att_id, $atts['size'], true ) . PHPEOL;
+			}
+			return $output;
+		}
+
+		$columns = intval( $atts['columns'] );
+		$img_size = $atts['size'];
+		$itemwidth = $columns > 0 ? floor( 100 / $columns ) : 100;
+
+		$size_class = sanitize_html_class( $atts['size'] );
+		$output = "<section class=\"gallery gallery-{$columns}-column gallery-size-{$img_size}\">";
+
+		$i = 0;
+		foreach ( $attachments as $id => $attachment ) {
+
+			$attr = array( 'class' => 'attachment-' . $atts['size'] );
+			if ( trim( $attachment->post_excerpt ) ) {
+				$attr['aria-describedby'] = "selector-$id";
+			}
+
+			$image_meta  = wp_get_attachment_metadata( $id );
+			$img_width = $image_meta['width'];
+			$img_height = $image_meta['height'];
+			if ( isset( $image_meta['sizes'][ $atts['size'] ] ) ) {
+				$img_width = $image_meta['sizes'][ $atts['size'] ]['width'];
+				$img_height = $image_meta['sizes'][ $atts['size'] ]['height'];
+			}
+			$orientation = '';
+			if ( isset( $img_height, $img_width ) ) {
+				$orientation = ( $img_height > $img_width ) ? 'portrait' : 'landscape';
+				if ( $img_height == $img_width ) {
+					$orientation = 'square';
+				}
+			}
+
+			$attr['class'] .= ' ' . $orientation;
+
+			if ( 0 == $i % $columns ) {
+				$attr['class'] .= ' end';
+			}
+
+			if ( ! empty( $atts['link'] ) && 'file' === $atts['link'] ) {
+				$image_output = daddio_get_attachment_link( $id, $atts['size'], false, false, false, $attr );
+			} elseif ( ! empty( $atts['link'] ) && 'none' === $atts['link'] ) {
+				$image_output = wp_get_attachment_image( $id, $atts['size'], false, $attr );
+			} else {
+				$image_output = daddio_get_attachment_link( $id, $atts['size'], true, false, false, $attr );
+			}
+
+			$output .= "$image_output";
+			$i++;
+		}
+
+		$output .= '</section>';
+
+		return $output;
 	}
 }
 Daddio_Post_Galleries::get_instance();

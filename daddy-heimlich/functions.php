@@ -60,7 +60,7 @@ $files_to_include = array(
 	'class-daddio-admin.php',
 	'scripts-styles.php',
 	'class-daddio-dates.php',
-	'media.php',
+	'class-daddio-media.php',
 	'class-daddio-archive.php',
 	'class-daddio-menus.php',
 	'class-daddio-post-galleries.php',
