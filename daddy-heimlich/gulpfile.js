@@ -163,9 +163,9 @@ gulp.task('javascript', function() {
 
   return gulp.src(PATHS.javascript)
     .pipe( concat('global.min.js') )
-    .pipe(sourcemaps.init())
+    // .pipe(sourcemaps.init())
     .pipe(uglify())
-    .pipe(sourcemaps.write())
+    // .pipe(sourcemaps.write())
     .pipe(gulp.dest('js'));
 });
 
