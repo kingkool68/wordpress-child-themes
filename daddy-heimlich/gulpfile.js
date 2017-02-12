@@ -68,7 +68,7 @@ gulp.task('sass', function() {
         var newPath = file.path.split('/scss/')[0];
         newPath += '/css';
         return newPath;
-    }
+    };
 
     var source = gulp.src(PATHS.scss)
       // Start process for sourcemaps
@@ -122,7 +122,10 @@ gulp.task('sass', function() {
 var jshint  = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 gulp.task('lint', function() {
-  return gulp.src('js/*.js')
+  return gulp.src([
+      'js/*.js',
+      '!js/*.min.js'
+    ])
     .pipe(jshint())
     .pipe(jshint.reporter(stylish));
 });
