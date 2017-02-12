@@ -162,7 +162,7 @@ gulp.task('phpcbf', function () {
  */
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
-gulp.task('javascript', function() {
+gulp.task('javascript:global', function() {
 
   return gulp.src(PATHS.javascript)
     .pipe( concat('global.min.js') )
@@ -171,6 +171,24 @@ gulp.task('javascript', function() {
     // .pipe(sourcemaps.write())
     .pipe(gulp.dest('js'));
 });
+
+gulp.task('javascript:min', function() {
+
+  return gulp.src([
+      'js/*.js',
+      '!js/*.min.js'
+    ])
+    // Create a new file for the minified verison
+    .pipe(rename({
+      suffix: '.min'
+    }))
+    // Uglify
+    .pipe(uglify())
+    // Save
+    .pipe(gulp.dest('js'));
+});
+
+gulp.task('javascript', ['javascript:global', 'javascript:min'] );
 
 /**
  * Build Task
@@ -191,7 +209,8 @@ gulp.task('clean', function(done) {
 
 gulp.task('clean:javascript', function() {
   return del([
-      // 'js/*.min.js'
+      'js/*.min.js',
+      '!js/jquery-2.min.js'
     ]);
 });
 
