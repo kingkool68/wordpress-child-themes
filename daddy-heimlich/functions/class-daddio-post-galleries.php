@@ -338,7 +338,6 @@ class Daddio_Post_Galleries {
 			foreach ( $_attachments as $key => $val ) {
 				$attachments[ $val->ID ] = $_attachments[ $key ];
 			}
-
 		} elseif ( ! empty( $atts['exclude'] ) ) {
 
 			$attachments = get_children( array(
