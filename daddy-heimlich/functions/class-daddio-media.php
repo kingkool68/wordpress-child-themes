@@ -40,35 +40,36 @@ class Daddio_Media {
 	}
 
 	function filter_img_caption_shortcode( $string = '', $attr = array(), $content = null ) {
-		extract( shortcode_atts( array(
+		$atts = shortcode_atts( array(
 			'id'    => '',
 			'align' => 'alignnone',
 			'width' => '',
 			'caption' => '',
 			'class' => '',
-		), $attr ) );
+		), $attr );
 
-		if ( (int) $width < 1 || empty( $caption ) ) {
+		if ( (int) $atts['width'] < 1 || empty( $atts['caption'] ) ) {
 			return $content;
 		}
 
 		$described_by = '';
-		if ( $id ) {
+		$id = '';
+		if ( $atts['id'] ) {
 			// Underscores in attributes are yucky.
-			$id_attr = str_replace( '_', '-', esc_attr( $id ) );
+			$id_attr = str_replace( '_', '-', esc_attr( $atts['id'] ) );
 			$described_by = 'aria-describedby="' . $id_attr . '"';
-			$id = 'id="' . $id_attr . '" ';
+			$id = 'id="' . esc_attr( $id_attr ) . '" ';
 		}
 
 		$inline_width = '';
-		if ( 'alignleft' === $align || 'alignright' === $align ) {
+		if ( 'alignleft' === $atts['align'] || 'alignright' === $atts['align'] ) {
 			// $inline_width = 'style="width: '. (10 + (int) $width) . 'px"';
 		}
-		$class .= ' wp-caption ' . esc_attr( $align );
+		$atts['class'] .= ' wp-caption ' . esc_attr( $atts['align'] );
 
-		return '<figure ' . $described_by . 'class="' . $class . '" ' . $inline_width . '>' .
+		return '<figure ' . $described_by . 'class="' . $atts['class'] . '" ' . $inline_width . '>' .
 			do_shortcode( $content ) .
-			'<figcaption class="wp-caption-text" ' . $id . '>' . $caption . '</figcaption>' .
+			'<figcaption class="wp-caption-text" ' . $id . '>' . $atts['caption'] . '</figcaption>' .
 			'</figure>';
 	}
 
@@ -130,38 +131,6 @@ class Daddio_Media {
 Daddio_Media::get_instance();
 
 /* Helpers */
-//media_sideload_image() would be so much better if it simply returned the attachment ID instead of HTML
-function media_sideload_image_return_id( $file, $post_id, $desc = null, $post_data = array() ) {
-	if ( ! empty( $file ) ) {
-
-		$file_array = array();
-		if ( ! isset( $post_data['file_name'] ) ) {
-			// Set variables for storage, fix file filename for query strings.
-			preg_match( '/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $file, $matches );
-			$file_array['name'] = basename( $matches[0] );
-		} else {
-			$file_array['name'] = $post_data['file_name'];
-		}
-
-		// Download file to temp location.
-		$file_array['tmp_name'] = download_url( $file );
-
-		// If error storing temporarily, return the error.
-		if ( is_wp_error( $file_array['tmp_name'] ) ) {
-			return $file_array['tmp_name'];
-		}
-
-		// Do the validation and storage stuff.
-		$id = media_handle_sideload( $file_array, $post_id, $desc, $post_data );
-
-		// If error storing permanently, unlink.
-		if ( is_wp_error( $id ) ) {
-			unlink( $file_array['tmp_name'] );
-		}
-
-		return $id;
-	}
-}
 
 function daddio_get_attachment_link( $id = 0, $size = 'thumbnail', $permalink = false, $icon = false, $text = false, $attr = '' ) {
 	$id = intval( $id );

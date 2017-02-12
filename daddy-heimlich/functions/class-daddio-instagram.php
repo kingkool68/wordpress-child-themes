@@ -547,7 +547,7 @@ class Daddio_Instagram {
 			'post_name' => $slug,
 			'file_name' => $slug . '.jpg',
 		);
-		$attachment_id = media_sideload_image_return_id( $src, $inserted, $caption, $attachment_data );
+		$attachment_id = $this->media_sideload_image_return_id( $src, $inserted, $caption, $attachment_data );
 		update_post_meta( $inserted, 'instagram_username', $username );
 
 		// Set the featured image
@@ -609,6 +609,39 @@ class Daddio_Instagram {
 
 		// Reset content-type to avoid conflicts -- http://core.trac.wordpress.org/ticket/23578
 		remove_filter( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
+	}
+
+	//media_sideload_image() would be so much better if it simply returned the attachment ID instead of HTML
+	public function media_sideload_image_return_id( $file, $post_id, $desc = null, $post_data = array() ) {
+		if ( ! empty( $file ) ) {
+
+			$file_array = array();
+			if ( ! isset( $post_data['file_name'] ) ) {
+				// Set variables for storage, fix file filename for query strings.
+				preg_match( '/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $file, $matches );
+				$file_array['name'] = basename( $matches[0] );
+			} else {
+				$file_array['name'] = $post_data['file_name'];
+			}
+
+			// Download file to temp location.
+			$file_array['tmp_name'] = download_url( $file );
+
+			// If error storing temporarily, return the error.
+			if ( is_wp_error( $file_array['tmp_name'] ) ) {
+				return $file_array['tmp_name'];
+			}
+
+			// Do the validation and storage stuff.
+			$id = media_handle_sideload( $file_array, $post_id, $desc, $post_data );
+
+			// If error storing permanently, unlink.
+			if ( is_wp_error( $id ) ) {
+				unlink( $file_array['tmp_name'] );
+			}
+
+			return $id;
+		}
 	}
 }
 Daddio_Instagram::get_instance();
