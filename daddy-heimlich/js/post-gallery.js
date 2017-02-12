@@ -20,7 +20,6 @@ jQuery(document).ready(function($) {
 			img = imageSizes[i];
 			if( winWidth <= img.width ) {
 				return img.size;
-				break;
 			}
 		}
 
@@ -42,7 +41,7 @@ jQuery(document).ready(function($) {
 			this.load();
 		},
 		previous: function() {
-			this.current = (this.current == 0) ? this.max - 1 : this.current - 1;
+			this.current = (this.current === 0) ? this.max - 1 : this.current - 1;
 			this.load();
 		},
 		preloadTheNext: function(count) {
@@ -138,11 +137,11 @@ jQuery(document).ready(function($) {
 				$.gallery.posts[i].title = title;
 				$.gallery.posts[i].preloading = false;
 				$.gallery.preload(i);
-			}
+			};
 		},
 		load: function(i) {
 			if( !i ) {
-				var i = this.current;
+				i = this.current;
 			}
 			var post = this.posts[i];
 			if( !post || !post.html ) {
@@ -174,7 +173,7 @@ jQuery(document).ready(function($) {
 				window.history.replaceState(null, null, newPath);
 			}
 		}
-	}
+	};
 
 	var imgSize = calculateImageSize();
 	postGalleryUrls = $('#post-gallery-urls').val().split(' ');
@@ -188,7 +187,7 @@ jQuery(document).ready(function($) {
 
 		var pieces = regex.exec(postGalleryUrl);
 		if( !pieces ) {
-			var pieces = regex.exec(postGalleryUrl);
+			pieces = regex.exec(postGalleryUrl);
 		}
 		var postName = pieces[2];
 
