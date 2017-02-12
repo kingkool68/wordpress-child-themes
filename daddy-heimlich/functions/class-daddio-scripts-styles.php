@@ -31,14 +31,21 @@ class Daddio_Scripts_Style {
 			$css_suffix = '.css';
 		}
 
-		// The mediaelement styles are rolled in to the zadie-heimlich.css file via Gulp
+		// The mediaelement styles are rolled in to the theme CSS file via Gulp
 		if ( ! is_admin() ) {
 			wp_deregister_style( 'wp-mediaelement' );
 		}
 
+		// This needs to be absctracted out so child themes can use it,
+		// also need to let other functions determine if they should be minfied or not.
+		$js_suffix = '.min.js';
+		if ( isset( $_GET['debug-js'] ) || ( function_exists( 'rh_is_dev' ) && rh_is_dev() ) ) {
+			$js_suffix = '.js';
+		}
+
 		// JavaScript
-		wp_register_script( 'post-gallery', get_template_directory_uri() . '/js/post-gallery.js', array( 'jquery' ), null, true );
-		wp_enqueue_script( 'daddio-analytics', get_template_directory_uri() . '/js/analytics.js', array( 'jquery' ), null, true );
+		wp_register_script( 'post-gallery', get_template_directory_uri() . '/js/post-gallery' . $js_suffix, array( 'jquery' ), null, true );
+		wp_enqueue_script( 'daddio-analytics', get_template_directory_uri() . '/js/analytics' . $js_suffix, array( 'jquery' ), null, true );
 
 		// Global JavaScript files bundled into one that gets loaded on every single page
 		wp_register_script( 'daddio-global-scripts', get_template_directory_uri() . '/js/global.min.js', array( 'jquery' ), null, true );
