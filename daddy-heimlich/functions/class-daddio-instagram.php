@@ -79,12 +79,12 @@ class Daddio_Instagram {
 
 	function manual_sync_submenu() {
 		$action = '';
-		if ( isset($_GET['action']  ) ) {
+		if ( isset( $_GET['action'] ) ) {
 			$action = $_GET['action'];
 		}
 
 		// MANUAL SYNC
-		if ( isset( $action ) && $action == 'manual-sync' ) {
+		if ( isset( $action ) && 'manual-sync' == $action ) {
 
 			$date_limit = 0;
 			$from_date = '';
@@ -181,7 +181,7 @@ class Daddio_Instagram {
 
 	public function manual_sync_ajax_callback() {
 		$max_id = null;
-		if ( isset($_POST['next_max_id']) ) {
+		if ( isset( $_POST['next_max_id'] ) ) {
 			$max_id = trim( $_POST['next_max_id'] );
 		}
 		$resp = $this->fetch_instagram_tag( CHILD_INSTAGRAM_HASHTAG, $max_id );
@@ -318,7 +318,7 @@ class Daddio_Instagram {
 
 	function the_content( $content ) {
 		$post = get_post();
-		if ( $post->post_type == 'instagram' ) {
+		if ( 'instagram' == $post->post_type ) {
 			$content = preg_replace( '/\s(#(\w+))/im', ' <a href="https://instagram.com/explore/tags/$2/">$1</a>', $content );
 			// $content = preg_replace('/^(#(\w+))/im', '<a href="https://instagram.com/explore/tags/$2/">$1</a>', $content);
 			$content = preg_replace( '/\s(@(\w+))/im', ' <a href="http://instagram.com/$2">$1</a>', $content );
@@ -377,11 +377,11 @@ class Daddio_Instagram {
 
 	function add_no_tags_filter() {
 		$whitelisted_post_types = array( 'post', 'instagram' );
-		if( !in_array( get_current_screen()->post_type, $whitelisted_post_types ) ) {
+		if ( ! in_array( get_current_screen()->post_type, $whitelisted_post_types ) ) {
 			return;
 		}
 
-		$selected = ( isset( $_GET['tag-filter'] ) && $_GET['tag-filter'] == 'no-tags' );
+		$selected = ( isset( $_GET['tag-filter'] ) && 'no-tags' == $_GET['tag-filter'] );
 		?>
 		<select name="tag-filter">
 			<option value="">All Tags</option>
@@ -391,11 +391,11 @@ class Daddio_Instagram {
 	}
 
 	function get_posts_with_no_tags( $query ) {
-		if( !is_admin() || !$query->is_main_query() ) {
+		if ( ! is_admin() || ! $query->is_main_query() ) {
 			return;
 		}
 
-		if( !isset( $_GET['tag-filter'] ) || $_GET['tag-filter'] != 'no-tags' ) {
+		if ( ! isset( $_GET['tag-filter'] ) || 'no-tags' != $_GET['tag-filter'] ) {
 			return;
 		}
 
@@ -405,8 +405,8 @@ class Daddio_Instagram {
 				'taxonomy' => 'post_tag',
 				'field'	=> 'id',
 				'terms'	=> $tag_ids,
-				'operator' => 'NOT IN'
-			)
+				'operator' => 'NOT IN',
+			),
 		) );
 	}
 
@@ -479,7 +479,7 @@ class Daddio_Instagram {
 		}
 
 		$src = $img->display_src;
-		$slug =  $img->code;
+		$slug = $img->code;
 		$permalink = 'https://www.instagram.com/p/' . $slug . '/';
 
 		$posted = date( 'Y-m-d H:i:s', intval( $img->date ) ); // In GMT time
@@ -525,7 +525,7 @@ class Daddio_Instagram {
 
 			// If error storing temporarily, unlink
 			if ( is_wp_error( $tmp ) ) {
-				@unlink( $file_array['tmp_name'] );
+				unlink( $file_array['tmp_name'] );
 				$file_array['tmp_name'] = '';
 			}
 
@@ -534,7 +534,7 @@ class Daddio_Instagram {
 
 			// If error storing permanently, unlink
 			if ( is_wp_error( $video_id ) ) {
-				@unlink( $file_array['tmp_name'] );
+				unlink( $file_array['tmp_name'] );
 			}
 
 			// Auto-tag this Instagram post as a video
@@ -558,7 +558,7 @@ class Daddio_Instagram {
 			add_post_meta( $inserted, '_video_id', $video_id );
 		}
 
-		if ( $post['post_status'] != 'publish' ) {
+		if ( 'no-tags' != $post['post_status'] ) {
 			// Send an email so we can approve the new photo ASAP!
 			$this->send_pending_post_notification_email( $inserted, $attachment_id );
 		}
@@ -589,7 +589,7 @@ class Daddio_Instagram {
 		$parts = parse_url( $permalink );
 		$id = $parts['path'];
 
-		$query = "SELECT `ID` FROM `" . $wpdb->posts . "` WHERE `guid` LIKE '%" . $id . "%' LIMIT 0,1;";
+		$query = 'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` LIKE "%' . $id . '%" LIMIT 0,1;';
 		return $wpdb->get_var( $query );
 	}
 
