@@ -1,12 +1,9 @@
-@import url(../../../../wp-includes/js/mediaelement/mediaelementplayer.min.css);
-@import url(../../../../wp-includes/js/mediaelement/wp-mediaelement.css);
-html {
-  background-blend-mode: multiply; }
-
 /*
 Bundle core WordPress stylesheets to save on requests
 ../../../../ = the site root
 */
+@import url(../../../../wp-includes/js/mediaelement/mediaelementplayer.min.css);
+@import url(../../../../wp-includes/js/mediaelement/wp-mediaelement.css);
 /* Add this to our main stylesheet to prevent a small style tag from being injected into the <head> of the page */
 img.wp-smiley,
 img.emoji {
@@ -478,8 +475,8 @@ html {
           box-sizing: border-box;
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
   font-weight: 300;
-  background-color: #027223;
-  background-image: url("../img/symphony.png");
+  background-color: #75ac6c;
+  background-image: url("../img/symphony-green.png");
   background-repeat: repeat;
   background-attachment: fixed; }
 
@@ -491,18 +488,18 @@ html {
 
 a {
   text-decoration: none;
-  color: #83c973;
-  border-bottom: 0.15em dotted #83c973;
+  color: #c7fab2;
+  border-bottom: 0.15em dotted #c7fab2;
   -webkit-transition: all 0.35s ease;
   transition: all 0.35s ease; }
 
 a:hover,
 a:focus {
-  color: #c7fab2;
-  border-bottom-color: #c7fab2; }
+  color: #FEF6C9;
+  border-bottom-color: #FEF6C9; }
 
 a:focus {
-  outline-color: #c7fab2; }
+  outline-color: #FEF6C9; }
 
 p {
   font-size: 1.125em;
@@ -593,7 +590,7 @@ article.instagram .wp-video {
 
 .gallery a:hover img,
 .gallery a:focus img {
-  border-color: #c7fab2; }
+  border-color: #FEF6C9; }
 
 @media (max-width: 47.5em) {
   .gallery {
@@ -612,7 +609,7 @@ article.instagram .wp-video {
 
 /* Override the video player color defaults */
 article.instagram .mejs-controls .mejs-time-rail .mejs-time-current {
-  background-color: #027223; }
+  background-color: #75ac6c; }
 
 /* SVG Icons */
 .icon {
@@ -650,7 +647,7 @@ header .site-title {
 header .site-title,
 header .site-title a {
   border-bottom-width: 0;
-  color: #027223;
+  color: #75ac6c;
   display: block; }
 
 header .site-title a {
@@ -659,12 +656,12 @@ header .site-title a {
 
 header .site-title a:hover,
 header .site-title a:focus {
-  background-color: #82b681;
-  background-color: rgba(130, 182, 129, 0.5);
+  background-color: #b9d6b8;
+  background-color: rgba(185, 214, 184, 0.5);
   color: #409d3f; }
 
 header .childs-current-age {
-  color: #85bd84;
+  color: #8dc18b;
   float: right;
   font-size: 1.5625em;
   margin-top: 1.6em;
@@ -722,8 +719,8 @@ header .childs-current-age {
   bottom: 0;
   right: -25em;
   padding: 1em 1.25em 0;
-  background-color: #027223;
-  background-image: url("../img/symphony.png");
+  background-color: #75ac6c;
+  background-image: url("../img/symphony-green.png");
   background-repeat: repeat;
   -webkit-box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5);
           box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5); }
@@ -780,8 +777,8 @@ header .childs-current-age {
 
 .more-menu li a:hover,
 .more-menu li a:focus {
-  background-color: #82b681;
-  background-color: rgba(130, 182, 129, 0.5); }
+  background-color: #b9d6b8;
+  background-color: rgba(185, 214, 184, 0.5); }
 
 .more-menu .social-links {
   padding-top: 0.46875em;
@@ -798,8 +795,8 @@ header .childs-current-age {
 
 .more-menu .social-links a:hover,
 .more-menu .social-links a:focus {
-  color: #82b681;
-  color: rgba(130, 182, 129, 0.5); }
+  color: #b9d6b8;
+  color: rgba(185, 214, 184, 0.5); }
 
 #magic-shield {
   background-color: rgba(255, 255, 255, 0);
@@ -818,8 +815,8 @@ header .childs-current-age {
   clear: both;
   padding-bottom: 0;
   padding: 0;
-  background-color: #82b681;
-  background-color: rgba(130, 182, 129, 0.5); }
+  background-color: #b9d6b8;
+  background-color: rgba(185, 214, 184, 0.5); }
 
 .new-menu .holder {
   padding-bottom: 0; }
@@ -843,7 +840,7 @@ header .childs-current-age {
 
 .new-menu a:hover,
 .new-menu a:focus {
-  background-color: #027223; }
+  background-color: #75ac6c; }
 
 @media (max-width: 48.75em) {
   .new-menu li {
@@ -874,7 +871,7 @@ nav {
 .rounded-button,
 .addtocalendar .atcb-link {
   display: block;
-  border: 0.08333em solid #82b681;
+  border: 0.08333em solid #b9d6b8;
   border-radius: 0.625em;
   background-color: #027000;
   color: #fff;
@@ -887,7 +884,7 @@ nav {
 .rounded-button:focus,
 .addtocalendar .atcb-link:hover,
 .addtocalendar .atcb-link:focus {
-  background-color: #82b681;
+  background-color: #b9d6b8;
   color: #fff; }
 
 h1,
@@ -922,8 +919,8 @@ h2 {
     display: inline-block; }
   .article .title a:hover,
   .article .title a:focus {
-    background-color: rgba(130, 182, 129, 0.5);
-    color: #c7fab2; }
+    background-color: rgba(185, 214, 184, 0.5);
+    color: #FEF6C9; }
   .article .time-stamp {
     font-size: 1.25em;
     margin-bottom: 1.2em;
