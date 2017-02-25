@@ -43,7 +43,7 @@ var PATHS = {
 	  'js/analytics.js'
   ],
   scss: [
-      '../other-baby/scss/*.scss',
+      '../vera-heimlich/scss/*.scss',
       '../zadie-heimlich/scss/*.scss'
   ],
   phpcs: [
@@ -216,7 +216,7 @@ gulp.task('clean:javascript', function() {
 
 gulp.task('clean:css', function() {
   return del([
-      '../other-baby/css/*',
+      '../vera-heimlich/css/*',
       '../zadie-heimlich/css/*'
   ], {force: true});
 });
