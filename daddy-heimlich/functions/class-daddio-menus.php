@@ -62,7 +62,7 @@ class Daddio_Menus {
 				wp_nav_menu( $args );
 				?>
 				<p class="social-links">
-					<a href="https://github.com/kingkool68/zadieheimlich" class="github" title="The code that powers this site is on GitHub" data-ga-category="nav" data-ga-label="GitHub Icon">
+					<a href="https://github.com/kingkool68/wordpress-child-themes" class="github" title="The code that powers this site is on GitHub" data-ga-category="nav" data-ga-label="GitHub Icon">
 						<?php echo daddio_svg_icon( 'github' ); ?>
 					</a>
 					<a href="https://www.instagram.com/<?php echo esc_attr( CHILD_INSTAGRAM_HANDLE ); ?>/" class="instagram" rel="me" title="Follow <?php echo esc_attr( CHILD_NAME ); ?> on Instagram @<?php echo esc_attr( CHILD_INSTAGRAM_HANDLE ); ?>" data-ga-category="nav" data-ga-label="Instagram Icon">
