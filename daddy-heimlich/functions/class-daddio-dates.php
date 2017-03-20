@@ -90,7 +90,7 @@ class Daddio_Dates {
 
 	public function get_monthly_archive_links() {
 		global $wpdb;
-		$month_format = 'M';
+		$month_format = 'n';
 		$months = array();
 		for ( $m = 1; $m <= 12; $m++ ) {
 			$months[ $m ] = date( $month_format, mktime( 0, 0, 0, $m, 1, date( 'Y' ) ) );
@@ -98,7 +98,7 @@ class Daddio_Dates {
 
 		// Get Posts
 		$order = 'DESC';
-		$where = "WHERE `post_type` = 'instagram' AND `post_status` = 'publish'";
+		$where = "WHERE `post_type` IN ( 'instagram', 'post' ) AND `post_status` = 'publish'";
 		$query = "SELECT YEAR(`post_date`) AS `year`, MONTH(`post_date`) AS `month`, count(ID) AS count FROM $wpdb->posts $where GROUP BY YEAR(`post_date`), MONTH(`post_date`) ORDER BY `post_date` $order";
 
 		$raw_post_data = $wpdb->get_results( $query );
@@ -108,8 +108,7 @@ class Daddio_Dates {
 		}
 
 		$start = new DateTime( CHILD_DATE_OF_BIRTH );
-		$end = new DateTime();
-		$end->modify( 'first day of next year' );
+		$end = new DateTime( '12/31/' . date( 'Y' ) );
 		$interval = DateInterval::createFromDateString( '1 year' );
 		$period = new DatePeriod( $start, $interval, $end );
 		$output = array();
