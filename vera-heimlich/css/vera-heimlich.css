@@ -1010,6 +1010,22 @@ section.archive {
     float: none;
     position: static; } }
 
+.date-archive .year-heading {
+  font-size: 2em;
+  display: block;
+  clear: both;
+  margin: 0 0 0.75em; }
+
+.date-archive .item {
+  float: left;
+  margin-right: 1em;
+  margin-bottom: 2em;
+  font-size: 1em; }
+
+.date-archive span.rounded-button {
+  background-color: transparent;
+  border: 0 none; }
+
 .on-this-day-date-switcher {
   text-align: center;
   margin-bottom: 0;
