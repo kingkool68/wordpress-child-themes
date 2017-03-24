@@ -3,6 +3,10 @@
 	<div id="content">
 		<section class="date-archive">
 			<h1>By Age</h1>
+			<?php
+			$data = get_age_archive_links();
+			
+			?>
 		</section>
 		<section class="date-archive">
 			<h1 class="heading">By Date</h1>
@@ -36,6 +40,10 @@
 			<?php
 				$args = array(
 					'taxonomy' => 'post_tag',
+					'unit' => 'em',
+					'number' => 50,
+					'smallest' => 0.75,
+					'largest' => 3,
 				);
 				wp_tag_cloud( $args );
 			?>

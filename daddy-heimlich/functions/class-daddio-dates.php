@@ -69,8 +69,11 @@ class Daddio_Dates {
 		return strtotime( CHILD_DATE_OF_BIRTH );
 	}
 
-	public function get_childs_birthday_diff( $levels = 2 ) {
-		return $this->human_time_diff( $levels,  get_childs_birthday(), get_the_time( 'U' ) );
+	public function get_childs_birthday_diff( $levels = 2, $time_offset = '' ) {
+		if ( ! $time_offset ) {
+			$time_offset = get_the_time( 'U' );
+		}
+		return $this->human_time_diff( $levels,  get_childs_birthday(), $time_offset );
 	}
 
 	public function get_childs_current_age( $levels = 2 ) {
@@ -87,6 +90,8 @@ class Daddio_Dates {
 	public function get_child_time_format() {
 		return get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
 	}
+<<<<<<< Updated upstream
+=======
 
 	public function get_monthly_archive_links() {
 		global $wpdb;
@@ -127,6 +132,21 @@ class Daddio_Dates {
 		}
 		return array_reverse( $output, $preserve_keys = true );
 	}
+
+	public function get_age_archive_links() {
+		$now = new DateTime();
+		$birth = new DateTime( CHILD_DATE_OF_BIRTH );
+		$diff = $birth->diff( $now );
+		$months = ( $diff->y * 12 ) + $diff->m;
+		$output = [];
+		$count = 0;
+		while ( $months > 12 ) {
+			$output[ $count ];
+			$count++;
+			$months = $months - 12;
+		}
+	}
+>>>>>>> Stashed changes
 }
 Daddio_Dates::get_instance();
 
@@ -148,17 +168,25 @@ function get_childs_birthday() {
 	return $instance->get_childs_birthday();
 }
 
-function get_childs_birthday_diff() {
+function get_childs_birthday_diff( $levels = 2, $time_offset = '' ) {
 	$instance = Daddio_Dates::get_instance();
-	return $instance->get_childs_birthday_diff();
+	return $instance->get_childs_birthday_diff( $levels, $time_offset );
 }
 
 function get_child_time_format() {
 	$instance = Daddio_Dates::get_instance();
 	return $instance->get_child_time_format();
 }
+<<<<<<< Updated upstream
+=======
 
 function get_monthly_archive_links() {
 	$instance = Daddio_Dates::get_instance();
 	return $instance->get_monthly_archive_links();
 }
+
+function get_age_archive_links() {
+	$instance = Daddio_Dates::get_instance();
+	return $instance->get_age_archive_links();
+}
+>>>>>>> Stashed changes
