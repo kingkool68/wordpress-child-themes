@@ -613,9 +613,11 @@ class Daddio_Instagram {
 		$id = $parts['path'];
 		$id = str_replace( '/p/', '', $id );
 		$id = str_replace( '/', '', $id );
+		// If a public ID goes private, part of the public ID is in
+		// the beginning of the new private ID
+		$id = substr( $id, 0, 7 );
 
 		$query = 'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` LIKE "%' . $id . '%" LIMIT 0,1;';
-		error_log( $query );
 		return $wpdb->get_var( $query );
 	}
 
