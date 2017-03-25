@@ -73,7 +73,7 @@ class Daddio_Instagram {
 	}
 
 	function admin_menu() {
-		add_submenu_page( 'edit.php?post_type=instagram', 'Manual Sync', 'Manual Sync', 'manage_options', 'zah-instagram-sync', array( $this, 'manual_sync_submenu' ) );
+		// add_submenu_page( 'edit.php?post_type=instagram', 'Manual Sync', 'Manual Sync', 'manage_options', 'zah-instagram-sync', array( $this, 'manual_sync_submenu' ) );
 		add_submenu_page( 'edit.php?post_type=instagram', 'Private Sync', 'Private Sync', 'manage_options', 'zah-instagram-private-sync', array( $this, 'private_sync_submenu' ) );
 	}
 
@@ -251,18 +251,22 @@ class Daddio_Instagram {
 		if ( isset( $_POST['instagram-source'] ) && ! empty( $_POST['instagram-source'] ) && check_admin_referer( 'zah-instagram-private-sync' ) ) {
 			$instagram_source = wp_unslash( $_POST['instagram-source'] );
 			$json = $this->get_instagram_json_from_html( $instagram_source );
-			$node = $json->entry_data->PostPage[0]->media;
 
-			$instagram_link = 'https://www.instagram.com/p/' . $node->code . '/';
-			$found = $this->does_instagram_permalink_exist( $instagram_link );
+			// It's a Tag page
+			if ( isset( $json->entry_data->TagPage[0] ) ) {
+				$top_posts = $json->entry_data->TagPage[0]->tag->top_posts->nodes;
+				$other = $json->entry_data->TagPage[0]->tag->media->nodes;
+				$nodes = array_merge( $top_posts, $other );
+			}
 
-			$inserted = $this->insert_instagram_post( $node, $force_publish_status = true );
-			if ( $inserted ) {
-				$wp_permalink = get_permalink( $inserted );
+			// It's a single Post page
+			if ( isset( $json->entry_data->PostPage[0] ) ) {
+				$nodes = array( $json->entry_data->PostPage[0]->media );
+			}
+
+			foreach ( $nodes as $node ) :
+				$instagram_link = 'https://www.instagram.com/p/' . $node->code . '/';
 				$caption = $node->caption;
-
-				$posted = date( 'Y-m-d H:i:s', intval( $node->date ) ); // In GMT time
-
 				$src = $node->display_src;
 				$width = 150;
 				$height = '';
@@ -270,16 +274,37 @@ class Daddio_Instagram {
 					$width = $height = 150;
 					$src = $node->thumbnail_src;
 				}
+				$posted = date( 'Y-m-d H:i:s', intval( $node->date ) ); // In GMT time
+				$permalink = $instagram_link;
 
-				$status = 'Success!';
+				$found = $this->does_instagram_permalink_exist( $instagram_link );
 				if ( $found ) {
-					$status = 'WARNING: This post already exists!';
+					continue;
 				}
 
-				$result .= '<h2>' . $status . '</h2>';
-				$result .= '<p><a href="' . $wp_permalink . '" target="_blank"><img src="' . $src . '" width="' . $width . '" height="' . $height . '"></a><br>' . $caption . '<br>' . get_date_from_gmt( $posted, 'F j, Y g:i a' ) . '</p>';
+				$inserted = $this->insert_instagram_post( $node, $force_publish_status = true );
+				if ( -1 === $inserted ) {
+
+					// It's a private post that needs to be manually downloaded...
+					$status_message = 'Private! Needs to be manually synced.';
+
+				} elseif ( $inserted ) {
+
+					// Success!
+					$status_message = 'Success!';
+					$permalink = get_permalink( $inserted );
+
+				}
+
+				// Output
+				$result .= '<h2>' . $status_message . '</h2>';
+				$result .= '<p><a href="' . esc_url( $permalink ) . '" target="_blank">';
+				$result .= '<img src="' . esc_url( $src ) . '" width="' . $width . '" height="' . $height . '">';
+				$result .= '</a>';
+				$result .= '<br>' . $caption;
+				$result .= '<br>' . get_date_from_gmt( $posted, 'F j, Y g:i a' ) . '</p>';
 				$result .= '<hr>';
-			}
+			endforeach;
 		}
 	?>
 		<style>
@@ -412,7 +437,8 @@ class Daddio_Instagram {
 
 	/* Quick Sync Dashboard Widget */
 	function wp_dashboard_setup() {
-		wp_add_dashboard_widget( 'instagram-quick-sync', 'Instagram Quick Sync', array( $this, 'quick_sync_dashboard_widget' ) );
+		// wp_add_dashboard_widget( 'instagram-quick-sync', 'Instagram Quick Sync', array( $this, 'quick_sync_dashboard_widget' ) );
+		wp_add_dashboard_widget( 'instagram-private-sync', 'Instagram Private Sync', array( $this, 'private_sync_dashboard_widget' ) );
 	}
 
 	function quick_sync_dashboard_widget() {
@@ -421,6 +447,14 @@ class Daddio_Instagram {
 		<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=zah-instagram-sync&action=manual-sync' ) );?>" method="post">
 			<input type="hidden" name="date-limit" value="<?php echo esc_attr( $two_days_ago ); ?>">
 			<input type="submit" class="button button-primary" value="Sync Last 48 Hours">
+		</form>
+		<?php
+	}
+
+	function private_sync_dashboard_widget() {
+		?>
+		<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=zah-instagram-private-sync' ) );?>" method="post">
+			<input type="submit" class="button button-primary" value="Private Sync">
 		</form>
 		<?php
 	}
@@ -474,6 +508,9 @@ class Daddio_Instagram {
 			$payload = $this->fetch_single_instagram( $node->code );
 			if ( empty( $payload ) || ! $payload ) {
 				return;
+			}
+			if ( ! isset( $payload->entry_data->PostPage[0] ) ) {
+				return -1;
 			}
 			$img = $payload->entry_data->PostPage[0]->media;
 		}
@@ -558,11 +595,6 @@ class Daddio_Instagram {
 			add_post_meta( $inserted, '_video_id', $video_id );
 		}
 
-		if ( 'no-tags' != $post['post_status'] ) {
-			// Send an email so we can approve the new photo ASAP!
-			$this->send_pending_post_notification_email( $inserted, $attachment_id );
-		}
-
 		return $inserted;
 	}
 
@@ -588,6 +620,11 @@ class Daddio_Instagram {
 
 		$parts = parse_url( $permalink );
 		$id = $parts['path'];
+		$id = str_replace( '/p/', '', $id );
+		$id = str_replace( '/', '', $id );
+		// If a public ID goes private, part of the public ID is in
+		// the beginning of the new private ID
+		$id = substr( $id, 0, 7 );
 
 		$query = 'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` LIKE "%' . $id . '%" LIMIT 0,1;';
 		return $wpdb->get_var( $query );
