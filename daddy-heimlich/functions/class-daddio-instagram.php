@@ -73,7 +73,7 @@ class Daddio_Instagram {
 	}
 
 	function admin_menu() {
-		add_submenu_page( 'edit.php?post_type=instagram', 'Manual Sync', 'Manual Sync', 'manage_options', 'zah-instagram-sync', array( $this, 'manual_sync_submenu' ) );
+		// add_submenu_page( 'edit.php?post_type=instagram', 'Manual Sync', 'Manual Sync', 'manage_options', 'zah-instagram-sync', array( $this, 'manual_sync_submenu' ) );
 		add_submenu_page( 'edit.php?post_type=instagram', 'Private Sync', 'Private Sync', 'manage_options', 'zah-instagram-private-sync', array( $this, 'private_sync_submenu' ) );
 	}
 
@@ -437,7 +437,8 @@ class Daddio_Instagram {
 
 	/* Quick Sync Dashboard Widget */
 	function wp_dashboard_setup() {
-		wp_add_dashboard_widget( 'instagram-quick-sync', 'Instagram Quick Sync', array( $this, 'quick_sync_dashboard_widget' ) );
+		// wp_add_dashboard_widget( 'instagram-quick-sync', 'Instagram Quick Sync', array( $this, 'quick_sync_dashboard_widget' ) );
+		wp_add_dashboard_widget( 'instagram-private-sync', 'Instagram Private Sync', array( $this, 'private_sync_dashboard_widget' ) );
 	}
 
 	function quick_sync_dashboard_widget() {
@@ -446,6 +447,14 @@ class Daddio_Instagram {
 		<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=zah-instagram-sync&action=manual-sync' ) );?>" method="post">
 			<input type="hidden" name="date-limit" value="<?php echo esc_attr( $two_days_ago ); ?>">
 			<input type="submit" class="button button-primary" value="Sync Last 48 Hours">
+		</form>
+		<?php
+	}
+
+	function private_sync_dashboard_widget() {
+		?>
+		<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=zah-instagram-private-sync' ) );?>" method="post">
+			<input type="submit" class="button button-primary" value="Private Sync">
 		</form>
 		<?php
 	}
