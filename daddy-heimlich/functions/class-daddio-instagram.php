@@ -219,7 +219,7 @@ class Daddio_Instagram {
 
 			$output['total']++;
 
-			$instagram_link = 'https://www.instagram.com/p/' . $node->code . '/';
+			$instagram_link = 'https://www.instagram.com/p/' . $node->shortcode . '/';
 			$found = $this->does_instagram_permalink_exist( $instagram_link );
 
 			if ( $found ) {
@@ -230,12 +230,13 @@ class Daddio_Instagram {
 				$inserted = $this->insert_instagram_post( $node );
 				if ( $inserted ) {
 					$wp_permalink = get_permalink( $inserted );
-					$caption = $node->caption;
+					$caption = $node->edge_media_to_caption->edges[0]->node->text;
 
-					$posted = date( 'Y-m-d H:i:s', intval( $node->date ) ); // In GMT time
+					$posted = date( 'Y-m-d H:i:s', intval( $node->taken_at_timestamp ) ); // In GMT time
 
-					$src = $node->thumbnail_src;
-					$width = $height = 150;
+					$src = $node->display_url;
+					$width = 150;
+					$height = '';
 
 					$output['imgs'][] = '<a href="' . $wp_permalink . '" target="_blank"><img src="' . $src . '" width="' . $width . '" height="' . $height . '"></a><br>' . $caption . '<br>' . get_date_from_gmt( $posted, 'F j, Y g:i a' );
 				}
@@ -261,47 +262,36 @@ class Daddio_Instagram {
 
 			// It's a single Post page
 			if ( isset( $json->entry_data->PostPage[0] ) ) {
-				$nodes = array( $json->entry_data->PostPage[0]->media );
+				$nodes = array( $json->entry_data->PostPage[0]->graphql->shortcode_media );
 			}
 
 			foreach ( $nodes as $node ) :
+				$node = $this->normalize_instagram_data( $node );
 				$instagram_link = 'https://www.instagram.com/p/' . $node->code . '/';
-				$caption = $node->caption;
-				$src = $node->display_src;
-				$width = 150;
-				$height = '';
-				if ( isset( $node->thumbnail_src ) ) {
-					$width = $height = 150;
-					$src = $node->thumbnail_src;
-				}
-				$posted = date( 'Y-m-d H:i:s', intval( $node->date ) ); // In GMT time
-				$permalink = $instagram_link;
-
 				$found = $this->does_instagram_permalink_exist( $instagram_link );
 				if ( $found ) {
 					continue;
 				}
 
+				$posted = date( 'Y-m-d H:i:s', intval( $node->timestamp ) ); // In GMT time
+				$permalink = $instagram_link;
+
 				$inserted = $this->insert_instagram_post( $node, $force_publish_status = true );
 				if ( -1 === $inserted ) {
-
 					// It's a private post that needs to be manually downloaded...
 					$status_message = 'Private! Needs to be manually synced.';
-
 				} elseif ( $inserted ) {
-
 					// Success!
 					$status_message = 'Success!';
 					$permalink = get_permalink( $inserted );
-
 				}
 
 				// Output
 				$result .= '<h2>' . $status_message . '</h2>';
 				$result .= '<p><a href="' . esc_url( $permalink ) . '" target="_blank">';
-				$result .= '<img src="' . esc_url( $src ) . '" width="' . $width . '" height="' . $height . '">';
+				$result .= '<img src="' . esc_url( $node->full_src ) . '" width="150" height="">';
 				$result .= '</a>';
-				$result .= '<br>' . $caption;
+				$result .= '<br>' . $node->caption;
 				$result .= '<br>' . get_date_from_gmt( $posted, 'F j, Y g:i a' ) . '</p>';
 				$result .= '<hr>';
 			endforeach;
@@ -461,7 +451,7 @@ class Daddio_Instagram {
 
 
 
-	/* Helper Functions */
+	/* Helper Methods */
 
 	public function get_instagram_json_from_html( $html = '' ) {
 		// Parse the page response and extract the JSON string.
@@ -469,7 +459,6 @@ class Daddio_Instagram {
 		$arr = explode( 'window._sharedData = ', $html );
 		$json = explode( ';</script>', $arr[1] );
 		$json = $json[0];
-
 		return json_decode( $json );
 	}
 
@@ -497,10 +486,112 @@ class Daddio_Instagram {
 		return $this->get_instagram_json_from_html( $response['body'] );
 	}
 
+	public function normalize_instagram_data( $node = false ) {
+		if ( ! $node ) {
+			return false;
+		}
+
+		// Check if $node is already normalized
+		// If so just return the $node back
+		if ( isset( $node->_normalized ) ) {
+			return $node;
+		}
+
+		$output = array(
+			'_normalized' => true,
+			'id' => '',
+			'code' => '',
+			'full_src' => '',
+			'thumbnail_src' => '',
+			'video_src' => '',
+			'is_video' => false,
+			'is_private' => false,
+			'caption' => '',
+			'timestamp' => '', // In GMT time
+			'owner_id' => '',
+			'owner_username' => '',
+			'owner_full_name' => '',
+			'location_id' => '',
+			'location_name' => '',
+			'location_slug' => '',
+			'location_has_public_page' => false,
+		);
+
+		// Common properties for both old and new format
+		if ( isset( $node->id ) ) {
+			$output['id'] = $node->id;
+		}
+		if ( isset( $node->is_video ) && $node->is_video ) {
+			$output['is_video'] = true;
+		}
+		if ( isset( $node->owner->id ) ) {
+			$output['owner_id'] = $node->owner->id;
+		}
+
+		// New API format introduced 4/18/2017
+		if ( isset( $node->shortcode ) ) {
+			$output['code'] = $node->shortcode;
+		}
+		if ( isset( $node->display_url ) ) {
+			$output['full_src'] = $node->display_url;
+		}
+		if ( isset( $node->video_url ) ) {
+			$output['video_src'] = $node->video_url;
+		}
+		if ( isset( $node->edge_media_to_caption->edges[0]->node->text ) ) {
+			$output['caption'] = $node->edge_media_to_caption->edges[0]->node->text;
+		}
+		if ( isset( $node->taken_at_timestamp ) ) {
+			$output['timestamp'] = $node->taken_at_timestamp;
+		}
+		if ( isset( $node->location->id ) ) {
+			$output['location_id'] = $node->location->id;
+		}
+		if ( isset( $node->location->has_public_page ) ) {
+			$output['location_has_public_page'] = $node->location->has_public_page;
+		}
+		if ( isset( $node->location->name ) ) {
+			$output['location_name'] = $node->location->name;
+		}
+		if ( isset( $node->location->slug ) ) {
+			$output['location_slug'] = $node->location->slug;
+		}
+		if ( isset( $node->owner->username ) ) {
+			$output['owner_username'] = $node->owner->username;
+		}
+		if ( isset( $node->owner->full_name ) ) {
+			$output['owner_full_name'] = $node->owner->full_name;
+		}
+		if ( isset( $node->owner->is_private ) && $node->owner->is_private ) {
+			$output['is_private'] = true;
+		}
+
+		// Old API format
+		if ( isset( $node->code ) ) {
+			$output['code'] = $node->code;
+		}
+		if ( isset( $node->date ) ) {
+			$output['timestamp'] = $node->date;
+		}
+		if ( isset( $node->display_src ) ) {
+			$output['full_src'] = $node->display_src;
+		}
+		if ( isset( $node->thumbnail_src ) ) {
+			$output['thumbnail_src'] = $node->thumbnail_src;
+		}
+		if ( isset( $node->caption ) ) {
+			$output['caption'] = $node->caption;
+		}
+
+		return (object) $output;
+	}
+
 	public function insert_instagram_post( $node, $force_publish_status = false ) {
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/admin.php';
 		}
+
+		$node = $this->normalize_instagram_data( $node );
 
 		$img = $node;
 		// Check to see if $node is already a PostPage object. If not, try and fetch a single instagram post.
@@ -512,16 +603,15 @@ class Daddio_Instagram {
 			if ( ! isset( $payload->entry_data->PostPage[0] ) ) {
 				return -1;
 			}
-			$img = $payload->entry_data->PostPage[0]->media;
+			$img = $payload->entry_data->PostPage[0]->graphql->shortcode_media;
 		}
+		$img = $this->normalize_instagram_data( $img );
+		$src = $img->full_src;
+		$permalink = 'https://www.instagram.com/p/' . $img->code . '/';
 
-		$src = $img->display_src;
-		$slug = $img->code;
-		$permalink = 'https://www.instagram.com/p/' . $slug . '/';
-
-		$posted = date( 'Y-m-d H:i:s', intval( $img->date ) ); // In GMT time
-		$username = $img->owner->username;
-		$full_name = $img->owner->full_name;
+		$posted = date( 'Y-m-d H:i:s', intval( $img->timestamp ) ); // In GMT time
+		$username = $img->owner_username;
+		$full_name = $img->owner_full_name;
 		$caption = Encoding::fixUTF8( $img->caption );
 		$title = preg_replace( '/\s#\w+/i', '', $caption );
 
@@ -553,12 +643,13 @@ class Daddio_Instagram {
 
 		$video_id = false;
 		if ( $img->is_video ) {
-			$video_file = $img->video_url;
+			$video_file = $img->video_src;
 			$tmp = download_url( $video_file );
 
-			$file_array = array();
-			$file_array['name'] = $slug . '.mp4';
-			$file_array['tmp_name'] = $tmp;
+			$file_array = array(
+				'name' => $img->code . '.mp4',
+				'tmp_name' => $tmp,
+			);
 
 			// If error storing temporarily, unlink
 			if ( is_wp_error( $tmp ) ) {
@@ -580,12 +671,12 @@ class Daddio_Instagram {
 
 		$attachment_data = array(
 			'post_content' => $caption,
-			'post_title' => 'Instagram: ' . $slug,
-			'post_name' => $slug,
-			'file_name' => $slug . '.jpg',
+			'post_title' => 'Instagram: ' . $img->code,
+			'post_name' => $img->code,
+			'file_name' => $img->code . '.jpg',
 		);
-		$attachment_id = $this->media_sideload_image_return_id( $src, $inserted, $caption, $attachment_data );
-		update_post_meta( $inserted, 'instagram_username', $username );
+		$attachment_id = $this->media_sideload_image_return_id( $img->full_src, $inserted, $caption, $attachment_data );
+		update_post_meta( $inserted, 'instagram_username', $img->owner_username );
 
 		// Set the featured image
 		add_post_meta( $inserted, '_thumbnail_id', $attachment_id );
