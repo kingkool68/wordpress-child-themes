@@ -482,6 +482,10 @@ class Daddio_Instagram {
 		$args = array();
 		$request = add_query_arg( $args, 'https://www.instagram.com/p/' . $code . '/' );
 		$response = wp_remote_get( $request );
+		if ( is_wp_error( $response ) ) {
+			echo '<p>' . $response->get_error_message . '</p>';
+			return false;
+		}
 
 		return $this->get_instagram_json_from_html( $response['body'] );
 	}
@@ -499,6 +503,7 @@ class Daddio_Instagram {
 
 		$output = array(
 			'_normalized' => true,
+			'typename' => false,
 			'id' => '',
 			'code' => '',
 			'full_src' => '',
@@ -529,6 +534,9 @@ class Daddio_Instagram {
 		}
 
 		// New API format introduced 4/18/2017
+		if ( isset( $node->__typename ) ) {
+			$output['typename'] = $node->__typename;
+		}
 		if ( isset( $node->shortcode ) ) {
 			$output['code'] = $node->shortcode;
 		}
@@ -590,12 +598,10 @@ class Daddio_Instagram {
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/admin.php';
 		}
-
 		$node = $this->normalize_instagram_data( $node );
-
 		$img = $node;
 		// Check to see if $node is already a PostPage object. If not, try and fetch a single instagram post.
-		if ( ! isset( $node->owner->is_private ) ) {
+		if ( ! $node->typename ) {
 			$payload = $this->fetch_single_instagram( $node->code );
 			if ( empty( $payload ) || ! $payload ) {
 				return;
