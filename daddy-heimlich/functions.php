@@ -6,10 +6,10 @@ add_theme_support( 'title-tag' );
 add_theme_support( 'html5', array( 'comment-list', 'comment-form', 'search-form', 'gallery', 'caption' ) );
 
 
-function pre_dump() {
-	echo '<pre>';
+function wp_dump() {
+	echo '<xmp>';
 	var_dump( func_get_args() );
-	echo '</pre>';
+	echo '</xmp>';
 }
 
 // Google Analytics Debugging flag
