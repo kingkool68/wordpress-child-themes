@@ -90,23 +90,22 @@ class Daddio_Dates {
 	public function get_child_time_format() {
 		return get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
 	}
-<<<<<<< Updated upstream
-=======
+
+	public function get_monthly_post_counts() {
+		global $wpdb;
+		$where = "WHERE `post_type` IN ( 'instagram', 'post' ) AND `post_status` = 'publish'";
+		$query = "SELECT YEAR(`post_date`) AS `year`, MONTH(`post_date`) AS `month`, count(ID) AS count FROM $wpdb->posts $where GROUP BY YEAR(`post_date`), MONTH(`post_date`) ORDER BY `post_date` DESC";
+		return $wpdb->get_results( $query );
+	}
 
 	public function get_monthly_archive_links() {
-		global $wpdb;
 		$month_format = 'n';
 		$months = array();
 		for ( $m = 1; $m <= 12; $m++ ) {
 			$months[ $m ] = date( $month_format, mktime( 0, 0, 0, $m, 1, date( 'Y' ) ) );
 		}
 
-		// Get Posts
-		$order = 'DESC';
-		$where = "WHERE `post_type` IN ( 'instagram', 'post' ) AND `post_status` = 'publish'";
-		$query = "SELECT YEAR(`post_date`) AS `year`, MONTH(`post_date`) AS `month`, count(ID) AS count FROM $wpdb->posts $where GROUP BY YEAR(`post_date`), MONTH(`post_date`) ORDER BY `post_date` $order";
-
-		$raw_post_data = $wpdb->get_results( $query );
+		$raw_post_data = $this->get_monthly_post_counts();
 		$post_data = array();
 		foreach ( $raw_post_data as $raw ) {
 			$post_data[ $raw->year ][ $raw->month ] = $raw->count;
@@ -133,20 +132,44 @@ class Daddio_Dates {
 		return array_reverse( $output, $preserve_keys = true );
 	}
 
-	public function get_age_archive_links() {
-		$now = new DateTime();
-		$birth = new DateTime( CHILD_DATE_OF_BIRTH );
-		$diff = $birth->diff( $now );
-		$months = ( $diff->y * 12 ) + $diff->m;
-		$output = [];
-		$count = 0;
-		while ( $months > 12 ) {
-			$output[ $count ];
-			$count++;
-			$months = $months - 12;
+	public function get_age_archive_data() {
+		$month_of_birth = date( 'm', $this->get_childs_birthday() );
+		$month_after_birth = intval( $month_of_birth ) + 1;
+		if ( $month_after_birth > 12 ) {
+			$month_after_birth = 1;
 		}
+
+		$day_of_birth = date( 'd', $this->get_childs_birthday() );
+		$day_before_birth = intval( $day_of_birth ) - 1;
+		$permalink = get_site_url() . '/age/';
+
+		$raw_post_data = $this->get_monthly_post_counts();
+		$output = array();
+		foreach ( $raw_post_data as $raw ) {
+			$time_offset = date( 'U', strtotime( $raw->year . '-' . $raw->month . '-' . $day_before_birth ) );
+			if ( $time_offset < $this->get_childs_birthday() + MONTH_IN_SECONDS ) {
+				continue;
+			}
+			$levels = 2;
+			$has_month = true;
+			if ( $month_after_birth == $raw->month ) {
+				$levels = 1;
+				$has_month = false;
+			}
+
+			if ( $time_offset < $this->get_childs_birthday() + YEAR_IN_SECONDS ) {
+				$levels = 1;
+			}
+			$diff = $this->get_childs_birthday_diff( $levels, $time_offset );
+			$diff_slug = str_replace( ' ', '', $diff );
+			$output[] = array(
+				'timestamp' => $diff,
+				'permalink' => $permalink . $diff_slug . '/',
+				'has_month' => $has_month,
+			);
+		}
+		return $output;
 	}
->>>>>>> Stashed changes
 }
 Daddio_Dates::get_instance();
 
@@ -177,16 +200,13 @@ function get_child_time_format() {
 	$instance = Daddio_Dates::get_instance();
 	return $instance->get_child_time_format();
 }
-<<<<<<< Updated upstream
-=======
 
 function get_monthly_archive_links() {
 	$instance = Daddio_Dates::get_instance();
 	return $instance->get_monthly_archive_links();
 }
 
-function get_age_archive_links() {
+function get_age_archive_data() {
 	$instance = Daddio_Dates::get_instance();
-	return $instance->get_age_archive_links();
+	return $instance->get_age_archive_data();
 }
->>>>>>> Stashed changes

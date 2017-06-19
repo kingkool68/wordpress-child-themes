@@ -4,8 +4,14 @@
 		<section class="date-archive">
 			<h1>By Age</h1>
 			<?php
-			$data = get_age_archive_links();
-			
+			$data = get_age_archive_data();
+			foreach ( $data as $item ) {
+				if ( ! $item['has_month'] ) : ?>
+					<h2><a href="<?php echo esc_url( $item['permalink'] ); ?>"><?php echo $item['timestamp']; ?></a></h2>
+				<?php else : ?>
+					<a href="<?php echo esc_url( $item['permalink'] ); ?>" style="display: block;"><?php echo $item['timestamp']; ?></a>
+				<?php endif;
+			}
 			?>
 		</section>
 		<section class="date-archive">
