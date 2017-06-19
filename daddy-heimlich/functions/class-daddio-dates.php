@@ -166,6 +166,7 @@ class Daddio_Dates {
 				'timestamp' => $diff,
 				'permalink' => $permalink . $diff_slug . '/',
 				'has_month' => $has_month,
+				'count' => $raw->count,
 			);
 		}
 		return $output;

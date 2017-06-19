@@ -6,10 +6,17 @@
 			<?php
 			$data = get_age_archive_data();
 			foreach ( $data as $item ) {
+				$title_attr = 'View ' . $item['count'] . ' items from when ' . CHILD_NAME . ' was ' . $item['timestamp'] . ' old';
 				if ( ! $item['has_month'] ) : ?>
-					<h2><a href="<?php echo esc_url( $item['permalink'] ); ?>"><?php echo $item['timestamp']; ?></a></h2>
+					<h2>
+						<a href="<?php echo esc_url( $item['permalink'] ); ?>" title="<?php echo esc_attr( $title_attr ); ?>">
+							<?php echo $item['timestamp']; ?>
+						</a>
+					</h2>
 				<?php else : ?>
-					<a href="<?php echo esc_url( $item['permalink'] ); ?>" style="display: block;"><?php echo $item['timestamp']; ?></a>
+					<a href="<?php echo esc_url( $item['permalink'] ); ?>" style="display: block;" title="<?php echo esc_attr( $title_attr ); ?>">
+						<?php echo $item['timestamp']; ?>
+					</a>
 				<?php endif;
 			}
 			?>
