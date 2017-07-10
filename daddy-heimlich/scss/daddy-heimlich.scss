@@ -32,8 +32,8 @@ Bundle core WordPress stylesheets to save on requests
 
 @import 'components/headings';
 @import 'components/article';
-@import 'components/archive';
-@import 'components/date-archives';
+@import 'components/archive-header';
+@import 'components/archives';
 @import 'components/on-this-day';
 @import 'components/rsvp-page';
 @import 'components/attachments';

@@ -86,7 +86,7 @@ class Daddio_Archive {
 
 		if ( $archive_header ) {
 		?>
-			<section class="archive"><?php echo $archive_header; ?></section>
+			<section class="archive-header"><?php echo $archive_header; ?></section>
 		<?php
 		}
 	}

@@ -1,28 +1,9 @@
 <?php get_header(); ?>
 
 	<div id="content">
-		<section class="date-archive">
-			<h1>By Age</h1>
-			<?php
-			$data = get_age_archive_data();
-			foreach ( $data as $item ) {
-				$title_attr = 'View ' . $item['count'] . ' items from when ' . CHILD_NAME . ' was ' . $item['timestamp'] . ' old';
-				if ( ! $item['has_month'] ) : ?>
-					<h2>
-						<a href="<?php echo esc_url( $item['permalink'] ); ?>" title="<?php echo esc_attr( $title_attr ); ?>">
-							<?php echo $item['timestamp']; ?>
-						</a>
-					</h2>
-				<?php else : ?>
-					<a href="<?php echo esc_url( $item['permalink'] ); ?>" style="display: block;" title="<?php echo esc_attr( $title_attr ); ?>">
-						<?php echo $item['timestamp']; ?>
-					</a>
-				<?php endif;
-			}
-			?>
-		</section>
-		<section class="date-archive">
-			<h1 class="heading">By Date</h1>
+		<h1>Archives</h1>
+		<section class="archive-section date-archive">
+			<h2 class="heading">By Date</h2>
 			<form>
 				<label>Enter a Date</label>
 				<input type="">
@@ -48,15 +29,37 @@
 			}
 			?>
 		</section>
-		<section>
-			<h1>By Tag</h1>
+
+		<section class="archive-section age-archive">
+			<h2 class="heading">By Age</h2>
+			<?php
+			$data = get_age_archive_data();
+			foreach ( $data as $item ) {
+				$title_attr = 'View ' . $item['count'] . ' items from when ' . CHILD_NAME . ' was ' . $item['timestamp'] . ' old';
+				if ( ! $item['has_month'] ) : ?>
+					<h3 class="year-heading">
+						<a href="<?php echo esc_url( $item['permalink'] ); ?>" title="<?php echo esc_attr( $title_attr ); ?>">
+							<?php echo $item['timestamp']; ?>
+						</a>
+					</h3>
+				<?php else : ?>
+					<a href="<?php echo esc_url( $item['permalink'] ); ?>" title="<?php echo esc_attr( $title_attr ); ?>" class="age-item">
+						<?php echo $item['timestamp']; ?>
+					</a>
+				<?php endif;
+			}
+			?>
+		</section>
+
+		<section class="archive-section tag-archive">
+			<h2 class="heading">By Tag</h2>
 			<?php
 				$args = array(
 					'taxonomy' => 'post_tag',
 					'unit' => 'em',
 					'number' => 50,
 					'smallest' => 0.75,
-					'largest' => 3,
+					'largest' => 2.5,
 				);
 				wp_tag_cloud( $args );
 			?>
