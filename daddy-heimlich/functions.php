@@ -6,11 +6,15 @@ add_theme_support( 'title-tag' );
 add_theme_support( 'html5', array( 'comment-list', 'comment-form', 'search-form', 'gallery', 'caption' ) );
 
 
-function wp_dump() {
-	echo '<xmp>';
-	var_dump( func_get_args() );
-	echo '</xmp>';
-}
+if ( ! function_exists( 'wp_dump' ) ) :
+	function wp_dump() {
+		foreach ( func_get_args() as $arg ) {
+			echo '<xmp>';
+			var_dump( $arg );
+			echo '</xmp>';
+		}
+	}
+endif;
 
 // Google Analytics Debugging flag
 function daddio_google_analytics_debugging_flag( $class = array() ) {
