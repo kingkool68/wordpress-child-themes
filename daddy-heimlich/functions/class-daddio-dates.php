@@ -15,11 +15,100 @@ class Daddio_Dates {
 	}
 
 	public function setup_hooks() {
+		add_action( 'init', array( $this, 'init_add_rewrite_tags' ) );
+		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
+
 		add_filter( 'the_time', array( $this, 'filter_the_time' ) );
+		add_filter( 'query_vars', array( $this, 'filter_query_vars' ) );
+		add_filter( 'rewrite_rules_array', array( $this, 'filter_rewrite_rules_array' ) );
+	}
+
+	public function init_add_rewrite_tags() {
+		global $wp_rewrite;
+
+		$rewrite_tags = array(
+			array( '%age%', 'age/([^/]+)', 'age=' ),
+		);
+		foreach ( $rewrite_tags as $tag ) {
+			 $wp_rewrite->add_rewrite_tag( $tag[0], $tag[1], $tag[2] );
+		}
+	}
+
+	public function action_pre_get_posts( $query ) {
+		$age = get_query_var( 'age' );
+		if ( ! $age ) {
+			return;
+		}
+
+		$unit = $this->get_smallest_time_unit( $age );
+		$relative_date = strtotime( $age );
+		$offset = $relative_date - date( 'U' );
+		$ending_offset = 0;
+		switch ( $unit ) {
+			case 'years':
+			case 'year':
+				$ending_offset = YEAR_IN_SECONDS;
+			 	break;
+
+			case 'months':
+			case 'month':
+				$ending_offset = MONTH_IN_SECONDS;
+				break;
+
+			case 'weeks':
+			case 'week':
+				$ending_offset = WEEK_IN_SECONDS;
+				break;
+
+			case 'days':
+			case 'day':
+				$ending_offset = DAY_IN_SECONDS;
+				break;
+
+			case 'hours':
+			case 'hour':
+				$ending_offset = HOUR_IN_SECONDS;
+				break;
+
+			case 'minutes':
+			case 'minute':
+				$ending_offset = MINUTE_IN_SECONDS;
+				break;
+		}
+		$start = $this->get_childs_birthday() + $offset; // In seconds
+		$end = $start + $ending_offset;
+		$date_query = array(
+			array(
+				'before' => date( 'Y-m-d g:ia', $end ),
+				'after' => date( 'Y-m-d g:ia', $start ),
+				'inclusive' => false,
+			),
+		);
+		$query->set( 'date_query', $date_query );
 	}
 
 	public function filter_the_time( $time = '' ) {
 		return preg_replace( '/(\d+):(\d+) (am|pm)/i', '<span class="time">$1<span class="colon">:</span>$2 <span class="am-pm">$3</span></span>', $time );
+	}
+
+	public function filter_query_vars( $vars = array() ) {
+		$vars[] = 'age';
+
+		return $vars;
+	}
+
+	public function filter_rewrite_rules_array( $rules = array() ) {
+		global $wp_rewrite;
+		$root = $wp_rewrite->root;
+		$permalink_structures = array(
+			$root . '/%age%/',
+		);
+
+		foreach ( $permalink_structures as $struc ) {
+			$rules = $wp_rewrite->generate_rewrite_rules( $struc, $ep_mask = EP_ALL_ARCHIVES ) + $rules;
+		}
+
+		return $rules;
 	}
 
 	/**
@@ -170,6 +259,20 @@ class Daddio_Dates {
 			);
 		}
 		return $output;
+	}
+
+	public function get_smallest_time_unit( $timestamp = '' ) {
+		if ( ! $timestamp ) {
+			return false;
+		}
+
+		$timestamp = strtolower( $timestamp );
+		// Strip out everything except numbers and letters
+		$timestamp = preg_replace( '/[^\w]+/', '', $timestamp );
+		$timestamp_words = preg_replace( '/(\d+)/', '-', $timestamp );
+		$timestamp_words = explode( '-', $timestamp_words );
+		$last_word = $timestamp_words[ count( $timestamp_words ) - 1 ];
+		return $last_word;
 	}
 }
 Daddio_Dates::get_instance();
