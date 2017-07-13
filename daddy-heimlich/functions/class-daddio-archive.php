@@ -58,6 +58,11 @@ class Daddio_Archive {
 			$heading = date( 'F d, Y', strtotime( $year . '-' . $month . '-' . $day ) );
 		}
 
+		if ( $age = get_query_var( 'age' ) ) {
+			$age = preg_replace( '/(\d)+/', ' $1 ', $age );
+			$heading = ucwords( $age ) . ' Old';
+		}
+
 		if ( $found = $wp_query->found_posts ) {
 			$found = number_format( $found );
 			$label = 'item';
