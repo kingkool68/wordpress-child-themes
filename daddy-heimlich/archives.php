@@ -1,13 +1,11 @@
 <?php get_header(); ?>
 
 	<div id="content">
-		<h1>Archives</h1>
+		<section class="archive-header">
+			<h1 class="heading">Archives</h1>
+		</section>
 		<section class="archive-section date-archive">
 			<h2 class="heading">By Date</h2>
-			<form>
-				<label>Enter a Date</label>
-				<input type="">
-			</form>
 			<?php
 			$data = get_monthly_archive_links();
 			foreach ( $data as $year => $month_data ) {
@@ -34,14 +32,22 @@
 			<h2 class="heading">By Age</h2>
 			<?php
 			$data = get_age_archive_data();
+			// We can better group the dates by reversing our data
+			$data = array_reverse( $data );
+			?>
+			<div class="age-group">
+				<h3 class="year-heading"><a href="#">0 years</a></h3>
+			<?php
 			foreach ( $data as $item ) {
 				$title_attr = 'View ' . $item['count'] . ' items from when ' . CHILD_NAME . ' was ' . $item['timestamp'] . ' old';
 				if ( ! $item['has_month'] ) : ?>
-					<h3 class="year-heading">
-						<a href="<?php echo esc_url( $item['permalink'] ); ?>" title="<?php echo esc_attr( $title_attr ); ?>">
-							<?php echo $item['timestamp']; ?>
-						</a>
-					</h3>
+					</div>
+					<div class="age-group">
+						<h3 class="year-heading">
+							<a href="<?php echo esc_url( $item['permalink'] ); ?>" title="<?php echo esc_attr( $title_attr ); ?>">
+								<?php echo $item['timestamp']; ?>
+							</a>
+						</h3>
 				<?php else : ?>
 					<a href="<?php echo esc_url( $item['permalink'] ); ?>" title="<?php echo esc_attr( $title_attr ); ?>" class="age-item">
 						<?php echo $item['timestamp']; ?>
@@ -49,6 +55,7 @@
 				<?php endif;
 			}
 			?>
+			</div>
 		</section>
 
 		<section class="archive-section tag-archive">

@@ -256,6 +256,8 @@ class Daddio_Dates {
 				'permalink' => $permalink . $diff_slug . '/',
 				'has_month' => $has_month,
 				'count' => $raw->count,
+				'year' => $raw->year,
+				'month' => $raw->month - 1,
 			);
 		}
 		return $output;

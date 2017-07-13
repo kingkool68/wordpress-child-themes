@@ -983,32 +983,37 @@ h2 {
     font-size: 80%;
     padding-bottom: 0.3125em; } }
 
-section.archive {
+.archive-header {
   border-bottom: 0.3125em solid #76c681;
   border-bottom-color: rgba(255, 255, 255, 0.5);
   font-family: "Shrikhand", Arial, Helvetica, sans-serif;
   padding: 1.125em 2.375em; }
-
-.archive .heading {
-  padding: 0 0.3125em 0 0;
-  display: inline-block; }
-
-.archive .subheading {
-  font-size: 1.25em;
-  position: relative;
-  top: 0.9em;
-  float: right; }
+  .archive-header .heading {
+    padding: 0 0.3125em 0 0;
+    display: inline-block; }
+  .archive-header .subheading {
+    font-size: 1.25em;
+    position: relative;
+    top: 0.9em;
+    float: right; }
 
 @media (max-width: 42.5em) {
-  section.archive {
+  .archive-header {
     text-align: center; }
-  .archive .heading {
-    font-size: 2.375em;
-    padding-right: 0;
-    padding-bottom: 0.2em; }
-  .archive .subheading {
-    float: none;
-    position: static; } }
+    .archive-header .heading {
+      font-size: 2.375em;
+      padding-right: 0;
+      padding-bottom: 0.2em; }
+    .archive-header .subheading {
+      float: none;
+      position: static; } }
+
+.archive-section {
+  overflow: auto;
+  height: 100%;
+  padding: 2em 2.375em 1em; }
+  .archive-section .heading {
+    font-size: 2em; }
 
 .date-archive .year-heading {
   font-size: 2em;
@@ -1025,6 +1030,23 @@ section.archive {
 .date-archive span.rounded-button {
   background-color: transparent;
   border: 0 none; }
+
+.age-archive .age-group {
+  float: left;
+  width: 33.33%; }
+
+.age-archive .year-heading {
+  font-size: 2em;
+  padding: 0 0 0.75em; }
+
+.age-archive .age-item {
+  float: left;
+  clear: left;
+  margin-left: 0.5em;
+  margin-bottom: 0.5em; }
+
+.tag-archive {
+  clear: both; }
 
 .on-this-day-date-switcher {
   text-align: center;

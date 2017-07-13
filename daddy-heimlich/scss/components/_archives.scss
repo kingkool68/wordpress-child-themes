@@ -1,7 +1,7 @@
 .archive-section {
 	overflow: auto;
 	height: 100%;
-	padding-bottom: em(15px);
+	padding: em(32px) em(38px) em(16px);
 
 	.heading {
 		font-size: em(32px);
@@ -9,8 +9,6 @@
 }
 
 .date-archive {
-	float: left;
-	width: 75%;
 
 	.year-heading {
 		font-size: em(32px);
@@ -33,13 +31,15 @@
 }
 
 .age-archive {
-	float: right;
-	width: 15%;
+
+	.age-group {
+		float: left;
+		width: 33.33%;
+	}
 
 	.year-heading {
-		clear: both;
 		font-size: em(32px);
-		padding: em(32px, 32px) 0 em(24px, 32px);
+		padding: 0 0 em(24px, 32px);
 	}
 
 	.age-item {
