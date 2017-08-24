@@ -59,7 +59,7 @@ class Daddio_Archive {
 		}
 
 		if ( $age = get_query_var( 'age' ) ) {
-			$age = preg_replace( '/(\d)+/', ' $1 ', $age );
+			$age = preg_replace( '/(\d+)/', ' $1 ', $age );
 			$heading = ucwords( $age ) . ' Old';
 		}
 
@@ -111,13 +111,25 @@ class Daddio_Archive {
 	}
 
 	public function filter_template_include( $template = '' ) {
+		global $wp_query;
+		$template_paths = array();
 		if ( '1' == get_query_var( 'daddio-archives-page' ) ) {
 			$template_paths = array(
 				'archives.php',
 			);
-			if ( $new_template = locate_template( $template_paths ) ) {
-				return $new_template;
-			}
+
+		}
+
+		$found_posts = intval( $wp_query->found_posts );
+		if ( ! $found_posts && get_query_var( 'age' ) ) {
+			$template_paths = array(
+				'404-age-archive.php',
+				'404.php',
+			);
+		}
+
+		if ( $new_template = locate_template( $template_paths ) ) {
+			return $new_template;
 		}
 		return $template;
 	}
