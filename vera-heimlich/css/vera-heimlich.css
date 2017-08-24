@@ -1029,7 +1029,9 @@ h2 {
 
 .date-archive span.rounded-button {
   background-color: transparent;
-  border: 0 none; }
+  border: 0 none;
+  padding-top: 0.55556em;
+  padding-bottom: 0.55556em; }
 
 .age-archive .age-group {
   float: left;
