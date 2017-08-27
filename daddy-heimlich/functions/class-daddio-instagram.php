@@ -618,7 +618,7 @@ class Daddio_Instagram {
 		$posted = date( 'Y-m-d H:i:s', intval( $img->timestamp ) ); // In GMT time
 		$username = $img->owner_username;
 		$full_name = $img->owner_full_name;
-		$caption = Encoding::fixUTF8( $img->caption );
+		$caption = wp_encode_emoji( $img->caption );
 		$title = preg_replace( '/\s#\w+/i', '', $caption );
 
 		$post = array(
