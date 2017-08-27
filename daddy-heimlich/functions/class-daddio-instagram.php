@@ -333,7 +333,7 @@ class Daddio_Instagram {
 
 	function the_content( $content ) {
 		$post = get_post();
-		if ( 'instagram' == $post->post_type ) {
+		if ( is_object( $post ) && 'instagram' == $post->post_type ) {
 			$content = preg_replace( '/\s(#(\w+))/im', ' <a href="https://instagram.com/explore/tags/$2/">$1</a>', $content );
 			// $content = preg_replace('/^(#(\w+))/im', '<a href="https://instagram.com/explore/tags/$2/">$1</a>', $content);
 			$content = preg_replace( '/\s(@(\w+))/im', ' <a href="http://instagram.com/$2">$1</a>', $content );
