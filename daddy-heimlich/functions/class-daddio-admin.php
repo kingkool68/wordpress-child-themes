@@ -52,4 +52,4 @@ class Daddio_Admin {
 		$wp_admin_bar->remove_menu( 'wp-logo' );
 	}
 }
-new Daddio_Admin;
+Daddio_Admin::get_instance();
