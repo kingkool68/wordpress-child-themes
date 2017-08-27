@@ -1,5 +1,8 @@
 <?php
 class Daddio_Archive {
+
+	public $is_date_query = false;
+
 	/**
 	 * Get an instance of this class
 	 */
@@ -15,6 +18,7 @@ class Daddio_Archive {
 
 	public function setup_hooks() {
 		add_action( 'daddio_before_content', array( $this, 'daddio_before_content' ) );
+		add_action( 'parse_query', array( $this, 'action_parse_query' ) );
 
 		add_filter( 'query_vars', array( $this, 'filter_query_vars' ) );
 		add_filter( 'rewrite_rules_array', array( $this, 'filter_rewrite_rules_array' ) );
@@ -96,6 +100,12 @@ class Daddio_Archive {
 		}
 	}
 
+	public function action_parse_query( $query ) {
+		if ( isset( $query->is_date ) ) {
+			$this->is_date_query = $query->is_date;
+		}
+	}
+
 	public function filter_query_vars( $vars = array() ) {
 		$vars[] = 'daddio-archives-page';
 		return $vars;
@@ -121,9 +131,19 @@ class Daddio_Archive {
 		}
 
 		$found_posts = intval( $wp_query->found_posts );
+
+		// Age 404 templates
 		if ( ! $found_posts && get_query_var( 'age' ) ) {
 			$template_paths = array(
 				'404-age-archive.php',
+				'404.php',
+			);
+		}
+
+		// Date 404 templates
+		if ( ! $found_posts && $this->is_date_query ) {
+			$template_paths = array(
+				'404-date-archive.php',
 				'404.php',
 			);
 		}
