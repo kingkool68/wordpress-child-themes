@@ -5,7 +5,7 @@
 	<div class="inner">
 		<h1 class="title">
 			<time datetime="<?php echo get_post_time( 'c', true ) ?>">
-				<?php if( !is_singular() ) { ?>
+				<?php if ( ! is_singular() ) { ?>
 					<a href="<?php the_permalink(); ?>"><?php the_time( get_child_time_format() ); ?></a>
 				<?php } else { ?>
 					<?php the_time( get_child_time_format() ); ?>

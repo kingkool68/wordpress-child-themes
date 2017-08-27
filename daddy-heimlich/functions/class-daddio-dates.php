@@ -93,7 +93,6 @@ class Daddio_Dates {
 
 	public function filter_query_vars( $vars = array() ) {
 		$vars[] = 'age';
-
 		return $vars;
 	}
 
