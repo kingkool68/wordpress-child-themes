@@ -1035,7 +1035,16 @@ h2 {
 
 .age-archive .age-group {
   float: left;
-  width: 33.33%; }
+  width: 33.33%;
+  overflow: auto;
+  margin-bottom: 1.5em; }
+  @media (max-width: 41.25em) {
+    .age-archive .age-group {
+      width: 50%; } }
+  @media (max-width: 30em) {
+    .age-archive .age-group {
+      float: none;
+      width: auto; } }
 
 .age-archive .year-heading {
   font-size: 2em;

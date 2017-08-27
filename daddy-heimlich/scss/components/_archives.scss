@@ -37,6 +37,19 @@
 	.age-group {
 		float: left;
 		width: 33.33%;
+		overflow: auto;
+		margin-bottom: em(24px);
+
+		@media( max-width: em(660px) ) {
+			width: 50%;
+		}
+
+		@media( max-width: em(480px) ) {
+			float: none;
+			width: auto;
+
+		}
+
 	}
 
 	.year-heading {
