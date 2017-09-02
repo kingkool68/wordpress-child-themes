@@ -36,7 +36,7 @@ class Daddio_Dates {
 
 	public function action_pre_get_posts( $query ) {
 		$age = get_query_var( 'age' );
-		if ( ! $age ) {
+		if ( ! $age || ! $query->is_main_query() ) {
 			return;
 		}
 
