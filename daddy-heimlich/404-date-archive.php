@@ -1,4 +1,8 @@
 <?php
+add_filter( 'body_class', function( $classes = array() ) {
+	$classes[] = 'error404';
+	return $classes;
+} );
 $daddio_dates = Daddio_Dates::get_instance();
 $year = get_query_var( 'year' );
 $month = get_query_var( 'monthnum' );
@@ -42,11 +46,13 @@ get_header();
 	<div id="content">
 		<article class="article page">
 			<h1 class="title">Nothing Found!</h1>
-			<?php if ( 'past' == $tense ) : ?>
-					<p><?php echo $date; ?> was <?php echo $age; ?> before <?php echo CHILD_NAME ?>&rsquo;s birthday.</p>
-			<?php else : ?>
-				<p><?php echo $future_prefix; ?> <?php echo $date; ?> <?php echo CHILD_NAME ?> will be <?php echo $age; ?> old.</p>
-			<?php endif; ?>
+			<p class="date-explanation">
+				<?php if ( 'past' == $tense ) : ?>
+						<?php echo $date; ?> was <?php echo $age; ?> before <?php echo CHILD_NAME ?>&rsquo;s birthday.
+				<?php else : ?>
+					<?php echo $future_prefix; ?> <?php echo $date; ?> <?php echo CHILD_NAME ?> will be <?php echo $age; ?> old.
+				<?php endif; ?>
+			</p>
 			<?php do_action( 'daddio_content_footer', $post ); ?>
 		</article>
 	</div>

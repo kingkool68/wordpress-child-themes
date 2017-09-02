@@ -1,4 +1,8 @@
 <?php
+add_filter( 'body_class', function( $classes = array() ) {
+	$classes[] = 'error404';
+	return $classes;
+} );
 $daddio_dates = Daddio_Dates::get_instance();
 $age_query_var = get_query_var( 'age' );
 if ( $age_query_var ) {
@@ -32,7 +36,7 @@ get_header();
 	<div id="content">
 		<article class="article page">
 			<h1 class="title">Nothing Found!</h1>
-				<p><?php echo CHILD_NAME ?> <?php echo $tense; ?> <?php echo $age; ?> on <?php echo $date; ?></p>
+				<p class="date-explanation"><?php echo CHILD_NAME ?> <?php echo $tense; ?> <?php echo $age; ?> on <?php echo $date; ?></p>
 			<?php do_action( 'daddio_content_footer', $post ); ?>
 		</article>
 	</div>

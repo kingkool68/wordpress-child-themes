@@ -1177,6 +1177,12 @@ article.attachment-image img {
   text-align: center;
   padding-top: 0.1875em; }
 
+.error404 .page .title {
+  margin-bottom: 0.11111em; }
+
+.date-explanation {
+  text-align: center; }
+
 /* Loading Bars via http://tobiasahlin.com/spinkit/ */
 .loading-bars {
   height: 7.5em;
