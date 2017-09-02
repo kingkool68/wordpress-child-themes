@@ -983,32 +983,81 @@ h2 {
     font-size: 80%;
     padding-bottom: 0.3125em; } }
 
-section.archive {
+.archive-header {
   border-bottom: 0.3125em solid #C678BD;
   border-bottom-color: rgba(255, 255, 255, 0.5);
   font-family: "Crete Round", Arial, Helvetica, sans-serif;
   padding: 1.125em 2.375em; }
-
-.archive .heading {
-  padding: 0 0.3125em 0 0;
-  display: inline-block; }
-
-.archive .subheading {
-  font-size: 1.25em;
-  position: relative;
-  top: 0.9em;
-  float: right; }
+  .archive-header .heading {
+    padding: 0 0.3125em 0 0;
+    display: inline-block; }
+  .archive-header .subheading {
+    font-size: 1.25em;
+    position: relative;
+    top: 0.9em;
+    float: right; }
 
 @media (max-width: 42.5em) {
-  section.archive {
+  .archive-header {
     text-align: center; }
-  .archive .heading {
-    font-size: 2.375em;
-    padding-right: 0;
-    padding-bottom: 0.2em; }
-  .archive .subheading {
-    float: none;
-    position: static; } }
+    .archive-header .heading {
+      font-size: 2.375em;
+      padding-right: 0;
+      padding-bottom: 0.2em; }
+    .archive-header .subheading {
+      float: none;
+      position: static; } }
+
+.archive-section {
+  overflow: auto;
+  height: 100%;
+  padding: 2em 2.375em 1em; }
+  .archive-section .heading {
+    font-size: 2em; }
+
+.date-archive .year-heading {
+  font-size: 2em;
+  display: block;
+  clear: both;
+  margin: 0 0 0.75em; }
+
+.date-archive .item {
+  float: left;
+  margin-right: 1em;
+  margin-bottom: 2em;
+  font-size: 1em; }
+
+.date-archive span.rounded-button {
+  background-color: transparent;
+  border: 0 none;
+  padding-top: 0.55556em;
+  padding-bottom: 0.55556em; }
+
+.age-archive .age-group {
+  float: left;
+  width: 33.33%;
+  overflow: auto;
+  margin-bottom: 1.5em; }
+  @media (max-width: 41.25em) {
+    .age-archive .age-group {
+      width: 50%; } }
+  @media (max-width: 30em) {
+    .age-archive .age-group {
+      float: none;
+      width: auto; } }
+
+.age-archive .year-heading {
+  font-size: 2em;
+  padding: 0 0 0.75em; }
+
+.age-archive .age-item {
+  float: left;
+  clear: left;
+  margin-left: 0.5em;
+  margin-bottom: 0.5em; }
+
+.tag-archive {
+  clear: both; }
 
 .on-this-day-date-switcher {
   text-align: center;
@@ -1127,6 +1176,12 @@ article.attachment-image img {
 .attachment .progress {
   text-align: center;
   padding-top: 0.1875em; }
+
+.error404 .page .title {
+  margin-bottom: 0.11111em; }
+
+.date-explanation {
+  text-align: center; }
 
 /* Loading Bars via http://tobiasahlin.com/spinkit/ */
 .loading-bars {

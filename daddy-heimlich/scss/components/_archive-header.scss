@@ -1,0 +1,35 @@
+.archive-header {
+	border-bottom: em(5px) solid $divider-color;
+	border-bottom-color: $divider-color-rgba;
+	font-family: $headline-font;
+	padding: em(18px) em(38px);
+
+	.heading {
+		padding: 0 em(5px) 0 0;
+		display: inline-block;
+	}
+
+	.subheading {
+		font-size: em(20px);
+		position: relative;
+		top: em(18px, 20px);
+		float: right;
+	}
+}
+
+@media( max-width: em(680px) ) {
+	.archive-header {
+		text-align: center;
+
+		.heading {
+			font-size: em(38px);
+			padding-right: 0;
+			padding-bottom: em(7.6px, 38px);
+		}
+
+		.subheading {
+			float: none;
+			position: static;
+		}
+	}
+}
