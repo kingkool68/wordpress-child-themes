@@ -637,8 +637,10 @@ class Daddio_Instagram {
 		$inserted = wp_insert_post( $post );
 		if ( ! $inserted ) {
 			// Maybe it's because of bad characters in the caption and title? Try again.
-			$post['post_content'] = Encoding::fixUTF8( $caption );
-			$post['post_title'] = Encoding::fixUTF8( $title );
+			$caption = Encoding::fixUTF8( $caption );
+			$title = Encoding::fixUTF8( $title );
+			$post['post_content'] = $caption;
+			$post['post_title'] = $title;
 			$inserted = wp_insert_post( $post );
 		}
 
@@ -682,6 +684,7 @@ class Daddio_Instagram {
 			'file_name' => $img->code . '.jpg',
 		);
 		$attachment_id = $this->media_sideload_image_return_id( $img->full_src, $inserted, $caption, $attachment_data );
+		error_log( print_r( $img, true ) );
 		update_post_meta( $inserted, 'instagram_username', $img->owner_username );
 
 		// Set the featured image
