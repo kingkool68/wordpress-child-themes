@@ -21,7 +21,6 @@ class Daddio_Infinite_Scroll {
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
 		add_action( 'wp', array( $this, 'action_wp' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'action_enqueue_script' ) );
 
 		add_filter( 'post_limits', array( $this, 'filter_post_limits' ) );
 		add_filter( 'redirect_canonical', array( $this, 'filter_redirect_canonical' ), 10, 2 );
@@ -95,19 +94,6 @@ class Daddio_Infinite_Scroll {
 			$result = preg_replace( '/pages\/([\d\-]+|all)\//i', '', $result );
 		}
 		return $result;
-	}
-
-	// Determine if the request should load the infite scroll script or not
-	public function action_enqueue_script() {
-		wp_register_script( 'daddio-infinite-scroll', get_template_directory_uri() . '/js/infinite-scroll.js', array( 'jquery' ), null, true );
-
-		if ( is_archive() || is_front_page() ) {
-			wp_enqueue_script( 'daddio-infinite-scroll' );
-			$var = strtolower( get_query_var( 'pages' ) );
-			if ( 'all' == $var && ! is_front_page() ) {
-				wp_dequeue_script( 'daddio-infinite-scroll' );
-			}
-		}
 	}
 
 	/**

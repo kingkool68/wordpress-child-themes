@@ -40,7 +40,8 @@ var PATHS = {
 	  wpIncludesDir + '/mediaelement/mediaelement-and-player.min.js',
 	  wpIncludesDir + '/mediaelement/wp-mediaelement.js',
 	  'js/menu.js',
-	  'js/analytics.js'
+	  'js/analytics.js',
+      'js/infinite-scroll.js'
   ],
   scss: [
       '../vera-heimlich/scss/*.scss',
