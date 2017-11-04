@@ -19,6 +19,7 @@ class Daddio_Scripts_Style {
 
 		add_filter( 'style_loader_tag', array( $this, 'filter_style_loader_tag' ), 10, 4 );
 		add_filter( 'script_loader_tag', array( $this, 'filter_script_loader_tag' ), 10, 3 );
+		add_filter( 'body_class', array( $this, 'filter_body_class' ), 10, 1 );
 	}
 
 	/**
@@ -45,7 +46,6 @@ class Daddio_Scripts_Style {
 
 		// JavaScript
 		wp_register_script( 'post-gallery', get_template_directory_uri() . '/js/post-gallery' . $js_suffix, array( 'jquery' ), null, true );
-		wp_enqueue_script( 'daddio-analytics', get_template_directory_uri() . '/js/analytics' . $js_suffix, array( 'jquery' ), null, true );
 
 		// Global JavaScript files bundled into one that gets loaded on every single page
 		wp_register_script( 'daddio-global-scripts', get_template_directory_uri() . '/js/global.min.js', array( 'jquery' ), null, true );
@@ -119,6 +119,19 @@ class Daddio_Scripts_Style {
 		}
 
 		return $script_element;
+	}
+
+	/**
+	 * Check if ?debug-ga is set and add a body class for debugging Google Analytics events
+	 *
+	 * @param  string $body_class Body class to filter
+	 * @return string             Filtered body class
+	 */
+	public function filter_body_class( $body_class = '' ) {
+		if ( isset( $_GET['debug-ga'] ) ) {
+			$body_class[] = 'debug-ga';
+		}
+		return $body_class;
 	}
 
 	/**
