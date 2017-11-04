@@ -1,36 +1,35 @@
 {
-  "name": "zadie-heimlich",
+  "name": "daddy-heimlich",
   "version": "0.1.0",
-  "description": "Zadie Heimlich's Site",
+  "description": "Daddy Heimlich's Site",
   "main": "gulpfile.js",
-  "dependencies": {
-    "del": "^2.2.2"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "autoprefixer": "latest",
+    "autoprefixer": "^7.1.6",
     "colors": "latest",
     "del": "latest",
     "gulp": "latest",
-    "gulp-autoprefixer": "latest",
-    "gulp-clean-css": "latest",
+    "gulp-autoprefixer": "^4.0.0",
+    "gulp-clean-css": "^3.9.0",
     "gulp-clone": "latest",
     "gulp-concat": "latest",
+    "gulp-concat-css": "latest",
     "gulp-cssnano": "latest",
     "gulp-if": "latest",
     "gulp-jshint": "latest",
     "gulp-notify": "latest",
     "gulp-phpcbf": "latest",
-    "gulp-phpcs": "latest",
+    "gulp-phpcs": "^2.1.0",
     "gulp-rename": "latest",
     "gulp-sass": "latest",
-    "gulp-sourcemaps": "latest",
-    "gulp-uglify": "latest",
+    "gulp-sourcemaps": "^2.6.1",
+    "gulp-uglify": "^3.0.0",
     "gulp-util": "latest",
-    "jshint": "latest",
+    "jshint": "^2.9.5",
     "jshint-stylish": "^2.2.1",
     "merge-stream": "^1.0.1",
-    "run-sequence": "latest",
-    "yargs": "latest"
+    "run-sequence": "^2.2.0",
+    "yargs": "^10.0.3"
   },
   "scripts": {
     "build": "gulp build",
@@ -41,12 +40,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kingkool68/zadieheimlich.git"
+    "url": "git+https://github.com/kingkool68/wordpress-child-themes.git"
   },
   "author": "Russell Heimlich",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/kingkool68/zadieheimlich/issues"
+    "url": "https://github.com/kingkool68/wordpress-child-themes/issues"
   },
-  "homepage": "https://github.com/kingkool68/zadieheimlich#readme"
+  "homepage": "https://github.com/kingkool68/wordpress-child-themes#readme"
 }
