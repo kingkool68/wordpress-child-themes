@@ -162,7 +162,13 @@ class Daddio_Scripts_Style {
 		}
 
 		// These scripts are bundled together in 'daddio-global-scripts' so they don't need to be printed to the screen.
-		$blacklisted = array( 'jquery-migrate', 'wp-embed', 'daddio-menu', 'daddio-analytics', 'mediaelement', 'wp-mediaelement' );
+		$blacklisted = array(
+			'jquery-migrate',
+			'wp-embed',
+			'daddio-menu',
+			'mediaelement',
+			'wp-mediaelement',
+		);
 		if ( in_array( $handle, $blacklisted ) ) {
 			return '';
 		}
