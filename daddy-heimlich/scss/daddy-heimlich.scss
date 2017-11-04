@@ -3,13 +3,10 @@
 @import 'base/functions';
 @import 'base/variables';
 
-/*
-Bundle core WordPress stylesheets to save on requests
-../../../../ = the site root
-*/
-@import '../../../../wp-includes/js/mediaelement/mediaelementplayer.min.css';
-@import '../../../../wp-includes/js/mediaelement/wp-mediaelement.css';
-@import 'components/wp-emoji';
+// Bundle core WordPress stylesheets to save on requests
+@import 'libs/mediaelementplayer';
+@import 'libs/wp-mediaelement';
+@import 'libs/wp-emoji';
 
 // Base theme components
 @import 'components/reset';
