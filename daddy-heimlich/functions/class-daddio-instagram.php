@@ -17,21 +17,26 @@ class Daddio_Instagram {
 		return $instance;
 	}
 
+	/**
+	 * Hook in to WordPress via actions and filters
+	 */
 	public function setup_hooks() {
-		add_action( 'init', array( $this, 'init' ) );
-		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
-		add_action( 'wp_ajax_daddio_instagram_manual_sync', array( $this, 'manual_sync_ajax_callback' ) );
-		add_action( 'pre_get_posts', array( $this, 'pre_get_posts' ) );
-		add_action( 'manage_posts_custom_column' , array( $this, 'manage_posts_custom_column' ) );
-		add_action( 'restrict_manage_posts', array( $this, 'add_no_tags_filter' ) );
-		add_action( 'pre_get_posts', array( $this, 'get_posts_with_no_tags' ) );
-		add_action( 'wp_dashboard_setup', array( $this, 'wp_dashboard_setup' ) );
+		add_action( 'init', array( $this, 'action_init' ) );
+		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
+		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
+		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts_with_no_tags' ) );
+		add_action( 'manage_posts_custom_column' , array( $this, 'action_manage_posts_custom_column' ) );
+		add_action( 'restrict_manage_posts', array( $this, 'action_restrict_manage_posts' ) );
+		add_action( 'wp_dashboard_setup', array( $this, 'action_wp_dashboard_setup' ) );
 
-		add_filter( 'the_content', array( $this, 'the_content' ) );
-		add_filter( 'manage_instagram_posts_columns', array( $this, 'manage_instagram_posts_columns' ) );
+		add_filter( 'the_content', array( $this, 'filter_the_content' ) );
+		add_filter( 'manage_instagram_posts_columns', array( $this, 'filter_manage_instagram_posts_columns' ) );
 	}
 
-	function init() {
+	/**
+	 * Setup post type
+	 */
+	function action_init() {
 		$labels = array(
 			'name'               => 'Instagram',
 			'singular_name'      => 'Instagram',
@@ -70,181 +75,108 @@ class Daddio_Instagram {
 		register_post_type( 'instagram', $args );
 	}
 
-	function admin_menu() {
-		// add_submenu_page( 'edit.php?post_type=instagram', 'Manual Sync', 'Manual Sync', 'manage_options', 'zah-instagram-sync', array( $this, 'manual_sync_submenu' ) );
-		add_submenu_page( 'edit.php?post_type=instagram', 'Private Sync', 'Private Sync', 'manage_options', 'zah-instagram-private-sync', array( $this, 'private_sync_submenu' ) );
+	/**
+	 * Add Private Sync submenu
+	 */
+	function action_admin_menu() {
+		add_submenu_page( 'edit.php?post_type=instagram', 'Private Sync', 'Private Sync', 'manage_options', 'zah-instagram-private-sync', array( $this, 'handle_private_sync_submenu' ) );
 	}
 
-	function manual_sync_submenu() {
-		$action = '';
-		if ( isset( $_GET['action'] ) ) {
-			$action = $_GET['action'];
+	/**
+	 * Include Instagram posts in the main query under certian conditions
+	 *
+	 * @param  WP_Query $query The WP_Query object we're modifying
+	 */
+	function action_pre_get_posts( $query ) {
+		if (
+			( $query->is_archive() || $query->is_home() )
+			&& $query->is_main_query()
+			&& ! is_admin()
+		) {
+			$query->set( 'post_type', array( 'post', 'instagram' ) );
 		}
+	}
 
-		// MANUAL SYNC
-		if ( isset( $action ) && 'manual-sync' == $action ) {
-
-			$date_limit = 0;
-			$from_date = '';
-			if ( isset( $_POST['date-limit'] ) ) {
-				$date_limit = strtotime( $_POST['date-limit'] );
-				$from_date = date( get_option( 'date_format' ), $date_limit );
-			}
-		?>
-			<div class="wrap">
-				<h1>Manaul Sync</h1>
-				<?php if ( $from_date ) : ?>
-					<p>From <strong><?php echo $from_date; ?></strong> until now.</p>
-				<?php endif; ?>
-				<div id="results">
-
-				</div>
-				<ul id="stats">
-					<li>Total: <span id="total">0</span></li>
-					<li>Skipped: <span id="skipped">0</span></li>
-				</ul>
-			</div>
-
-			<script>
-			jQuery(document).ready(function($) {
-
-				var dateLimit = <?php echo intval( $date_limit ); ?>;
-
-				function update_the_page( data ) {
-					if( imgs = data.imgs ) {
-						$('#results' ).append( '<p>' + imgs.join('</p><p>') + '</p>' );
-					}
-					var total = data.total + parseInt( $('#total').text() );
-					$('#total' ).html( total );
-
-					var skipped = data.skipped + parseInt( $('#skipped').text() );
-					$('#skipped').html( skipped );
-				}
-
-				function send_the_ajax_request( data ) {
-					$.post(ajaxurl, data, function(resp) {
-						update_the_page( resp.data );
-						if( next_max_id = resp.data.next_max_id ) {
-							send_the_ajax_request({
-								'action': 'daddio_instagram_manual_sync',
-								'date-limit': dateLimit,
-								'next_max_id': next_max_id
-							});
-						} else {
-							var total = parseInt( $('#total').text() );
-							var skipped = parseInt( $('#skipped').text() );
-							$('#stats').after('<p>All done :-)</p>');
-						}
-					});
-				}
-
-				//Kick things off...
-				send_the_ajax_request({
-					'action': 'daddio_instagram_manual_sync',
-					'date-limit': dateLimit
-				});
-
-
-			});
-			</script>
-		<?php
+	/**
+	 * Return Instagram posts that aren't tagged
+	 *
+	 * @param  WP_Query $query The WP_Query object we're modifying
+	 */
+	function action_pre_get_posts_with_no_tags( $query ) {
+		if ( ! is_admin() || ! $query->is_main_query() ) {
 			return;
 		}
 
-		// DEFAULT
-		?>
-		<div class="wrap">
-			<h1>Manaully Sync Instagram</h1>
-			<p>Make sure all of the Instagram photos tagged with <strong>#<?php echo CHILD_INSTAGRAM_HASHTAG; ?></strong> are saved as posts on this site. Nothing will be overwritten, only missing Instagram photos will be added.</p>
-			<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=zah-instagram-sync&action=manual-sync' ) );?>" method="post">
+		if ( ! isset( $_GET['tag-filter'] ) || 'no-tags' != $_GET['tag-filter'] ) {
+			return;
+		}
 
-				<table class="form-table">
-					<tbody>
-						<tr class="form-field">
-							<th scope="row" valign="top"><label for="date-limit">Date Limit</label></th>
-							<td>
-								<input type="date" name="date-limit" id="date-limit" value=""><br>
-								<em>Only Sync Instagram photos posted between now and this date</em>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-
-
-				<p><input type="submit" class="button-primary" value="Sync"></p>
-			</form>
-		</div>
-	<?php
+		$tag_ids = get_terms( 'post_tag', array( 'fields' => 'ids' ) );
+		$query->set( 'tax_query', array(
+			array(
+				'taxonomy' => 'post_tag',
+				'field'	=> 'id',
+				'terms'	=> $tag_ids,
+				'operator' => 'NOT IN',
+			),
+		) );
 	}
 
-	public function manual_sync_ajax_callback() {
-		$max_id = null;
-		if ( isset( $_POST['next_max_id'] ) ) {
-			$max_id = trim( $_POST['next_max_id'] );
-		}
-		$resp = $this->fetch_instagram_tag( CHILD_INSTAGRAM_HASHTAG, $max_id );
-		$nodes = $resp->entry_data->TagPage[0]->tag->media->nodes;
-		$last_node = end( $nodes );
+	/**
+	 * Handle Instagram post type columns
+	 *
+	 * @param  string  $column  ID of the column to output data for
+	 * @param  integer $post_id ID of the Post for the current row
+	 */
+	function action_manage_posts_custom_column( $column = '', $post_id = 0 ) {
 
-		$next_max_id = false;
-		if ( isset( $last_node->id ) ) {
-			$next_max_id = $last_node->id;
-		}
+		$post = get_post( $post_id );
+		switch ( $column ) {
+			case 'instagram_photo':
+				$featured_id = get_post_thumbnail_id( $post->ID );
+				if ( ! $featured_id ) {
+					// We don't have one so let's try and get a featured image...
+					$media = get_attached_media( 'image', $post->ID );
+					$media_ids = array_keys( $media );
+					$featured_id = $media_ids[0];
 
-		$date_limit = 0;
-		if ( isset( $_POST['date-limit'] ) ) {
-			$date_limit = intval( $_POST['date-limit'] );
-		}
-
-		$output = array(
-			'next_max_id' => $next_max_id,
-			'imgs' => array(),
-			'skipped' => 0,
-			'total' => 0,
-		);
-
-		if ( isset( $_POST['next_max_id'] ) &&  $next_max_id == $_POST['next_max_id'] ) {
-			unset( $output['next_max_id'] );
-		}
-
-		foreach ( $nodes as $node ) {
-
-			// If the $img was posted later than our break limit then we need to stop
-			if ( intval( $node->date ) < $date_limit ) {
-				unset( $output['next_max_id'] );
-				break;
-			}
-
-			$output['total']++;
-
-			$instagram_link = 'https://www.instagram.com/p/' . $node->shortcode . '/';
-			$found = $this->does_instagram_permalink_exist( $instagram_link );
-
-			if ( $found ) {
-				$output['skipped']++;
-			}
-
-			if ( ! $found ) {
-				$inserted = $this->insert_instagram_post( $node );
-				if ( $inserted ) {
-					$wp_permalink = get_permalink( $inserted );
-					$caption = $node->edge_media_to_caption->edges[0]->node->text;
-
-					$posted = date( 'Y-m-d H:i:s', intval( $node->taken_at_timestamp ) ); // In GMT time
-
-					$src = $node->display_url;
-					$width = 150;
-					$height = '';
-
-					$output['imgs'][] = '<a href="' . $wp_permalink . '" target="_blank"><img src="' . $src . '" width="' . $width . '" height="' . $height . '"></a><br>' . $caption . '<br>' . get_date_from_gmt( $posted, 'F j, Y g:i a' );
+					add_post_meta( $post->ID, '_thumbnail_id', $featured_id );
 				}
-			}
+
+				$img = wp_get_attachment_image_src( $featured_id, 'thumbnail' );
+				echo '<a href="' . esc_url( get_permalink( $post->ID ) ) . '"><img src="' . esc_url( $img[0] ) . '" width="' . esc_attr( $img[1] ) . '" height="' . esc_attr( $img[2] ) . '"></a>';
+
+			break;
+
+			case 'instagram_permalink':
+				echo '<a href="' . esc_url( $post->guid ) . '" target="_blank">@' . get_instagram_username() . '</a>';
+			break;
 		}
 
-		wp_send_json_success( (object) $output );
 	}
 
-	function private_sync_submenu() {
+	/**
+	 * Add a select menu for showing posts that aren't tagged in the post list screen
+	 */
+	function action_restrict_manage_posts() {
+		$whitelisted_post_types = array( 'post', 'instagram' );
+		if ( ! in_array( get_current_screen()->post_type, $whitelisted_post_types ) ) {
+			return;
+		}
+
+		$selected = ( isset( $_GET['tag-filter'] ) && 'no-tags' == $_GET['tag-filter'] );
+		?>
+		<select name="tag-filter">
+			<option value="">All Tags</option>
+			<option value="no-tags" <?php echo selected( $selected ); ?>>No Tags</option>
+		</select>
+		<?php
+	}
+
+	/**
+	 * Render the screen for the private sync submenu page
+	 */
+	function handle_private_sync_submenu() {
 
 		$result = '';
 		if ( isset( $_POST['instagram-source'] ) && ! empty( $_POST['instagram-source'] ) && check_admin_referer( 'zah-instagram-private-sync' ) ) {
@@ -318,20 +250,15 @@ class Daddio_Instagram {
 	}
 
 
-	/* Filters */
-	function pre_get_posts( $query ) {
-		if (
-			( $query->is_archive() || $query->is_home() ) &&
-			$query->is_main_query() &&
-			! is_admin()
-		) {
-			$query->set( 'post_type', array( 'post', 'instagram' ) );
-		}
-	}
-
-	function the_content( $content ) {
+	/**
+	 * Filter Instagram content to linkify Instagram usernames and hashtags
+	 *
+	 * @param  string $content The content to modify
+	 * @return string          The modified content
+	 */
+	function filter_the_content( $content = '' ) {
 		$post = get_post();
-		if ( is_object( $post ) && 'instagram' == $post->post_type ) {
+		if ( 'instagram' == get_post_type( $post ) ) {
 			$content = preg_replace( '/\s(#(\w+))/im', ' <a href="https://instagram.com/explore/tags/$2/">$1</a>', $content );
 			// $content = preg_replace('/^(#(\w+))/im', '<a href="https://instagram.com/explore/tags/$2/">$1</a>', $content);
 			$content = preg_replace( '/\s(@(\w+))/im', ' <a href="http://instagram.com/$2">$1</a>', $content );
@@ -341,11 +268,13 @@ class Daddio_Instagram {
 		return $content;
 	}
 
-	function set_html_content_type() {
-		return 'text/html';
-	}
-
-	function manage_instagram_posts_columns( $columns ) {
+	/**
+	 * Modify the columns for Instagram postl isting screens
+	 *
+	 * @param  array  $columns The columns to modify
+	 * @return array           The modified columns
+	 */
+	function filter_manage_instagram_posts_columns( $columns = array() ) {
 		$new_columns = array(
 			'cb' => $columns['cb'],
 			'title' => $columns['title'],
@@ -360,86 +289,19 @@ class Daddio_Instagram {
 		return array_merge( $new_columns, $columns );
 	}
 
-	function manage_posts_custom_column( $column, $post_id = 0 ) {
+	// Quick Sync Dashboard Widget
 
-		switch ( $column ) {
-			case 'instagram_photo':
-				$post = get_post( $post_id );
-				$featured_id = get_post_thumbnail_id( $post->ID );
-				if ( ! $featured_id ) {
-					// We don't have one so let's try and get a featured image...
-					$media = get_attached_media( 'image', $post->ID );
-					$media_ids = array_keys( $media );
-					$featured_id = $media_ids[0];
-
-					add_post_meta( $post->ID, '_thumbnail_id', $featured_id );
-				}
-
-				$img = wp_get_attachment_image_src( $featured_id, 'thumbnail' );
-				echo '<a href="' . esc_url( get_permalink( $post->ID ) ) . '"><img src="' . esc_url( $img[0] ) . '" width="' . esc_attr( $img[1] ) . '" height="' . esc_attr( $img[2] ) . '"></a>';
-
-			break;
-
-			case 'instagram_permalink':
-				$post = get_post( $post_id );
-				echo '<a href="' . esc_url( $post->guid ) . '" target="_blank">@' . get_instagram_username() . '</a>';
-			break;
-		}
-
+	/**
+	 * Setup the Private Sync dahboard widget
+	 */
+	function action_wp_dashboard_setup() {
+		wp_add_dashboard_widget( 'instagram-private-sync', 'Instagram Private Sync', array( $this, 'handle_private_sync_dashboard_widget' ) );
 	}
 
-	function add_no_tags_filter() {
-		$whitelisted_post_types = array( 'post', 'instagram' );
-		if ( ! in_array( get_current_screen()->post_type, $whitelisted_post_types ) ) {
-			return;
-		}
-
-		$selected = ( isset( $_GET['tag-filter'] ) && 'no-tags' == $_GET['tag-filter'] );
-		?>
-		<select name="tag-filter">
-			<option value="">All Tags</option>
-			<option value="no-tags" <?php echo selected( $selected ); ?>>No Tags</option>
-		</select>
-		<?php
-	}
-
-	function get_posts_with_no_tags( $query ) {
-		if ( ! is_admin() || ! $query->is_main_query() ) {
-			return;
-		}
-
-		if ( ! isset( $_GET['tag-filter'] ) || 'no-tags' != $_GET['tag-filter'] ) {
-			return;
-		}
-
-		$tag_ids = get_terms( 'post_tag', array( 'fields' => 'ids' ) );
-		$query->set( 'tax_query', array(
-			array(
-				'taxonomy' => 'post_tag',
-				'field'	=> 'id',
-				'terms'	=> $tag_ids,
-				'operator' => 'NOT IN',
-			),
-		) );
-	}
-
-	/* Quick Sync Dashboard Widget */
-	function wp_dashboard_setup() {
-		// wp_add_dashboard_widget( 'instagram-quick-sync', 'Instagram Quick Sync', array( $this, 'quick_sync_dashboard_widget' ) );
-		wp_add_dashboard_widget( 'instagram-private-sync', 'Instagram Private Sync', array( $this, 'private_sync_dashboard_widget' ) );
-	}
-
-	function quick_sync_dashboard_widget() {
-		$two_days_ago = date( 'Y-m-d', strtotime( '-2 days' ) );
-		?>
-		<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=zah-instagram-sync&action=manual-sync' ) );?>" method="post">
-			<input type="hidden" name="date-limit" value="<?php echo esc_attr( $two_days_ago ); ?>">
-			<input type="submit" class="button button-primary" value="Sync Last 48 Hours">
-		</form>
-		<?php
-	}
-
-	function private_sync_dashboard_widget() {
+	/**
+	 * Render the Private Sync dashboard widget
+	 */
+	function handle_private_sync_dashboard_widget() {
 		?>
 		<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=zah-instagram-private-sync' ) );?>" method="post">
 			<input type="submit" class="button button-primary" value="Private Sync">
@@ -449,8 +311,21 @@ class Daddio_Instagram {
 
 
 
-	/* Helper Methods */
+	// Helper Methods
 
+	/**
+	 * Set text/html mime type for emails
+	 */
+	public function set_html_content_type() {
+		return 'text/html';
+	}
+
+	/**
+	 * Given an HTML page from Instagram, return a JSON of the data from that page
+	 *
+	 * @param  string $html HTML from an Instagram URL
+	 * @return json         Instagram data embedded in the page
+	 */
 	public function get_instagram_json_from_html( $html = '' ) {
 		// Parse the page response and extract the JSON string.
 		// via https://github.com/raiym/instagram-php-scraper/blob/849f464bf53f84a93f86d1ecc6c806cc61c27fdc/src/InstagramScraper/Instagram.php#L32
@@ -460,7 +335,14 @@ class Daddio_Instagram {
 		return json_decode( $json );
 	}
 
-	public function fetch_instagram_tag( $tag = '', $max_id = null, $min_id = null ) {
+	/**
+	 * Fetch data for a given Instagram tag
+	 *
+	 * @param  string      $tag    Instagram tag to fetch data for
+	 * @param  null|string $max_id Instagram ID to act like pagination
+	 * @return JSON        JSON data from the tag page
+	 */
+	public function fetch_instagram_tag( $tag = '', $max_id = null ) {
 		$args = array();
 		if ( $max_id ) {
 			$args['max_id'] = $max_id;
@@ -472,6 +354,12 @@ class Daddio_Instagram {
 		return $this->get_instagram_json_from_html( $response['body'] );
 	}
 
+	/**
+	 * Fetch a single Instagram page/data from a given code
+	 *
+	 * @param  string $code Instagram short URL code to fetch
+	 * @return JSON        JSON data from the tag page
+	 */
 	public function fetch_single_instagram( $code = '' ) {
 		if ( ! $code ) {
 			return array();
@@ -488,6 +376,12 @@ class Daddio_Instagram {
 		return $this->get_instagram_json_from_html( $response['body'] );
 	}
 
+	/**
+	 * Normalize different Instagram API versions in one common format
+	 *
+	 * @param  Object|false  $node Node object from the Instagram API
+	 * @return Object|false  Normalized data
+	 */
 	public function normalize_instagram_data( $node = false ) {
 		if ( ! $node ) {
 			return false;
@@ -500,23 +394,23 @@ class Daddio_Instagram {
 		}
 
 		$output = array(
-			'_normalized' => true,
-			'typename' => false,
-			'id' => '',
-			'code' => '',
-			'full_src' => '',
-			'thumbnail_src' => '',
-			'video_src' => '',
-			'is_video' => false,
-			'is_private' => false,
-			'caption' => '',
-			'timestamp' => '', // In GMT time
-			'owner_id' => '',
-			'owner_username' => '',
-			'owner_full_name' => '',
-			'location_id' => '',
-			'location_name' => '',
-			'location_slug' => '',
+			'_normalized'              => true,
+			'typename'                 => false,
+			'id'                       => '',
+			'code'                     => '',
+			'full_src'                 => '',
+			'thumbnail_src'            => '',
+			'video_src'                => '',
+			'is_video'                 => false,
+			'is_private'               => false,
+			'caption'                  => '',
+			'timestamp'                => '', // In GMT time
+			'owner_id'                 => '',
+			'owner_username'           => '',
+			'owner_full_name'          => '',
+			'location_id'              => '',
+			'location_name'            => '',
+			'location_slug'            => '',
 			'location_has_public_page' => false,
 		);
 
@@ -592,6 +486,13 @@ class Daddio_Instagram {
 		return (object) $output;
 	}
 
+	/**
+	 * Given an Instagram node, insert a WordPress post
+	 *
+	 * @param  Object  $node                  Instagram node
+	 * @param  boolean $force_publish_status  Force the post to be published
+	 * @return boolean                        Whether the post was inserted successfully or not
+	 */
 	public function insert_instagram_post( $node, $force_publish_status = false ) {
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/admin.php';
@@ -696,6 +597,12 @@ class Daddio_Instagram {
 		return $inserted;
 	}
 
+	/**
+	 * Get an Instagram username from a given post ID
+	 *
+	 * @param  Integer $post_id  Post ID get the username for
+	 * @return String            Instagram username
+	 */
 	public function get_instagram_username( $post_id = false ) {
 		if ( $post_id ) {
 			$post_id = intval( $post_id );
@@ -713,6 +620,12 @@ class Daddio_Instagram {
 		return $output;
 	}
 
+	/**
+	 * Conditional check if an Instagram post has already been imported or not
+	 *
+	 * @param  string $permalink Instagram permalink
+	 * @return boolean           Whether the Instagram post has been imported or not
+	 */
 	public function does_instagram_permalink_exist( $permalink = '' ) {
 		global $wpdb;
 
@@ -728,26 +641,17 @@ class Daddio_Instagram {
 		return $wpdb->get_var( $query );
 	}
 
-	public function send_pending_post_notification_email( $post_id, $attachment_id ) {
-		add_filter( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
-
-		$post = get_post( $post_id );
-		$img = wp_get_attachment_image_src( $attachment_id, 'medium' );
-
-		$subject = '#' . CHILD_INSTAGRAM_HASHTAG . ': Pending post from ' . $this->get_instagram_username( $post_id );
-		$html = '';
-		$html .= '<p><a href="' . $post->guid . '" target="_blank"><img src="' . $img[0] . '" width="' . $img[1] . '" height="' . $img[2] . '"></a><p>';
-		$html .= '<p>Edit this post at <a href="' . get_edit_post_link( $post_id ) . '" target="_blank">' . get_edit_post_link( $post_id ) . '</a></p>';
-
-		// INSTAGRAM_PENDING_EMAIL_ADDRESS should be defined as a constant in wp-config.php so we don't post the email address publicly.
-		wp_mail( INSTAGRAM_PENDING_EMAIL_ADDRESS, $subject, $html );
-
-		// Reset content-type to avoid conflicts -- http://core.trac.wordpress.org/ticket/23578
-		remove_filter( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
-	}
-
-	//media_sideload_image() would be so much better if it simply returned the attachment ID instead of HTML
-	public function media_sideload_image_return_id( $file, $post_id, $desc = null, $post_data = array() ) {
+	/**
+	 * Alternative version of `media_sideload_image()` that returns the ID
+	 * of the media attachment instead of an HTML string
+	 *
+	 * @param  string   $file      URL of the image to download
+	 * @param  integer  $post_id   The post ID the media is to be attached to
+	 * @param  string   $desc      Description of the image
+	 * @param  array    $post_data $_POST data to fake the request with
+	 * @return integer             Post ID of the inserted attachment
+	 */
+	public function media_sideload_image_return_id( $file = '', $post_id, $desc = null, $post_data = array() ) {
 		if ( ! empty( $file ) ) {
 
 			$file_array = array();
@@ -781,7 +685,7 @@ class Daddio_Instagram {
 }
 Daddio_Instagram::get_instance();
 
-/* Global helper functions */
+// Global helper functions
 function get_instagram_username( $post_id = false ) {
 	$daddio_instagram = Daddio_Instagram::get_instance();
 	return $daddio_instagram->get_instagram_username( $post_id );
