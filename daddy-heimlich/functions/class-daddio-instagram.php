@@ -4,8 +4,6 @@ use \ForceUTF8\Encoding;
 
 class Daddio_Instagram {
 
-	var $whitelisted_usernames = array( 'naudebynature', 'kingkool68', 'lilzadiebug' );
-
 	/**
 	 * Get an instance of this class
 	 */
