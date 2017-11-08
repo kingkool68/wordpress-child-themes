@@ -18,6 +18,14 @@ if ( ! function_exists( 'wp_dump' ) ) :
 	}
 endif;
 
+if ( ! function_exists( 'wp_log' ) ) :
+	function wp_log() {
+		foreach ( func_get_args() as $arg ) {
+			error_log( print_r( $arg, true ) );
+		}
+	}
+endif;
+
 // Google Analytics Debugging flag
 function daddio_google_analytics_debugging_flag( $class = array() ) {
 	if ( is_user_logged_in() && isset( $_GET['debug-ga'] ) ) {
