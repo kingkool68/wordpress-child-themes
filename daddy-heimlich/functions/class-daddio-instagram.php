@@ -23,6 +23,7 @@ class Daddio_Instagram {
 	public function setup_hooks() {
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
+		add_action( 'before_delete_post', array( $this, 'action_before_delete_post' ) );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts_with_no_tags' ) );
 		add_action( 'manage_posts_custom_column' , array( $this, 'action_manage_posts_custom_column' ) );
@@ -80,6 +81,31 @@ class Daddio_Instagram {
 	 */
 	function action_admin_menu() {
 		add_submenu_page( 'edit.php?post_type=instagram', 'Private Sync', 'Private Sync', 'manage_options', 'zah-instagram-private-sync', array( $this, 'handle_private_sync_submenu' ) );
+	}
+
+	/**
+	 * Delete attached media associated with an Instagram post that is going to be deleted
+	 *
+	 * @param  integer $post_id ID of the post that is about to be deleted
+	 */
+	public function action_before_delete_post( $post_id = 0 ) {
+		$post = get_post( $post_id );
+		if ( 'instagram' != $post->post_type ) {
+			return;
+		}
+		$args = array(
+			'post_type'   => 'attachment',
+			'post_status' => 'any',
+			'post_parent' => $post->ID,
+			'fields'      => 'ids',
+		);
+		$query = new WP_Query( $args );
+		if ( empty( $query->posts ) ) {
+			return;
+		}
+		foreach ( $query->posts as $attachment_id ) {
+			wp_delete_attachment( $attachment_id, $force_delete = true );
+		}
 	}
 
 	/**
