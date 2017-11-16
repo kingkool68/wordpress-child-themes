@@ -166,8 +166,10 @@ class Daddio_Scripts_Style {
 			'jquery-migrate',
 			'wp-embed',
 			'daddio-menu',
-			'mediaelement',
+			'mediaelement-core',
+			'mediaelement-migrate',
 			'wp-mediaelement',
+			'mediaelement-vimeo',
 		);
 		if ( in_array( $handle, $blacklisted ) ) {
 			return '';
