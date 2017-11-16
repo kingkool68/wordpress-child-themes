@@ -80,7 +80,23 @@ class Daddio_Instagram {
 	 * Add Private Sync submenu
 	 */
 	function action_admin_menu() {
-		add_submenu_page( 'edit.php?post_type=instagram', 'Private Sync', 'Private Sync', 'manage_options', 'zah-instagram-private-sync', array( $this, 'handle_private_sync_submenu' ) );
+		add_submenu_page(
+			'edit.php?post_type=instagram',
+			'Private Sync',
+			'Private Sync',
+			'manage_options',
+			'zah-instagram-private-sync',
+			array( $this, 'handle_private_sync_submenu' )
+		);
+
+		add_submenu_page(
+			null,
+			'Modify Synced Instagram Post',
+			'Modify Synced Instagram Post',
+			'manage_options',
+			'zah-instagram-modify-post',
+			array( $this, 'handle_modify_instagram_post_submenu' )
+		);
 	}
 
 	/**
@@ -220,44 +236,32 @@ class Daddio_Instagram {
 			if ( isset( $json->entry_data->PostPage[0] ) ) {
 				$nodes = array( $json->entry_data->PostPage[0]->graphql->shortcode_media );
 			}
-
 			foreach ( $nodes as $node ) :
 				$node = $this->normalize_instagram_data( $node );
 				$instagram_link = 'https://www.instagram.com/p/' . $node->code . '/';
+
 				$found = $this->does_instagram_permalink_exist( $instagram_link );
 				if ( $found ) {
 					continue;
 				}
 
-				$posted = date( 'Y-m-d H:i:s', intval( $node->timestamp ) ); // In GMT time
-				$permalink = $instagram_link;
-
-				$inserted = $this->insert_instagram_post( $node, $force_publish_status = true );
-				if ( -1 === $inserted ) {
-					// It's a private post that needs to be manually downloaded...
-					$status_message = 'Private! Needs to be manually synced.';
-				} elseif ( $inserted ) {
-					// Success!
-					$status_message = 'Success!';
-					$permalink = get_permalink( $inserted );
-				}
-
-				// Output
-				$result .= '<h2>' . $status_message . '</h2>';
-				$result .= '<p><a href="' . esc_url( $permalink ) . '" target="_blank">';
-				$result .= '<img src="' . esc_url( $node->full_src ) . '" width="150" height="">';
-				$result .= '</a>';
-				$result .= '<br>' . $node->caption;
-				$result .= '<br>' . get_date_from_gmt( $posted, 'F j, Y g:i a' ) . '</p>';
-				$result .= '<hr>';
+				$inserted = $this->insert_instagram_post( $node, $post_args = array() );
+				$data = $this->handle_instagram_inserted_result( $inserted, $node );
+				$result .= $this->render_instagram_inserted_result( $data );
 			endforeach;
 		}
 	?>
 		<style>
 			#instagram-source {
 				display: block;
-				max-width:800px;
+				max-width: 800px;
 				width: 95%;
+			}
+			.children {
+				padding-left: 25px;
+			}
+			.delete-link {
+				color: red;
 			}
 		</style>
 		<div class="wrap">
@@ -275,6 +279,89 @@ class Daddio_Instagram {
 	<?php
 	}
 
+	public function handle_modify_instagram_post_submenu() {
+		echo 'boo!';
+	}
+
+	public function handle_instagram_inserted_result( $result, $node ) {
+		$node = $this->normalize_instagram_data( $node );
+
+		$output = array(
+			'status_message'   => '',
+			'permalink'        => 'https://www.instagram.com/p/' . $node->code . '/',
+			'thumbnail_src'    => $node->full_src,
+			'caption'          => $node->caption,
+			'posted_timestamp' => date( 'Y-m-d H:i:s', intval( $node->timestamp ) ), // In GMT time
+			'children'         => array(),
+			'post_id'          => 0,
+		);
+		if ( -1 === $result ) {
+			// It's a private post that needs to be manually downloaded...
+			$output = wp_parse_args( array(
+				'status_message' => 'Private! Needs to be manually synced.',
+			), $output );
+		} elseif ( is_object( $result ) && isset( $result->post_id ) ) {
+			// Success!
+			$post_id = $result->post_id;
+			$featured_image_id = get_post_thumbnail_id( $post_id );
+			$thumbnail_src = wp_get_attachment_image_src( $featured_image_id, 'thumbnail' );
+			$output = wp_parse_args( array(
+				'status_message' => 'Success!',
+				'permalink'      => get_permalink( $post_id ),
+				'post_id'        => $post_id,
+				'thumbnail_src'  => $thumbnail_src[0],
+			), $output );
+			if ( ! empty( $result->children ) ) {
+				foreach ( $result->children as $child_post_id ) {
+					$output['children'][] = $this->handle_instagram_inserted_result(
+						(object) array(
+							'post_id'  => $child_post_id,
+							'children' => array(),
+						),
+						$node
+					);
+				}
+			}
+		}
+		return $output;
+	}
+
+	public function render_instagram_inserted_result( $data ) {
+		$defaults = array(
+			'status_message'   => '',
+			'permalink'        => '',
+			'thumbnail_src'    => '',
+			'caption'          => '',
+			'posted_timestamp' => '',
+			'children'         => array(),
+		);
+		$data = wp_parse_args( $data, $defaults );
+		extract( $data );
+		$output = '';
+		ob_start();
+		?>
+			<h2><?php echo $status_message; ?></h2>
+			<p>
+				<a href="<?php echo esc_url( $permalink ); ?>" target="_blank">
+					<img src="<?php echo esc_url( $thumbnail_src ); ?>" width="150" height="">
+				</a>
+				<br> <?php echo $caption; ?>
+				<br><?php echo get_date_from_gmt( $posted_timestamp, 'F j, Y g:i a' ); ?>
+				<br><a href="" target="_blank" class="delete-link">Delete</a> | <a href="" target="_blank" class="draft-link">Set to Draft</a>
+			</p>
+		<?php
+		$output .= ob_get_clean();
+
+		if ( $children ) {
+			$output .= '<div class="children">';
+			foreach ( $children as $child_data ) {
+				$output .= $this->render_instagram_inserted_result( $child_data );
+			}
+			$output .= '</div>';
+		}
+		$output .= '<hr>';
+		return $output;
+	}
 
 	/**
 	 * Filter Instagram content to linkify Instagram usernames and hashtags
@@ -438,6 +525,7 @@ class Daddio_Instagram {
 			'location_name'            => '',
 			'location_slug'            => '',
 			'location_has_public_page' => false,
+			'children'                 => array(),
 		);
 
 		// Common properties for both old and new format
@@ -509,7 +597,33 @@ class Daddio_Instagram {
 			$output['caption'] = $node->caption;
 		}
 
+		// Check if this node has children
+		if (
+			isset( $node->edge_sidecar_to_children->edges )
+			&& ! empty( $node->edge_sidecar_to_children->edges )
+		) {
+			$children = $node->edge_sidecar_to_children->edges;
+			// Remove the first child since it is the same as the parent node
+			array_shift( $children );
+			foreach ( $children as $child_node ) {
+				$output['children'][] = $this->normalize_instagram_data( $child_node->node );
+			}
+		}
+
 		return (object) $output;
+	}
+
+	public function get_instagram_data_from_node( $node ) {
+		$node = $this->normalize_instagram_data( $node );
+		// Check to see if $node is already a PostPage object. If not, try and fetch a single instagram post.
+		if ( ! $node->typename ) {
+			$payload = $this->fetch_single_instagram( $node->code );
+			if ( empty( $payload ) || ! $payload ) {
+				return;
+			}
+			$node = $this->normalize_instagram_data( $payload );
+		}
+		return $node;
 	}
 
 	/**
@@ -519,54 +633,78 @@ class Daddio_Instagram {
 	 * @param  boolean $force_publish_status  Force the post to be published
 	 * @return boolean                        Whether the post was inserted successfully or not
 	 */
-	public function insert_instagram_post( $node, $force_publish_status = false ) {
+	public function insert_instagram_post( $node, $post_args = array(), $force_publish_status = true ) {
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/admin.php';
 		}
-		$node = $this->normalize_instagram_data( $node );
-		$img = $node;
-		// Check to see if $node is already a PostPage object. If not, try and fetch a single instagram post.
-		if ( ! $node->typename ) {
-			$payload = $this->fetch_single_instagram( $node->code );
-			if ( empty( $payload ) || ! $payload ) {
-				return;
-			}
-			if ( ! isset( $payload->entry_data->PostPage[0] ) ) {
-				return -1;
-			}
-			$img = $payload->entry_data->PostPage[0]->graphql->shortcode_media;
+		$node = $this->get_instagram_data_from_node( $node );
+		$src = $node->full_src;
+		$permalink = 'https://www.instagram.com/p/' . $node->code . '/';
+		$found = $this->does_instagram_permalink_exist( $permalink );
+		if ( $found ) {
+			return false;
 		}
-		$img = $this->normalize_instagram_data( $img );
-		$src = $img->full_src;
-		$permalink = 'https://www.instagram.com/p/' . $img->code . '/';
 
-		$posted = date( 'Y-m-d H:i:s', intval( $img->timestamp ) ); // In GMT time
-		$username = $img->owner_username;
-		$full_name = $img->owner_full_name;
-		$caption = wp_encode_emoji( $img->caption );
+		$posted = date( 'Y-m-d H:i:s', intval( $node->timestamp ) ); // In GMT time
+
+		// Override the date to make debugging easier
+		$posted = date( 'Y-m-d H:i:s' );
+		// DEBUG ^^^ ERROR ^^^ KILL ^^^
+
+		$username = $node->owner_username;
+		$full_name = $node->owner_full_name;
+		$caption = wp_encode_emoji( $node->caption );
 		$title = preg_replace( '/\s#\w+/i', '', $caption );
 
-		$post = array(
-			'post_title' => $title,
-			'post_content' => $caption,
-			'post_status' => 'pending',
-			'post_type' => 'instagram',
-			'post_date' => get_date_from_gmt( $posted ),
+		$default_post_args = array(
+			'post_title'    => $title,
+			'post_content'  => $caption,
+			'post_status'   => 'publish',
+			'post_type'     => 'instagram',
+			'post_date'     => get_date_from_gmt( $posted ),
 			'post_date_gmt' => $posted,
-			'guid' => $permalink,
+			'guid'          => $permalink,
+			'post_parent'   => 0,
 		);
-		if ( in_array( $username, $this->whitelisted_usernames ) || $force_publish_status ) {
-			$post['post_status'] = 'publish';
+		if ( ! $force_publish_status ) {
+			$default_post_args['post_status'] = 'pending';
+		}
+		$post_args = wp_parse_args( $post_args, $default_post_args );
+		if ( $post_args['post_parent'] > 0 ) {
+			$post_args['post_name'] = $node->code;
+		}
+		$post_args['post_content'] = wp_encode_emoji( $post_args['post_content'] );
+		$inserted = wp_insert_post( $post_args );
+
+		// Handle children
+		$inserted_child_ids = array();
+		if ( ! empty( $node->children ) ) {
+			foreach ( $node->children as $child_node ) {
+				// Augment the child nodes with the parent node details
+				foreach ( $node as $node_key => $node_val ) {
+					if ( 'children' == $node_key ) {
+						continue;
+					}
+					if ( empty( $child_node->${'node_key'} ) ) {
+						$child_node->${'node_key'} = $node_val;
+					}
+				}
+				// Insert child node making the parent node the parent
+				$child_post_args = array(
+					'post_parent' => $inserted,
+				);
+				$inserted_child_obj = $this->insert_instagram_post( $child_node, $child_post_args );
+				if ( is_object( $inserted_child_obj ) && isset( $inserted_child_obj->post_id ) ) {
+					$inserted_child_ids[] = $inserted_child_obj->post_id;
+				}
+			}
 		}
 
-		$inserted = wp_insert_post( $post );
 		if ( ! $inserted ) {
 			// Maybe it's because of bad characters in the caption and title? Try again.
-			$caption = Encoding::fixUTF8( $caption );
-			$title = Encoding::fixUTF8( $title );
-			$post['post_content'] = $caption;
-			$post['post_title'] = $title;
-			$inserted = wp_insert_post( $post );
+			$post_args['post_content'] = Encoding::fixUTF8( $post_args['post_content'] );
+			$post_args['post_title'] = Encoding::fixUTF8( $post_args['post_title'] );
+			$inserted = wp_insert_post( $post_args );
 		}
 
 		if ( ! $inserted ) {
@@ -575,12 +713,12 @@ class Daddio_Instagram {
 		}
 
 		$video_id = false;
-		if ( $img->is_video ) {
-			$video_file = $img->video_src;
+		if ( $node->is_video ) {
+			$video_file = $node->video_src;
 			$tmp = download_url( $video_file );
 
 			$file_array = array(
-				'name' => $img->code . '.mp4',
+				'name' => $node->code . '.mp4',
 				'tmp_name' => $tmp,
 			);
 
@@ -590,7 +728,7 @@ class Daddio_Instagram {
 				$file_array['tmp_name'] = '';
 			}
 
-			// do the validation and storage stuff
+			// Do the validation and storage stuff
 			$video_id = media_handle_sideload( $file_array, $inserted, $caption );
 
 			// If error storing permanently, unlink
@@ -603,14 +741,13 @@ class Daddio_Instagram {
 		}
 
 		$attachment_data = array(
-			'post_content' => $caption,
-			'post_title' => 'Instagram: ' . $img->code,
-			'post_name' => $img->code,
-			'file_name' => $img->code . '.jpg',
+			'post_content' => $post_args['post_content'],
+			'post_title'   => 'Instagram: ' . $node->code,
+			'post_name'    => $node->code,
+			'file_name'    => $node->code . '.jpg',
 		);
-		$attachment_id = $this->media_sideload_image_return_id( $img->full_src, $inserted, $caption, $attachment_data );
-		error_log( print_r( $img, true ) );
-		update_post_meta( $inserted, 'instagram_username', $img->owner_username );
+		$attachment_id = $this->media_sideload_image_return_id( $node->full_src, $inserted, $caption, $attachment_data );
+		update_post_meta( $inserted, 'instagram_username', $node->owner_username );
 
 		// Set the featured image
 		add_post_meta( $inserted, '_thumbnail_id', $attachment_id );
@@ -620,7 +757,10 @@ class Daddio_Instagram {
 			add_post_meta( $inserted, '_video_id', $video_id );
 		}
 
-		return $inserted;
+		return (object) array(
+			'post_id'  => $inserted,
+			'children' => $inserted_child_ids,
+		);
 	}
 
 	/**
