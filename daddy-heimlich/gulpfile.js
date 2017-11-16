@@ -37,7 +37,7 @@ var PATHS = {
 	  // wpIncludesDir + '/jquery/jquery-migrate.js',
 	  wpIncludesDir + '/wp-embed.js',
 	  wpIncludesDir + '/wp-emoji-release.min.js',
-	  wpIncludesDir + '/mediaelement/mediaelement-and-player.min.js',
+	  wpIncludesDir + '/mediaelement/mediaelement-and-player.js',
 	  wpIncludesDir + '/mediaelement/wp-mediaelement.js',
 	  'js/menu.js',
 	  'js/analytics.js',
