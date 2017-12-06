@@ -21,7 +21,11 @@ endif;
 if ( ! function_exists( 'wp_log' ) ) :
 	function wp_log() {
 		foreach ( func_get_args() as $arg ) {
-			error_log( print_r( $arg, true ) );
+			if ( is_array( $arg ) || is_object( $arg ) ) {
+				error_log( print_r( $arg, true ) );
+			} else {
+				error_log( $arg );
+			}
 		}
 	}
 endif;
