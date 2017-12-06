@@ -280,7 +280,37 @@ class Daddio_Instagram {
 	}
 
 	public function handle_modify_instagram_post_submenu() {
-		echo 'boo!';
+		if ( empty( $_GET['post_id'] ) ) {
+			wp_die( 'Missing Post ID parameter' );
+		}
+		if ( empty( $_GET['action'] ) ) {
+			wp_die( 'Missing action parameter' );
+		}
+
+		$post_id = absint( $_GET['post_id'] );
+		check_admin_referer( 'modify_' . $post_id );
+
+		if ( get_post_type( $post_id ) != 'instagram' ) {
+			wp_die( 'Not an Instagram post' );
+		}
+		$action = strtolower( $_GET['action'] );
+
+		switch ( $action ) {
+			case 'draft':
+				$update_args = array(
+					'ID'          => $post_id,
+					'post_status' => 'draft',
+				);
+				wp_update_post( $update_args );
+				echo '<p>Post set to draft.</p>';
+				break;
+
+			case 'delete':
+				wp_delete_post( $post_id, true );
+				echo '<p>Post deleted.</p>';
+				break;
+		}
+
 	}
 
 	public function handle_instagram_inserted_result( $result, $node ) {
@@ -334,9 +364,14 @@ class Daddio_Instagram {
 			'caption'          => '',
 			'posted_timestamp' => '',
 			'children'         => array(),
+			'post_id'          => 0,
 		);
 		$data = wp_parse_args( $data, $defaults );
 		extract( $data );
+		$modify_post_url = admin_url( 'edit.php?post_type=instagram&page=zah-instagram-modify-post&post_id=' . $post_id );
+		$modify_post_url = wp_nonce_url( $modify_post_url, 'modify_' . $post_id );
+		$save_to_draft_url = add_query_arg( 'action', 'draft', $modify_post_url );
+		$delete_url = add_query_arg( 'action', 'delete', $modify_post_url );
 		$output = '';
 		ob_start();
 		?>
@@ -347,7 +382,7 @@ class Daddio_Instagram {
 				</a>
 				<br> <?php echo $caption; ?>
 				<br><?php echo get_date_from_gmt( $posted_timestamp, 'F j, Y g:i a' ); ?>
-				<br><a href="" target="_blank" class="delete-link">Delete</a> | <a href="" target="_blank" class="draft-link">Set to Draft</a>
+				<br><a href="<?php echo esc_url( $delete_url ); ?>" target="_blank" class="delete-link">Delete</a> | <a href="<?php echo esc_url( $save_to_draft_url ); ?>" target="_blank" class="draft-link">Set to Draft</a>
 			</p>
 		<?php
 		$output .= ob_get_clean();
