@@ -661,11 +661,16 @@ class Daddio_Instagram {
 		$node = $this->normalize_instagram_data( $node );
 		// Check to see if $node is already a PostPage object. If not, try and fetch a single instagram post.
 		if ( ! $node->typename ) {
-			$payload = $this->fetch_single_instagram( $node->code );
-			if ( empty( $payload ) || ! $payload ) {
+			$json = $this->fetch_single_instagram( $node->code );
+			if ( empty( $json ) || ! $json ) {
 				return;
 			}
-			$node = $this->normalize_instagram_data( $payload );
+
+			// It's a single Post page
+			if ( isset( $json->entry_data->PostPage[0] ) ) {
+				$node = $json->entry_data->PostPage[0]->graphql->shortcode_media;
+			}
+			$node = $this->normalize_instagram_data( $node );
 		}
 		return $node;
 	}
@@ -691,12 +696,11 @@ class Daddio_Instagram {
 
 		$posted = date( 'Y-m-d H:i:s', intval( $node->timestamp ) ); // In GMT time
 
-		// Override the date to make debugging easier
-		$posted = date( 'Y-m-d H:i:s' );
-		// DEBUG ^^^ ERROR ^^^ KILL ^^^
-
 		$username = $node->owner_username;
 		$full_name = $node->owner_full_name;
+		if ( empty( $username ) ) {
+			return -1;
+		}
 		$caption = wp_encode_emoji( $node->caption );
 		$title = preg_replace( '/\s#\w+/i', '', $caption );
 
