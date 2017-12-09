@@ -636,6 +636,11 @@ class Daddio_Instagram {
 			$output['caption'] = $node->caption;
 		}
 
+		// If no username is present then it is a good sign this is a private post
+		if ( empty( $output['owner_username'] ) ) {
+			$output['is_private'] = true;
+		}
+
 		// Check if this node has children
 		if (
 			isset( $node->edge_sidecar_to_children->edges )
