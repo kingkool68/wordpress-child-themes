@@ -283,6 +283,9 @@ class Daddio_Instagram {
 	<?php
 	}
 
+	/**
+	 * Handle requests to modify instagram posts (delete or set to draft)
+	 */
 	public function handle_modify_instagram_post_submenu() {
 		if ( empty( $_GET['post_id'] ) ) {
 			wp_die( 'Missing Post ID parameter' );
@@ -317,6 +320,13 @@ class Daddio_Instagram {
 
 	}
 
+	/**
+	 * Display a result depending on the status of inserting an Instagram post during a sync
+	 *
+	 * @param  object|-1 $result The result of attempting to insert the Instagram post
+	 * @param  object $node   Normaized node data for reference
+	 * @return array          Options depending on if the post was inserted or not
+	 */
 	public function handle_instagram_inserted_result( $result, $node ) {
 		$node = $this->normalize_instagram_data( $node );
 
@@ -360,6 +370,12 @@ class Daddio_Instagram {
 		return $output;
 	}
 
+	/**
+	 * Given an Instagram inserted result, render an output to the sync screen
+	 *
+	 * @param  array $data Insert data
+	 * @return string      HTML output
+	 */
 	public function render_instagram_inserted_result( $data ) {
 		$defaults = array(
 			'status_message'   => '',
@@ -657,6 +673,11 @@ class Daddio_Instagram {
 		return (object) $output;
 	}
 
+	/**
+	 * Makes sure the node data is from a single page otherwise it fetches a single page's data
+	 * @param  object $node Instagram node data
+	 * @return object       Instagram node data
+	 */
 	public function get_instagram_data_from_node( $node ) {
 		$node = $this->normalize_instagram_data( $node );
 		// Check to see if $node is already a PostPage object. If not, try and fetch a single instagram post.
