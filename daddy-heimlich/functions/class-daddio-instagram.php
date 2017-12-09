@@ -221,7 +221,11 @@ class Daddio_Instagram {
 	function handle_private_sync_submenu() {
 
 		$result = '';
-		if ( isset( $_POST['instagram-source'] ) && ! empty( $_POST['instagram-source'] ) && check_admin_referer( 'zah-instagram-private-sync' ) ) {
+		if (
+			isset( $_POST['instagram-source'] )
+			&& ! empty( $_POST['instagram-source'] )
+			&& check_admin_referer( 'zah-instagram-private-sync' )
+		) {
 			$instagram_source = wp_unslash( $_POST['instagram-source'] );
 			$json = $this->get_instagram_json_from_html( $instagram_source );
 
