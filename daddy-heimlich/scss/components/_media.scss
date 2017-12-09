@@ -2,12 +2,11 @@ img,
 .wp-video {
 	max-width: 100%;
 	height: auto;
+}
+img {
 	border: em(3px) solid #fff;
 	border-radius: em(10px);
 	box-sizing: border-box;
-}
-.wp-video {
-	font-size: em(18px);
 }
 img.alignleft,
 figure.alignleft img {

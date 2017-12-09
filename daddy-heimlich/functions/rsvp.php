@@ -18,11 +18,11 @@ CREATE TABLE `wp_3_rsvps` (
 
 function daddio_redirect_rsvp_vanity_url() {
 	global $wp_query;
-	if ( !is_404() ) {
+	if ( ! is_404() ) {
 		return;
 	}
 	if ( isset( $wp_query->query['name'] ) && $wp_query->query['name'] == 'rsvp' ) {
-		$page = get_page_by_path( 'rsvp-zadies-second-birthday-party' );
+		$page = get_page_by_path( 'rsvp-zadies-third-birthday-party' );
 		wp_safe_redirect( get_permalink( $page->ID ) );
 		die();
 	}
@@ -30,7 +30,7 @@ function daddio_redirect_rsvp_vanity_url() {
 add_action( 'wp', 'daddio_redirect_rsvp_vanity_url' );
 
 function daddio_add_rsvp_form_to_the_content( $content ) {
-	if ( ! is_page( 'rsvp-zadies-second-birthday-party' ) ) {
+	if ( ! is_page( 'rsvp-zadies-third-birthday-party' ) ) {
 		return $content;
 	}
 
@@ -86,16 +86,16 @@ add_filter( 'the_content', 'daddio_add_rsvp_form_to_the_content' );
 
 function daddio_rsvp_process_form() {
 	global $wpdb;
-	if ( !isset( $_GET['submitted'] ) || empty( $_POST ) ) {
+	if ( ! isset( $_GET['submitted'] ) || empty( $_POST ) ) {
 		return;
 	}
 
-	if ( !isset( $_POST['other-email'] ) || !empty($_POST['other-email']) ) {
-		//This field should be present but blank. If it's filled in then we have an automated spam bot.
+	if ( ! isset( $_POST['other-email'] ) || ! empty( $_POST['other-email'] ) ) {
+		// This field should be present but blank. If it's filled in then we have an automated spam bot.
 		wp_die( 'We suspect you are not a real person.' );
 	}
 
-	if ( !isset( $_POST['current-year'] ) || $_POST['current-year'] != date('Y') ) {
+	if ( ! isset( $_POST['current-year'] ) || $_POST['current-year'] != date('Y') ) {
 		wp_die( 'You didn\'t fill in the correct year. We suspect you are not a real person.' );
 	}
 
@@ -105,7 +105,7 @@ function daddio_rsvp_process_form() {
 	}
 
 	$attending = '';
-	if ( isset( $_POST['attending'] ) && in_array( $_POST['attending'], array('Yes', 'No') ) ) {
+	if ( isset( $_POST['attending'] ) && in_array( $_POST['attending'], array( 'Yes', 'No' ) ) ) {
 		$attending = $_POST['attending'];
 	}
 
@@ -134,7 +134,7 @@ function daddio_rsvp_process_form() {
 	);
 
 	$email_message = '';
-	foreach( $answers as $label => $answer ) {
+	foreach ( $answers as $label => $answer ) {
 		$email_message .= $label . ': ' . $answer . "\n";
 	}
 
@@ -146,7 +146,7 @@ function daddio_rsvp_process_form() {
 			$total_guests = $total_guests - 1;
 			$status .= ' with ' . $total_guests . ' guest!';
 			if ( $total_guests > 1 ) {
-				$status = str_replace( '!', 's!', $status);
+				$status = str_replace( '!', 's!', $status );
 			}
 		}
 	}
@@ -170,7 +170,7 @@ function daddio_rsvp_process_form() {
 	$inserted = $wpdb->insert( $wpdb->prefix . 'rsvps', $db_data, $formats );
 	$thing = $wpdb->last_error;
 
-	$page = get_page_by_path( 'rsvp-zadies-second-birthday-party' );
+	$page = get_page_by_path( 'rsvp-zadies-third-birthday-party' );
 	$url = add_query_arg( 'attending', strtolower( $attending ), get_permalink( $page->ID ) );
 
 	wp_safe_redirect( $url );
@@ -185,12 +185,12 @@ $content = <<<'EOD'
 	<link href="https://addtocalendar.com/atc/1.5/atc-style-button-icon.css" rel="stylesheet" type="text/css">
 	<p class="addtocalendar">
         <var class="atc_event">
-            <var class="atc_date_start">2017-01-07 14:45:00</var>
-            <var class="atc_date_end">2017-01-07 17:00:00</var>
+            <var class="atc_date_start">2017-12-30 11:00:00</var>
+            <var class="atc_date_end">2017-12-30 13:00:00</var>
             <var class="atc_timezone">America/New_York</var>
-            <var class="atc_title">Zadie's 2nd Birthday Party</var>
-            <var class="atc_description">http://zadieheimlich.com/rsvp/</var>
-            <var class="atc_location">1386 Lamberton Dr, Silver Spring, MD 20902</var>
+            <var class="atc_title">Zadie's 3rd Birthday Party</var>
+            <var class="atc_description">Don't forget socks! https://zadieheimlich.com/rsvp/</var>
+            <var class="atc_location">11 Wisconsin Cir, Bethesda, MD 20815</var>
             <var class="atc_organizer">Kristina Heimlich</var>
             <var class="atc_organizer_email">us@12hugo.com</var>
         </var>
@@ -206,7 +206,7 @@ $content = <<<'EOD'
     </script>
 
 EOD;
-	$happy_img = '[video src="https://www.zadieheimlich.com/wp-content/uploads/sites/3/2016/09/BKeapLagVHq.mp4" poster="https://www.zadieheimlich.com/wp-content/uploads/sites/3/2016/09/BKeapLagVHq.jpg"]' . "\n\n" . '<p>Squeeee!!!</p>';
+	$happy_img = '<img width="1080" height="1080" src="https://turbo.russellheimlich.com/wp-content/uploads/sites/3/2017/10/Ba2-ZPdDdoC.jpg" class="aligncenter from-instagram" alt="" srcset="https://turbo.russellheimlich.com/wp-content/uploads/sites/3/2017/10/Ba2-ZPdDdoC.jpg 1080w, https://turbo.russellheimlich.com/wp-content/uploads/sites/3/2017/10/Ba2-ZPdDdoC-150x150.jpg 150w, https://turbo.russellheimlich.com/wp-content/uploads/sites/3/2017/10/Ba2-ZPdDdoC-300x300.jpg 300w, https://turbo.russellheimlich.com/wp-content/uploads/sites/3/2017/10/Ba2-ZPdDdoC-768x768.jpg 768w, https://turbo.russellheimlich.com/wp-content/uploads/sites/3/2017/10/Ba2-ZPdDdoC-1024x1024.jpg 1024w, https://turbo.russellheimlich.com/wp-content/uploads/sites/3/2017/10/Ba2-ZPdDdoC-320x320.jpg 320w, https://turbo.russellheimlich.com/wp-content/uploads/sites/3/2017/10/Ba2-ZPdDdoC-360x360.jpg 360w, https://turbo.russellheimlich.com/wp-content/uploads/sites/3/2017/10/Ba2-ZPdDdoC-480x480.jpg 480w, https://turbo.russellheimlich.com/wp-content/uploads/sites/3/2017/10/Ba2-ZPdDdoC-640x640.jpg 640w, https://turbo.russellheimlich.com/wp-content/uploads/sites/3/2017/10/Ba2-ZPdDdoC-800x800.jpg 800w" sizes="(max-width: 1080px) 100vw, 1080px">';
 	$content .= $happy_img;
 	}
 	if ( $status == 'no' ) {
