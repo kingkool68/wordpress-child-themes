@@ -107,6 +107,39 @@ class Daddio_Instagram {
 			'show_tagcloud'              => true,
 		);
 		register_taxonomy( 'location', array( 'instagram' ), $args );
+
+		$labels = array(
+			'name'                       => 'Zip Codes',
+			'singular_name'              => 'Zip Code',
+			'menu_name'                  => 'Zip Codes',
+			'all_items'                  => 'All Zip Codes',
+			'parent_item'                => 'Parent Zip Code',
+			'parent_item_colon'          => 'Parent Zip Code:',
+			'new_item_name'              => 'New Zip Code Name',
+			'add_new_item'               => 'Add New Zip Code',
+			'edit_item'                  => 'Edit Zip Code',
+			'update_item'                => 'Update Zip Code',
+			'view_item'                  => 'View Zip Code',
+			'separate_items_with_commas' => 'Separate zip codes with commas',
+			'add_or_remove_items'        => 'Add or remove zip codes',
+			'choose_from_most_used'      => 'Choose from the most used',
+			'popular_items'              => 'Popular Zip Codes',
+			'search_items'               => 'Search Zip Codes',
+			'not_found'                  => 'Not Found',
+			'no_terms'                   => 'No zip codes',
+			'items_list'                 => 'Zip codes list',
+			'items_list_navigation'      => 'Zip codes list navigation',
+		);
+		$args = array(
+			'labels'                     => $labels,
+			'hierarchical'               => false,
+			'public'                     => true,
+			'show_ui'                    => true,
+			'show_admin_column'          => true,
+			'show_in_nav_menus'          => true,
+			'show_tagcloud'              => true,
+		);
+		register_taxonomy( 'zip-code', array( 'instagram' ), $args );
 	}
 
 	/**
@@ -555,6 +588,16 @@ class Daddio_Instagram {
 		return $this->get_instagram_json_from_html( $response['body'] );
 	}
 
+	public function fetch_instagram_location( $location_id = '' ) {
+		if ( ! $location_id ) {
+			return false;
+		}
+		$request = 'https://www.instagram.com/explore/locations/' . $location_id . '/';
+		$response = wp_remote_get( $request );
+
+		return $this->get_instagram_json_from_html( $response['body'] );
+	}
+
 	/**
 	 * Fetch a single Instagram page/data from a given code
 	 *
@@ -758,6 +801,18 @@ class Daddio_Instagram {
 		$caption = wp_encode_emoji( $node->caption );
 		$title = preg_replace( '/\s#\w+/i', '', $caption );
 
+		$location_term_id = false;
+		if ( ! empty( $node->location_id ) ) {
+			$location_args = array(
+				'id'              => $node->location_id,
+				'name'            => $node->location_name,
+				'slug'            => $node->location_slug,
+				'has_public_page' => $node->location_has_public_page,
+			);
+			$location_term_id = $this->maybe_add_location( $location_args );
+			$location_data = $this->get_location_data( $location_term_id );
+		}
+
 		$default_post_args = array(
 			'post_title'    => $title,
 			'post_content'  => $caption,
@@ -767,6 +822,7 @@ class Daddio_Instagram {
 			'post_date_gmt' => $posted,
 			'guid'          => $permalink,
 			'post_parent'   => 0,
+			'meta_input'    => array(),
 		);
 		if ( ! $force_publish_status ) {
 			$default_post_args['post_status'] = 'pending';
@@ -776,6 +832,21 @@ class Daddio_Instagram {
 			$post_args['post_name'] = $node->code;
 		}
 		$post_args['post_content'] = wp_encode_emoji( $post_args['post_content'] );
+
+		// Store location id as post_meta if there is one
+		if ( ! empty( $node->location_id ) ) {
+			$post_args['meta_input']['instagram_location_id'] = $node->location_id;
+		}
+
+		if ( ! empty( $location_data ) ) {
+			if ( isset( $location_data['lat'] ) ) {
+				$post_args['meta_input']['latitude'] = $location_data['lat'];
+			}
+			if ( isset( $location_data['lng'] ) ) {
+				$post_args['meta_input']['longitude'] = $location_data['lng'];
+			}
+		}
+
 		$inserted = wp_insert_post( $post_args );
 
 		// Handle children
@@ -857,6 +928,44 @@ class Daddio_Instagram {
 		// If we have a video id, store it as post meta
 		if ( $video_id ) {
 			add_post_meta( $inserted, '_video_id', $video_id );
+		}
+
+		// Do some more location data tagging
+		if ( ! empty( $location_data ) ) {
+
+			if ( ! empty( $location_data['postcode'] ) ) {
+				$term = get_term_by(
+					$field = 'name',
+					$value = $location_data['postcode'],
+					$taxonomy = 'zip-code'
+				);
+				if ( $term === false ) {
+					$description = $location_data['city'] . ', ' . $this->get_state_abbreviation( $location_data['state'] );
+					$term = wp_insert_term(
+						$location_data['postcode'],
+						$taxonomy = 'zip-code',
+						array(
+							'description' => $description,
+						)
+					);
+				}
+				if ( isset( $term->term_id ) ) {
+					$term_id = $term->term_id;
+					wp_set_object_terms(
+						$object_id = $inserted,
+						$term_id,
+						'zip-code',
+						$append = true
+					);
+				}
+			}
+
+			/*
+			Zip Code
+			State
+			county
+			Country
+			 */
 		}
 
 		return (object) array(
@@ -949,6 +1058,202 @@ class Daddio_Instagram {
 
 			return $id;
 		}
+	}
+
+	public function maybe_add_location( $args = array() ) {
+		global $wpdb;
+
+		$default_args = array(
+			'id'              => '',
+			'name'            => '',
+			'slug'            => '',
+			'has_public_page' => '',
+		);
+		$args = wp_parse_args( $args, $default_args );
+		if ( empty( $args['id'] ) ) {
+			return false;
+		}
+
+		$meta_key = 'instagram-location-id';
+		$meta_value = $args['id'];
+
+		$term_id = $wpdb->get_var( $wpdb->prepare(
+			"
+				SELECT `term_id`
+				FROM `{$wpdb->termmeta}`
+				WHERE `meta_key` = %s
+				AND `meta_value` = %s
+				LIMIT 0,1;
+			",
+			$meta_key,
+			$meta_value
+		) );
+		if ( $term_id ) {
+			return $term_id;
+		}
+		$raw_location_data = $this->fetch_instagram_location( $args['id'] );
+		$location_data = array(
+			'id'              => '',
+			'name'            => '',
+			'has_public_page' => '',
+			'lat'             => '',
+			'lng'             => '',
+			'slug'            => '',
+		);
+		if ( isset( $raw_location_data->entry_data->LocationsPage[0]->location ) ) {
+			$location_obj = $raw_location_data->entry_data->LocationsPage[0]->location;
+			foreach ( $location_data as $key => $val ) {
+				if ( isset( $location_obj->{ $key } ) ) {
+					$location_data[ $key ] = $location_obj->{ $key };
+				}
+			}
+		}
+		$address_data = array();
+		if ( ! empty( $location_data['lat'] ) && ! empty( $location_data['lng'] ) ) {
+			$address_data = $this->reverse_geocode( $location_data['lat'], $location_data['lng'] );
+		}
+
+		$location_data = array_merge( $location_data, $address_data );
+		$custom_slug = $args['slug'] . '-' . $args['id'];
+		$term_args = array(
+			'slug' => $custom_slug,
+		);
+		$term = wp_insert_term( $args['name'], $taxonomy = 'location', $term_args );
+		if ( ! is_array( $term ) || empty( $term['term_id'] ) || is_wp_error( $term ) ) {
+			return 0;
+		}
+		$term_id = intval( $term['term_id'] );
+		add_term_meta( $term_id, $meta_key, $meta_value );
+		add_term_meta( $term_id, 'latitude', $location_data['lat'] );
+		add_term_meta( $term_id, 'longitude', $location_data['lng'] );
+		add_term_meta( $term_id, 'instagram-last-updated', time() );
+		add_term_meta( $term_id, 'location-data', $location_data );
+		return $term_id;
+	}
+
+	public function reverse_geocode( $lat = '', $long = '' ) {
+		$output = array(
+			'locality'      => '',
+			'city'          => '',
+			'county'        => '',
+			'state'         => '',
+			'postcode'      => '',
+			'country'       => '',
+			'country_code'  => '',
+		);
+		if ( empty( $lat ) || empty( $long ) ) {
+			return $output;
+		}
+		$query_args = array(
+			'format'         => 'json',
+			'lat'            => $lat,
+			'lon'            => $long,
+			'zoom'           => 80,
+			'addressdetails' => 1,
+		);
+		$request = add_query_arg( $query_args, 'https://nominatim.openstreetmap.org/reverse' );
+		wp_log( $request );
+		$response = wp_remote_get( $request );
+		$body = $response['body'];
+		if ( ! is_string( $body ) || empty( $body ) ) {
+			return $output;
+		}
+		$json = json_decode( $response['body'] );
+		if ( isset( $json->address ) ) {
+			$output = wp_parse_args( $json->address, $output );
+		}
+		if ( isset( $output['postcode'] ) && empty( $output['city'] ) ) {
+			// Get city data
+			$request = 'https://api.zippopotam.us/us/' . $output['postcode'];
+			$response = wp_remote_get( $request );
+			$body = $response['body'];
+			if ( is_string( $body ) && ! empty( $body ) ) {
+				$json = json_decode( $body );
+				if ( isset( $json->places[0]->{'place name'} ) ) {
+					$output['city'] = $json->places[0]->{'place name'};
+				}
+			}
+		}
+		return $output;
+	}
+
+	public function get_location_data( $term = '' ) {
+		$term_id = false;
+		if ( is_numeric( $term ) ) {
+			$term_id = $term;
+		} else {
+			$term = get_term( $term, 'location' );
+			if ( is_object( $term ) && isset( $term->term_id ) ) {
+				$term_id = $term->term_id;
+			}
+		}
+		if ( ! $term_id ) {
+			return array();
+		}
+		return get_term_meta( $term_id, 'location-data', true );
+	}
+
+	public function get_state_abbreviation( $state = '' ) {
+		$key = ucwords( strtolower( $state ) );
+		// via https://gist.github.com/maxrice/2776900#gistcomment-1172963
+		$states = array(
+			'Alabama'        => 'AL',
+			'Alaska'         => 'AK',
+			'Arizona'        => 'AZ',
+			'Arkansas'       => 'AR',
+			'California'     => 'CA',
+			'Colorado'       => 'CO',
+			'Connecticut'    => 'CT',
+			'Delaware'       => 'DE',
+			'District of Columbia' => 'DC',
+			'Florida'        => 'FL',
+			'Georgia'        => 'GA',
+			'Hawaii'         => 'HI',
+			'Idaho'          => 'ID',
+			'Illinois'       => 'IL',
+			'Indiana'        => 'IN',
+			'Iowa'           => 'IA',
+			'Kansas'         => 'KS',
+			'Kentucky'       => 'KY',
+			'Louisiana'      => 'LA',
+			'Maine'          => 'ME',
+			'Maryland'       => 'MD',
+			'Massachusetts'  => 'MA',
+			'Michigan'       => 'MI',
+			'Minnesota'      => 'MN',
+			'Mississippi'    => 'MS',
+			'Missouri'       => 'MO',
+			'Montana'        => 'MT',
+			'Nebraska'       => 'NE',
+			'Nevada'         => 'NV',
+			'New Hampshire'  => 'NH',
+			'New Jersey'     => 'NJ',
+			'New Mexico'     => 'NM',
+			'New York'       => 'NY',
+			'North Carolina' => 'NC',
+			'North Dakota'   => 'ND',
+			'Ohio'           => 'OH',
+			'Oklahoma'       => 'OK',
+			'Oregon'         => 'OR',
+			'Pennsylvania'   => 'PA',
+			'Rhode Island'   => 'RI',
+			'South Carolina' => 'SC',
+			'South Dakota'   => 'SD',
+			'Tennessee'      => 'TN',
+			'Texas'          => 'TX',
+			'Utah'           => 'UT',
+			'Vermont'        => 'VT',
+			'Virginia'       => 'VA',
+			'Washington'     => 'WA',
+			'West Virginia'  => 'WV',
+			'Wisconsin'      => 'WI',
+			'Wyoming'        => 'WY',
+		);
+
+		if ( isset( $states[ $key ] ) ) {
+			return $states[ $key ];
+		}
+		return false;
 	}
 }
 Daddio_Instagram::get_instance();
