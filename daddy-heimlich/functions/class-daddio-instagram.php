@@ -961,7 +961,6 @@ class Daddio_Instagram {
 			}
 
 			/*
-			Zip Code
 			State
 			county
 			Country
