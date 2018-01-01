@@ -35,7 +35,7 @@ class Daddio_Instagram_Locations {
 	function action_init() {
 		$args = array(
 			'labels'            => daddio_generate_taxonomy_labels( 'location', 'locations' ),
-			'hierarchical'      => true,
+			'hierarchical'      => false,
 			'public'            => true,
 			'show_ui'           => true,
 			'show_admin_column' => true,
@@ -49,7 +49,7 @@ class Daddio_Instagram_Locations {
 			'hierarchical'      => false,
 			'public'            => true,
 			'show_ui'           => true,
-			'show_admin_column' => true,
+			'show_admin_column' => false,
 			'show_in_nav_menus' => true,
 			'show_tagcloud'     => true,
 		);
@@ -60,7 +60,7 @@ class Daddio_Instagram_Locations {
 			'hierarchical'      => false,
 			'public'            => true,
 			'show_ui'           => true,
-			'show_admin_column' => true,
+			'show_admin_column' => false,
 			'show_in_nav_menus' => true,
 			'show_tagcloud'     => true,
 		);
@@ -71,7 +71,7 @@ class Daddio_Instagram_Locations {
 			'hierarchical'      => false,
 			'public'            => true,
 			'show_ui'           => true,
-			'show_admin_column' => true,
+			'show_admin_column' => false,
 			'show_in_nav_menus' => true,
 			'show_tagcloud'     => true,
 		);
@@ -82,7 +82,7 @@ class Daddio_Instagram_Locations {
 			'hierarchical'      => false,
 			'public'            => true,
 			'show_ui'           => true,
-			'show_admin_column' => true,
+			'show_admin_column' => false,
 			'show_in_nav_menus' => true,
 			'show_tagcloud'     => true,
 		);
@@ -93,6 +93,19 @@ class Daddio_Instagram_Locations {
 		$location_data = $this->get_location_data_from_node( $node );
 		if ( empty( $location_data ) ) {
 			return;
+		}
+
+		if ( ! empty( $location_data['id'] ) ) {
+			// Get the term id for the location
+			$term_id = $this->get_term_id_from_location_id( $location_data['id'] );
+			if ( $term_id ) {
+				wp_set_object_terms(
+					$post_id,
+					$term_id,
+					'location',
+					$append = true
+				);
+			}
 		}
 
 		if ( ! empty( $location_data['postcode'] ) ) {
@@ -106,11 +119,37 @@ class Daddio_Instagram_Locations {
 			$this->maybe_add_term_and_associate_with_post( $args );
 		}
 
-		/*
-		State
-		county
-		Country
-		 */
+		if ( ! empty( $location_data['state'] ) ) {
+			$args = array(
+				'term_name'        => $location_data['state'],
+				'term_description' => '',
+				'taxonomy'         => 'state',
+				'post_id'          => $post_id,
+			);
+			$this->maybe_add_term_and_associate_with_post( $args );
+		}
+
+		if ( ! empty( $location_data['county'] ) ) {
+			$term_name = str_replace( 'County', '', $location_data['county'] );
+			$description = $location_data['county'] . ', ' . $this->get_state_abbreviation( $location_data['state'] );
+			$args = array(
+				'term_name'        => $term_name,
+				'term_description' => $description,
+				'taxonomy'         => 'county',
+				'post_id'          => $post_id,
+			);
+			$this->maybe_add_term_and_associate_with_post( $args );
+		}
+
+		if ( ! empty( $location_data['country'] ) ) {
+			$args = array(
+				'term_name'        => $location_data['country'],
+				'term_description' => '',
+				'taxonomy'         => 'country',
+				'post_id'          => $post_id,
+			);
+			$this->maybe_add_term_and_associate_with_post( $args );
+		}
 	}
 
 	public function filter_daddio_pre_insert_instagram_post_args( $post_args, $node = array() ) {
@@ -155,7 +194,6 @@ class Daddio_Instagram_Locations {
 			'post_id' => 0,
 		);
 		$args = wp_parse_args( $args, $default_args );
-
 		$term = get_term_by(
 			$field = 'name',
 			$args['term_name'],
@@ -171,7 +209,6 @@ class Daddio_Instagram_Locations {
 			);
 		}
 		if ( isset( $term->term_id ) ) {
-			$term_id = ;
 			wp_set_object_terms(
 				$args['post_id'],
 				$term->term_id,
@@ -195,20 +232,7 @@ class Daddio_Instagram_Locations {
 			return false;
 		}
 
-		$meta_key = 'instagram-location-id';
-		$meta_value = $args['id'];
-
-		$term_id = $wpdb->get_var( $wpdb->prepare(
-			"
-				SELECT `term_id`
-				FROM `{$wpdb->termmeta}`
-				WHERE `meta_key` = %s
-				AND `meta_value` = %s
-				LIMIT 0,1;
-			",
-			$meta_key,
-			$meta_value
-		) );
+		$term_id = $this->get_term_id_from_location_id( $args['id'] );
 		if ( $term_id ) {
 			return $term_id;
 		}
@@ -244,12 +268,36 @@ class Daddio_Instagram_Locations {
 			return 0;
 		}
 		$term_id = intval( $term['term_id'] );
-		add_term_meta( $term_id, $meta_key, $meta_value );
+		add_term_meta( $term_id, 'instagram-location-id', $location_data['id'] );
 		add_term_meta( $term_id, 'latitude', $location_data['lat'] );
 		add_term_meta( $term_id, 'longitude', $location_data['lng'] );
 		add_term_meta( $term_id, 'instagram-last-updated', time() );
 		add_term_meta( $term_id, 'location-data', $location_data );
 		return $term_id;
+	}
+
+	public function get_term_id_from_location_id( $location_id = 0 ) {
+		global $wpdb;
+
+		$meta_key = 'instagram-location-id';
+		$meta_value = $location_id;
+
+		$term_id = $wpdb->get_var( $wpdb->prepare(
+			"
+				SELECT `term_id`
+				FROM `{$wpdb->termmeta}`
+				WHERE `meta_key` = %s
+				AND `meta_value` = %s
+				LIMIT 0,1;
+			",
+			$meta_key,
+			$meta_value
+		) );
+		$term_id = intval( $term_id );
+		if ( $term_id ) {
+			return $term_id;
+		}
+		return 0;
 	}
 
 	public function fetch_instagram_location( $location_id = '' ) {
@@ -299,7 +347,6 @@ class Daddio_Instagram_Locations {
 			'addressdetails' => 1,
 		);
 		$request = add_query_arg( $query_args, 'https://nominatim.openstreetmap.org/reverse' );
-		wp_log( $request );
 		$response = wp_remote_get( $request );
 		$body = $response['body'];
 		if ( ! is_string( $body ) || empty( $body ) ) {
