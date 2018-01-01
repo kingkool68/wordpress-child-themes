@@ -25,6 +25,7 @@ class Daddio_Instagram_Locations {
 	public function setup_hooks() {
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'daddio_after_instagram_inserted', array( $this, 'action_daddio_after_instagram_inserted' ), 10, 2 );
+		add_action( 'location_edit_form_fields', array( $this, 'action_location_edit_form_fields' ), 11 );
 
 		add_filter( 'daddio_pre_insert_instagram_post_args', array( $this, 'filter_daddio_pre_insert_instagram_post_args' ), 10, 2 );
 	}
@@ -91,6 +92,10 @@ class Daddio_Instagram_Locations {
 
 	public function action_daddio_after_instagram_inserted( $post_id, $node ) {
 		$location_data = $this->get_location_data_from_node( $node );
+		// $location_data might not be complete at this point
+		// Maybe get it again?
+		// Example, County data is set but county is not associated with the instagram post
+
 		if ( empty( $location_data ) ) {
 			return;
 		}
@@ -131,12 +136,15 @@ class Daddio_Instagram_Locations {
 
 		if ( ! empty( $location_data['county'] ) ) {
 			$term_name = str_replace( 'County', '', $location_data['county'] );
-			$description = $location_data['county'] . ', ' . $this->get_state_abbreviation( $location_data['state'] );
+			$state_abbreviation = $this->get_state_abbreviation( $location_data['state'] );
+			$term_slug = $term_name . ' ' . $state_abbreviation;
+			$description = $location_data['county'] . ', ' . $state_abbreviation;
 			$args = array(
 				'term_name'        => $term_name,
 				'term_description' => $description,
 				'taxonomy'         => 'county',
 				'post_id'          => $post_id,
+				'slug'             => $term_slug,
 			);
 			$this->maybe_add_term_and_associate_with_post( $args );
 		}
@@ -150,6 +158,64 @@ class Daddio_Instagram_Locations {
 			);
 			$this->maybe_add_term_and_associate_with_post( $args );
 		}
+	}
+
+	public function action_location_edit_form_fields( $term ) {
+		$location_data = $this->get_location_data( $term );
+		wp_log( $location_data );
+		if ( ! empty( $location_data['id'] ) ) {
+			$url = 'https://www.instagram.com/explore/locations/' . $location_data['id'] . '/';
+			$link = '<a href="' . esc_url( $url ) . '" target="_blank">' . $location_data['id'] . '</a>';
+			echo $this->edit_form_field(
+				'Instagram Location',
+				$link
+			);
+		}
+
+		$query_args = array(
+			'format'         => 'json',
+			'lat'            => $location_data['lat'],
+			'lon'            => $location_data['lng'],
+			'zoom'           => 80,
+			'addressdetails' => 1,
+		);
+		$request_url = add_query_arg( $query_args, 'https://nominatim.openstreetmap.org/reverse' );
+		$request_link_text = $location_data['lat'] . ', ' . $location_data['lng'];
+		$request_link = '<a href="' . esc_url( $request_url ) . '" target="_blank">' . $request_link_text . '</a>';
+		echo $this->edit_form_field(
+			'Reverse Geocode',
+			$request_link
+		);
+
+		$blacklisted_keys = array( 'id', 'name', 'has_public_page' );
+		$meta_data = array();
+		foreach ( $location_data as $key => $val ) {
+			if ( in_array( $key, $blacklisted_keys ) ) {
+				continue;
+			}
+			if ( ! empty( $val ) ) {
+				$meta_data[] = $key . ': ' . $val;
+			}
+		}
+		echo $this->edit_form_field(
+			'Meta Data',
+			implode( '<br>', $meta_data )
+		);
+	}
+
+	public function edit_form_field( $label = '', $value = '' ) {
+		ob_start();
+		?>
+		<tr class="form-field form-required term-name-wrap">
+			<th scope="row">
+				<label><?php echo $label; ?></label>
+			</th>
+			<td>
+				<?php echo $value; ?>
+			</td>
+		</tr>
+		<?php
+		return ob_get_clean();
 	}
 
 	public function filter_daddio_pre_insert_instagram_post_args( $post_args, $node = array() ) {
@@ -188,10 +254,11 @@ class Daddio_Instagram_Locations {
 
 	public function maybe_add_term_and_associate_with_post( $args = array() ) {
 		$default_args = array(
-			'term_name' => '',
+			'term_name'        => '',
 			'term_description' => '',
-			'taxonomy' => '',
-			'post_id' => 0,
+			'slug'             => '',
+			'taxonomy'         => '',
+			'post_id'          => 0,
 		);
 		$args = wp_parse_args( $args, $default_args );
 		$term = get_term_by(
@@ -205,6 +272,7 @@ class Daddio_Instagram_Locations {
 				$args['taxonomy'],
 				array(
 					'description' => $args['term_description'],
+					'slug'        => $args['slug'],
 				)
 			);
 		}
@@ -356,8 +424,8 @@ class Daddio_Instagram_Locations {
 		if ( isset( $json->address ) ) {
 			$output = wp_parse_args( $json->address, $output );
 		}
-		if ( isset( $output['postcode'] ) && empty( $output['city'] ) ) {
-			// Get city data
+		if ( isset( $output['postcode'] ) ) {
+			// Get city/state data via zipcode
 			$request = 'https://api.zippopotam.us/us/' . $output['postcode'];
 			$response = wp_remote_get( $request );
 			$body = $response['body'];
@@ -365,6 +433,9 @@ class Daddio_Instagram_Locations {
 				$json = json_decode( $body );
 				if ( isset( $json->places[0]->{'place name'} ) ) {
 					$output['city'] = $json->places[0]->{'place name'};
+				}
+				if ( isset( $json->places[0]->state ) ) {
+					$output['state'] = $json->places[0]->state;
 				}
 			}
 		}
