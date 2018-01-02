@@ -97,6 +97,7 @@ class Daddio_Instagram_Locations {
 		// Example, County data is set but county is not associated with the instagram post
 
 		if ( empty( $location_data ) ) {
+			// TODO: Maybe we should tag it with a None location
 			return;
 		}
 
