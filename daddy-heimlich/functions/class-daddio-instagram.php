@@ -231,8 +231,19 @@ class Daddio_Instagram {
 
 			// It's a Tag page
 			if ( isset( $json->entry_data->TagPage[0] ) ) {
-				$top_posts = $json->entry_data->TagPage[0]->tag->top_posts->nodes;
-				$other = $json->entry_data->TagPage[0]->tag->media->nodes;
+				$top_posts = array();
+				$other = array();
+
+				if ( isset( $json->entry_data->TagPage[0]->tag ) ) {
+					$top_posts = $json->entry_data->TagPage[0]->tag->top_posts->nodes;
+					$other = $json->entry_data->TagPage[0]->tag->media->nodes;
+				}
+
+				// New format I detected on 01/02/2018
+				if ( isset( $json->entry_data->TagPage[0]->graphql->hashtag ) ) {
+					$top_posts = $json->entry_data->TagPage[0]->graphql->hashtag->edge_hashtag_to_top_posts->edges;
+					$other = $json->entry_data->TagPage[0]->graphql->hashtag->edge_hashtag_to_media->edges;
+				}
 				$nodes = array_merge( $top_posts, $other );
 			}
 
@@ -582,6 +593,9 @@ class Daddio_Instagram {
 			'location_has_public_page' => false,
 			'children'                 => array(),
 		);
+		if ( isset( $node->node ) ) {
+			$node = $node->node;
+		}
 
 		// Common properties for both old and new format
 		if ( isset( $node->id ) ) {
