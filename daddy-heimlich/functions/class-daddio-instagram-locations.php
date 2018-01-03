@@ -37,7 +37,7 @@ class Daddio_Instagram_Locations {
 		$args = array(
 			'labels'            => daddio_generate_taxonomy_labels( 'location', 'locations' ),
 			'hierarchical'      => false,
-			'public'            => true,
+			'public'            => false,
 			'show_ui'           => true,
 			'show_admin_column' => true,
 			'show_in_nav_menus' => true,
@@ -48,7 +48,7 @@ class Daddio_Instagram_Locations {
 		$args = array(
 			'labels'            => daddio_generate_taxonomy_labels( 'zip code', 'zip codes' ),
 			'hierarchical'      => false,
-			'public'            => true,
+			'public'            => false,
 			'show_ui'           => true,
 			'show_admin_column' => false,
 			'show_in_nav_menus' => true,
@@ -59,7 +59,7 @@ class Daddio_Instagram_Locations {
 		$args = array(
 			'labels'            => daddio_generate_taxonomy_labels( 'state', 'states' ),
 			'hierarchical'      => false,
-			'public'            => true,
+			'public'            => false,
 			'show_ui'           => true,
 			'show_admin_column' => false,
 			'show_in_nav_menus' => true,
@@ -70,7 +70,7 @@ class Daddio_Instagram_Locations {
 		$args = array(
 			'labels'            => daddio_generate_taxonomy_labels( 'county', 'counties' ),
 			'hierarchical'      => false,
-			'public'            => true,
+			'public'            => false,
 			'show_ui'           => true,
 			'show_admin_column' => false,
 			'show_in_nav_menus' => true,
@@ -81,7 +81,7 @@ class Daddio_Instagram_Locations {
 		$args = array(
 			'labels'            => daddio_generate_taxonomy_labels( 'country', 'countries' ),
 			'hierarchical'      => false,
-			'public'            => true,
+			'public'            => false,
 			'show_ui'           => true,
 			'show_admin_column' => false,
 			'show_in_nav_menus' => true,
