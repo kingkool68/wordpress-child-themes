@@ -97,7 +97,14 @@ class Daddio_Instagram_Locations {
 		// Example, County data is set but county is not associated with the instagram post
 
 		if ( empty( $location_data ) ) {
-			// TODO: Maybe we should tag it with a None location
+			$description = 'No location set';
+			$args = array(
+				'term_name'        => 'None',
+				'term_description' => $description,
+				'taxonomy'         => 'location',
+				'post_id'          => $post_id,
+			);
+			$this->maybe_add_term_and_associate_with_post( $args );
 			return;
 		}
 
