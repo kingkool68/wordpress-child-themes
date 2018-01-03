@@ -46,3 +46,41 @@ function fix_zadies_instagram_images() {
 	WP_CLI::success( 'Done!' );
 }
 WP_CLI::add_command( 'zah-fix-instagrams', 'fix_zadies_instagram_images' );
+
+function zah_add_locations() {
+	// Get all published instagram posts that don't have a instagram_location_id meta key set...
+	$args = array(
+		'post_type'      => 'instagram',
+		'post_status'    => 'public',
+		'posts_per_page' => 1,
+		'meta_query'     => array(
+			array(
+				'key'     => 'instagram_location_id',
+				'compare' => 'NOT EXISTS',
+			),
+		),
+	);
+	$query = new WP_Query( $args );
+	// @TODO Run through eahc post and get any location data from Instagram to process
+	// Probably need to call do_action( 'daddio_after_instagram_inserted' ) passing the post_id and the node data
+	// fetch_single_instagram() might be useful
+	$insta = Daddio_Instagram::get_instance();
+	foreach ( $query->posts as $post ) {
+		$post_id = $post->ID;
+		$guid = $post->guid;
+		$parts = explode( 'com/p/', $guid );
+		$code = $parts[1];
+		$code = str_replace( '/', '', $code );
+		$json = $insta->fetch_single_instagram( $code );
+		if ( isset( $json->entry_data->PostPage[0] ) ) {
+			$node = $json->entry_data->PostPage[0]->graphql->shortcode_media;
+			$node = $insta->normalize_instagram_data( $node );
+			// do_action( 'daddio_after_instagram_inserted', $post_id, $node );
+			print_r( $node );
+		}
+
+		WP_CLI::line( $post_id . ' (' . $code . ') is done' );
+	}
+	WP_CLI::success( 'Done!' );
+}
+WP_CLI::add_command( 'zah-add-locations', 'zah_add_locations' );

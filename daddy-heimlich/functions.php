@@ -118,7 +118,7 @@ $files_to_include = array(
 	'rsvp.php',
 	'class-daddio-infinite-scroll.php',
 	'class-daddio-on-this-day.php',
-	// 'cli-commands.php',
+	'cli-commands.php',
 );
 $dir = get_template_directory() . '/functions/';
 foreach ( $files_to_include as $filename ) {
