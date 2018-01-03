@@ -276,6 +276,9 @@ class Daddio_Instagram_Locations {
 					'slug'        => $args['slug'],
 				)
 			);
+			if ( ! is_wp_error( $term ) ) {
+				$term = (object) $term;
+			}
 		}
 		if ( isset( $term->term_id ) ) {
 			wp_set_object_terms(
