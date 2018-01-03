@@ -92,9 +92,6 @@ class Daddio_Instagram_Locations {
 
 	public function action_daddio_after_instagram_inserted( $post_id, $node ) {
 		$location_data = $this->get_location_data_from_node( $node );
-		// $location_data might not be complete at this point
-		// Maybe get it again?
-		// Example, County data is set but county is not associated with the instagram post
 
 		if ( empty( $location_data ) ) {
 			$description = 'No location set';
@@ -105,6 +102,7 @@ class Daddio_Instagram_Locations {
 				'post_id'          => $post_id,
 			);
 			$this->maybe_add_term_and_associate_with_post( $args );
+			update_post_meta( $post_id, 'instagram_location_id', 0 );
 			return;
 		}
 
