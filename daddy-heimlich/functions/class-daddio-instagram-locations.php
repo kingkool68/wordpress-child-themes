@@ -24,6 +24,8 @@ class Daddio_Instagram_Locations {
 	 */
 	public function setup_hooks() {
 		add_action( 'init', array( $this, 'action_init' ) );
+		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
+		add_action( 'wp_ajax_daddio_private_location_sync', array( $this, 'ajax_daddio_private_location_sync' ) );
 		add_action( 'daddio_after_instagram_inserted', array( $this, 'action_daddio_after_instagram_inserted' ), 10, 2 );
 		add_action( 'location_edit_form_fields', array( $this, 'action_location_edit_form_fields' ), 11 );
 	}
@@ -86,6 +88,139 @@ class Daddio_Instagram_Locations {
 			'show_tagcloud'     => true,
 		);
 		register_taxonomy( 'country', array( 'instagram' ), $args );
+	}
+
+	/**
+	 * Add Private Sync submenu
+	 */
+	public function action_admin_menu() {
+		add_submenu_page(
+			'edit.php?post_type=instagram',
+			'Private Location Sync',
+			'Private Location Sync',
+			'manage_options',
+			'instagram-private-location-sync',
+			array( $this, 'handle_private_location_sync_submenu' )
+		);
+	}
+
+	public function handle_private_location_sync_submenu() {
+		// Get all published instagram posts that have a needs-private-location-data meta key set...
+		$args = array(
+			'post_type'      => 'instagram',
+			'post_status'    => 'public',
+			'posts_per_page' => 15,
+			'meta_query'     => array(
+				array(
+					'key'     => 'needs-private-location-data',
+					'value'   => '1',
+					'compare' => '=',
+				),
+			),
+		);
+		$query = new WP_Query( $args );
+		$context = array(
+			'found_posts' => $query->found_posts,
+			'posts' => array(),
+		);
+		foreach ( $query->posts as $post ) {
+			$post_id = $post->ID;
+			$guid = $post->guid;
+			$parts = explode( 'com/p/', $guid );
+			$code = $parts[1];
+			$code = str_replace( '/', '', $code );
+
+			$featured_image_id = get_post_thumbnail_id( $post_id );
+			$img_attrs = array(
+				'class' => 'alignleft',
+				'alt' => 'Instagram Thumbnail',
+			);
+			$thumbnail = wp_get_attachment_image( $featured_image_id, 'thumbnail', false, $img_attrs );
+
+			$context['posts'][] = (object) array(
+				'thumbnail'     => $thumbnail,
+				'instagram_url' => $guid,
+				'post_id'       => $post_id,
+				'edit_link'     => get_edit_post_link( $post_id, 'url' ),
+			);
+		}
+		wp_enqueue_script(
+			'daddio-private-location-sync-submenu',
+			get_template_directory_uri() . '/js/admin-private-location-sync-submenu.js',
+			array( 'jquery' )
+		);
+		echo $this->render_private_location_sync_submenu( $context );
+	}
+
+	public function render_private_location_sync_submenu( $data = array() ) {
+		$defaults = array(
+			'found_posts' => 0,
+			'posts' => array(),
+		);
+		$x = wp_parse_args( $data, $defaults );
+		ob_start();
+		?>
+		<style>
+			.post {
+				overflow: auto;
+				padding: 15px;
+				margin-bottom: 30px;
+			}
+			.post.loading {
+				opacity: 0.35;
+			}
+			.post.success {
+				background-color: green;
+				color: #fff;
+			}
+			.post.fail {
+				background-color: red;
+				color: #fff;
+			}
+			.post .text-fields {
+				overflow: auto;
+				padding: 0 15px;
+			}
+			.post .instagram-url,
+			.post textarea {
+				margin-bottom: 15px;
+				width: 99%;
+			}
+		</style>
+		<h1>Privte Instagram Posts that Need Location Data Synced</h1>
+		<?php foreach ( $x['posts'] as $post ) : ?>
+			<div class="post">
+				<a href="<?php echo esc_url( $post->edit_link ); ?>" target="_blank">
+					<?php echo $post->thumbnail; ?>
+				</a>
+				<div class="text-fields">
+					<input type="text" class="instagram-url" value="view-source:<?php echo esc_url( $post->instagram_url ); ?>" onfocus="this.select();" readonly>
+					<input type="hidden" class="post-id" name="post-id" value="<?php echo absint( $post->post_id ); ?>">
+					<textarea rows="5" class="instagram-source"></textarea>
+				</div>
+			</div>
+		<?php endforeach; ?>
+		<p><?php echo $x['found_posts']; ?> private Instagram posts need location data</p>
+		<?php
+		return ob_get_clean();
+	}
+
+	public function ajax_daddio_private_location_sync() {
+		$post_id = absint( $_POST['post-id'] );
+		if ( ! $post_id ) {
+			wp_send_json_fail( array( 'message' => 'Bad post-id' ) );
+		}
+		$html = wp_unslash( $_POST['instagram-source'] );
+		$insta = Daddio_Instagram::get_instance();
+		$json = $insta->get_instagram_json_from_html( $html );
+		if ( isset( $json->entry_data->PostPage[0] ) ) {
+			$node = $json->entry_data->PostPage[0]->graphql->shortcode_media;
+			$node = $insta->normalize_instagram_data( $node );
+			do_action( 'daddio_after_instagram_inserted', $post_id, $node );
+			delete_post_meta( $post_id, 'needs-private-location-data' );
+		}
+		wp_send_json_success( array( 'message' => 'Success!' ) );
+		die();
 	}
 
 	public function action_daddio_after_instagram_inserted( $post_id, $node ) {
