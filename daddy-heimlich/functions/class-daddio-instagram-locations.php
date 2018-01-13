@@ -91,6 +91,10 @@ class Daddio_Instagram_Locations {
 	}
 
 	public function action_daddio_after_instagram_inserted( $post_id, $node ) {
+		$post = get_post( $post_id );
+		if ( $post->post_type != 'instagram' ) {
+			return;
+		}
 		$location_data = $this->get_location_data_from_node( $node );
 
 		if ( empty( $location_data ) ) {
