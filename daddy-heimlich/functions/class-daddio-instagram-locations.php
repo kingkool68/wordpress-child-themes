@@ -26,8 +26,6 @@ class Daddio_Instagram_Locations {
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'daddio_after_instagram_inserted', array( $this, 'action_daddio_after_instagram_inserted' ), 10, 2 );
 		add_action( 'location_edit_form_fields', array( $this, 'action_location_edit_form_fields' ), 11 );
-
-		add_filter( 'daddio_pre_insert_instagram_post_args', array( $this, 'filter_daddio_pre_insert_instagram_post_args' ), 10, 2 );
 	}
 
 	/**
@@ -121,6 +119,14 @@ class Daddio_Instagram_Locations {
 					$append = true
 				);
 			}
+			update_post_meta( $post_id, 'instagram_location_id', $location_data['id'] );
+		}
+
+		if ( ! empty( $location_data['lat'] ) ) {
+			update_post_meta( $post_id, 'latitude', $location_data['lat'] );
+		}
+		if ( ! empty( $location_data['lng'] ) ) {
+			update_post_meta( $post_id, 'longitude', $location_data['lng'] );
 		}
 
 		if ( ! empty( $location_data['postcode'] ) ) {
@@ -226,25 +232,6 @@ class Daddio_Instagram_Locations {
 		</tr>
 		<?php
 		return ob_get_clean();
-	}
-
-	public function filter_daddio_pre_insert_instagram_post_args( $post_args, $node = array() ) {
-		// Store location id as post_meta if there is one
-		if ( ! empty( $node->location_id ) ) {
-			$post_args['meta_input']['instagram_location_id'] = $node->location_id;
-		}
-
-		$location_data = $this->get_location_data_from_node( $node );
-		if ( ! empty( $location_data ) ) {
-			if ( isset( $location_data['lat'] ) ) {
-				$post_args['meta_input']['latitude'] = $location_data['lat'];
-			}
-			if ( isset( $location_data['lng'] ) ) {
-				$post_args['meta_input']['longitude'] = $location_data['lng'];
-			}
-		}
-
-		return $post_args;
 	}
 
 	public function get_location_data_from_node( $node = array() ) {
