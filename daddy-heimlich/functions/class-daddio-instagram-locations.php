@@ -173,6 +173,9 @@ class Daddio_Instagram_Locations {
 				background-color: green;
 				color: #fff;
 			}
+			.post.success a {
+				color: #fff;
+			}
 			.post.fail {
 				background-color: red;
 				color: #fff;
@@ -219,7 +222,16 @@ class Daddio_Instagram_Locations {
 			do_action( 'daddio_after_instagram_inserted', $post_id, $node );
 			delete_post_meta( $post_id, 'needs-private-location-data' );
 		}
-		wp_send_json_success( array( 'message' => 'Success!' ) );
+
+		$locations = [];
+		$location_objs = wp_get_object_terms( $post_id, 'location' );
+		if ( ! is_wp_error( $location_objs ) ) {
+			foreach ( $location_objs as $term ) {
+				$locations[] = '<a href="' . esc_url( get_term_link( $term ) ) . '" target="_blank" rel="noopener noreferrer">' . $term->name . '</a>';
+			}
+		}
+		$locations_str = implode( ', ', $locations );
+		wp_send_json_success( array( 'message' => 'Success!<br>Location: ' . $locations_str ) );
 		die();
 	}
 
