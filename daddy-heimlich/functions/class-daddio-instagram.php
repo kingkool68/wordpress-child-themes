@@ -157,8 +157,8 @@ class Daddio_Instagram {
 		$query->set( 'tax_query', array(
 			array(
 				'taxonomy' => 'post_tag',
-				'field'	=> 'id',
-				'terms'	=> $tag_ids,
+				'field'	   => 'id',
+				'terms'	   => $tag_ids,
 				'operator' => 'NOT IN',
 			),
 		) );
@@ -748,6 +748,7 @@ class Daddio_Instagram {
 			'post_date_gmt' => $posted,
 			'guid'          => $permalink,
 			'post_parent'   => 0,
+			'meta_input'    => array(),
 		);
 		if ( ! $force_publish_status ) {
 			$default_post_args['post_status'] = 'pending';
@@ -757,6 +758,8 @@ class Daddio_Instagram {
 			$post_args['post_name'] = $node->code;
 		}
 		$post_args['post_content'] = wp_encode_emoji( $post_args['post_content'] );
+
+		$post_args = apply_filters( 'daddio_pre_insert_instagram_post_args', $post_args, $node );
 		$inserted = wp_insert_post( $post_args );
 
 		// Handle children
@@ -839,6 +842,8 @@ class Daddio_Instagram {
 		if ( $video_id ) {
 			add_post_meta( $inserted, '_video_id', $video_id );
 		}
+
+		do_action( 'daddio_after_instagram_inserted', $inserted, $node );
 
 		return (object) array(
 			'post_id'  => $inserted,

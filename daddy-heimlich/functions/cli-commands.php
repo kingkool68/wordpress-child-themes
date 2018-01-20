@@ -46,3 +46,61 @@ function fix_zadies_instagram_images() {
 	WP_CLI::success( 'Done!' );
 }
 WP_CLI::add_command( 'zah-fix-instagrams', 'fix_zadies_instagram_images' );
+
+function zah_prep_locations() {
+	$args = array(
+		'post_type'      => 'instagram',
+		'post_status'    => 'public',
+		'posts_per_page' => -1,
+	);
+	$query = new WP_Query( $args );
+	$count = 0;
+	foreach ( $query->posts as $post ) {
+		$post_id = $post->ID;
+		$has_location_id = get_post_meta( $post_id, 'instagram_location_id', true );
+		if ( ! $has_location_id ) {
+			update_post_meta( $post_id, 'needs-location-data', '1' );
+			$count++;
+		}
+	}
+	WP_CLI::success( number_format( $count ) . ' posts need location data out of ' . number_format( $query->found_posts ) . ' posts' );
+}
+WP_CLI::add_command( 'zah-prep-locations', 'zah_prep_locations' );
+
+function zah_add_locations() {
+	// Get all published instagram posts that don't have a instagram_location_id meta key set...
+	$args = array(
+		'post_type'      => 'instagram',
+		'post_status'    => 'public',
+		'posts_per_page' => -1,
+		'meta_query'     => array(
+			array(
+				'key'     => 'needs-location-data',
+				'value'   => '1',
+				'compare' => '=',
+			),
+		),
+	);
+	$query = new WP_Query( $args );
+	$insta = Daddio_Instagram::get_instance();
+	foreach ( $query->posts as $post ) {
+		$post_id = $post->ID;
+		$guid = $post->guid;
+		$parts = explode( 'com/p/', $guid );
+		$code = $parts[1];
+		$code = str_replace( '/', '', $code );
+		$json = $insta->fetch_single_instagram( $code );
+		if ( isset( $json->entry_data->PostPage[0] ) ) {
+			$node = $json->entry_data->PostPage[0]->graphql->shortcode_media;
+			$node = $insta->normalize_instagram_data( $node );
+			do_action( 'daddio_after_instagram_inserted', $post->ID, $node );
+			delete_post_meta( $post_id, 'needs-location-data' );
+			WP_CLI::line( $post_id . ' (https://www.instagram.com/p/' . $code . '/) is done' );
+		} else {
+			update_post_meta( $post_id, 'needs-private-location-data', '1' );
+			WP_CLI::line( 'PRIVATE: ' . $post_id . ' (https://www.instagram.com/p/' . $code . '/) is private!' );
+		}
+	}
+	WP_CLI::success( 'All Done!' );
+}
+WP_CLI::add_command( 'zah-add-locations', 'zah_add_locations' );
