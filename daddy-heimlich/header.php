@@ -15,7 +15,7 @@
 
 <link rel="alternate" type="application/rss+xml" title="<?php bloginfo( 'name' ); ?> RSS Feed" href="<?php bloginfo( 'rss2_url' ); ?>">
 <link rel="manifest" type="application/manifest+json" href="<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/zadieheimlich.com.webmanifest.json">
-<link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/favicons/apple-touch-icon.png">
+<link rel="apple-touch-icon" class="u-logo" sizes="180x180" href="<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/favicons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/favicons/favicon-32x32.png" sizes="32x32">
 <link rel="icon" type="image/png" href="<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/favicons/favicon-16x16.png" sizes="16x16">
 <link rel="manifest" href="<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/favicons/manifest.json">
@@ -32,9 +32,23 @@
 	<?php include get_template_directory() . '/svg/zadie-heimlich-icons.svg'; ?>
 	<a id="top" href="#content">Skip to Content</a>
 	<header class="clearfix">
-		<div class="holder">
-			<h1 class="site-title"><a href="<?php echo get_site_url(); ?>" data-ga-category="nav" data-ga-label="Site Title: <?php echo esc_attr( get_bloginfo('name') );?>"><?php bloginfo('name') ?></a></h1>
-			<p class="childs-current-age"><?php echo get_childs_current_age(); ?> old.</p>
+		<div class="holder h-card">
+			<h1 class="site-title">
+				<a
+					href="<?php echo get_site_url(); ?>"
+					data-ga-category="nav"
+					data-ga-label="Site Title: <?php echo esc_attr( get_bloginfo('name') );?>"
+					class="p-name u-url"
+				>
+					<?php bloginfo('name') ?>
+				</a>
+			</h1>
+			<p class="childs-current-age">
+				<?php $birthday = date( DATE_W3C, get_childs_birthday() ); ?>
+				<time datetime="<?php echo esc_attr( $birthday ); ?>" class="dt-bday">
+					<?php echo get_childs_current_age(); ?> old.
+				</time>
+			</p>
 		</div>
 	</header>
 
