@@ -1,6 +1,6 @@
 <?php
 function filter_daddio_rsvp_page_slug() {
-	return 'rsvp-for-veras-first-birthday-party';
+	return 'rsvp-veras-first-birthday-party';
 }
 add_filter( 'daddio_rsvp_page_slug', 'filter_daddio_rsvp_page_slug' );
 
