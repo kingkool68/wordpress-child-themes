@@ -114,6 +114,7 @@ $files_to_include = array(
 	'class-daddio-post-galleries.php',
 	'class-daddio-instagram.php',
 	'class-daddio-instagram-locations.php',
+	'class-daddio-weather.php',
 	'rsvp.php',
 	'class-daddio-infinite-scroll.php',
 	'class-daddio-on-this-day.php',
