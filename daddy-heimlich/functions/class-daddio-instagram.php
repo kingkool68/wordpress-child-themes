@@ -672,8 +672,6 @@ class Daddio_Instagram {
 			&& ! empty( $node->edge_sidecar_to_children->edges )
 		) {
 			$children = $node->edge_sidecar_to_children->edges;
-			// Remove the first child since it is the same as the parent node
-			array_shift( $children );
 			foreach ( $children as $child_node ) {
 				$output['children'][] = $this->normalize_instagram_data( $child_node->node );
 			}
