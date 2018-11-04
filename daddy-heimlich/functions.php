@@ -13,6 +13,7 @@ $files_to_require = array(
 	'class-daddio-dates.php',
 	'class-daddio-media.php',
 	'class-daddio-archive.php',
+	'class-daddio-pagination.php',
 	'class-daddio-menus.php',
 	'class-daddio-post-galleries.php',
 	'class-daddio-instagram.php',
