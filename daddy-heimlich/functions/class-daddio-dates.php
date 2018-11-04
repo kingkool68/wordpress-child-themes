@@ -7,7 +7,6 @@ class Daddio_Dates {
 	public static function get_instance() {
 		static $instance = null;
 		if ( null === $instance ) {
-			// Late static binding (PHP 5.3+)
 			$instance = new static();
 			$instance->setup_hooks();
 		}

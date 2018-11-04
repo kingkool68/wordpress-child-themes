@@ -6,7 +6,6 @@ class Daddio_Scripts_Style {
 	public static function get_instance() {
 		static $instance = null;
 		if ( null === $instance ) {
-			// Late static binding (PHP 5.3+)
 			$instance = new static();
 			$instance->setup_hooks();
 		}
@@ -151,10 +150,10 @@ class Daddio_Scripts_Style {
 
 	/**
 	 * If we're loading a bundled version of scripts then we don't want to load individual JavaScript files for certain script handles.
-	 * @param  [string] $script_element		<script> element to be rendered
-	 * @param  [string] $handle 			script handle that was registered
-	 * @param  [string] $script_src			src sttribute of the <script>
-	 * @return [string]						New <script> element
+	 * @param  [string] $script_element     <script> element to be rendered
+	 * @param  [string] $handle             script handle that was registered
+	 * @param  [string] $script_src         src sttribute of the <script>
+	 * @return [string]                     New <script> element
 	 */
 	public function dont_load_bundled_scripts( $script_element, $handle, $script_src ) {
 		if ( ! $this->maybe_use_global_script_file() ) {
