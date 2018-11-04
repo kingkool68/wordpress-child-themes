@@ -1,0 +1,27 @@
+{{ svg_icons }}
+<a id="top" href="#content">Skip to Content</a>
+<header class="clearfix">
+	<div class="holder h-card">
+		<h1 class="site-title">
+			<a
+				href="{{ site_url|esc_url }}"
+				data-ga-category="nav"
+				data-ga-label="Site Title: {{ site_title|esc_attr }}"
+				class="p-name u-url"
+			>
+				{{ site_title }}
+			</a>
+		</h1>
+		<p class="childs-current-age">
+			<time datetime="{{ child_birthday_machine_time|esc_attr }}" class="dt-bday">
+				{{ childs_current_age }} old.
+			</time>
+		</p>
+	</div>
+</header>
+
+{% if main_menu %}
+	<nav id="new-menu" class="new-menu">
+		{{ main_menu}}
+	</nav>
+{% endif %}
