@@ -34,7 +34,7 @@ class Daddio_Instagram_Locations {
 	 */
 	function action_init() {
 		$args = array(
-			'labels'            => daddio_generate_taxonomy_labels( 'location', 'locations' ),
+			'labels'            => Daddio_Helpers::generate_taxonomy_labels( 'location', 'locations' ),
 			'hierarchical'      => false,
 			'public'            => false,
 			'show_ui'           => true,
@@ -45,7 +45,7 @@ class Daddio_Instagram_Locations {
 		register_taxonomy( 'location', array( 'instagram' ), $args );
 
 		$args = array(
-			'labels'            => daddio_generate_taxonomy_labels( 'zip code', 'zip codes' ),
+			'labels'            => Daddio_Helpers::generate_taxonomy_labels( 'zip code', 'zip codes' ),
 			'hierarchical'      => false,
 			'public'            => false,
 			'show_ui'           => true,
@@ -56,7 +56,7 @@ class Daddio_Instagram_Locations {
 		register_taxonomy( 'zip-code', array( 'instagram' ), $args );
 
 		$args = array(
-			'labels'            => daddio_generate_taxonomy_labels( 'state', 'states' ),
+			'labels'            => Daddio_Helpers::generate_taxonomy_labels( 'state', 'states' ),
 			'hierarchical'      => false,
 			'public'            => false,
 			'show_ui'           => true,
@@ -67,7 +67,7 @@ class Daddio_Instagram_Locations {
 		register_taxonomy( 'state', array( 'instagram' ), $args );
 
 		$args = array(
-			'labels'            => daddio_generate_taxonomy_labels( 'county', 'counties' ),
+			'labels'            => Daddio_Helpers::generate_taxonomy_labels( 'county', 'counties' ),
 			'hierarchical'      => false,
 			'public'            => false,
 			'show_ui'           => true,
@@ -78,7 +78,7 @@ class Daddio_Instagram_Locations {
 		register_taxonomy( 'county', array( 'instagram' ), $args );
 
 		$args = array(
-			'labels'            => daddio_generate_taxonomy_labels( 'country', 'countries' ),
+			'labels'            => Daddio_Helpers::generate_taxonomy_labels( 'country', 'countries' ),
 			'hierarchical'      => false,
 			'public'            => false,
 			'show_ui'           => true,

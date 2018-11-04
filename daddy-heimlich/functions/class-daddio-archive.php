@@ -77,7 +77,7 @@ class Daddio_Archive {
 
 		$page = intval( get_query_var( 'paged' ) );
 		if ( $page > 1 ) {
-			$suffix = ordinal_suffix( $page, false );
+			$suffix = Daddio_Helpers::ordinal_suffix( $page, false );
 			$subheading[] = $page . '<sup>' . $suffix . '</sup> page';
 		}
 
