@@ -9,6 +9,7 @@ $files_to_require = array(
 	'class-daddio-helpers.php',
 	'class-daddio-admin.php',
 	'class-daddio-scripts-styles.php',
+	'class-daddio-head.php',
 	'class-daddio-dates.php',
 	'class-daddio-media.php',
 	'class-daddio-archive.php',
