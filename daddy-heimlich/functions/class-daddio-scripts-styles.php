@@ -25,26 +25,13 @@ class Daddio_Scripts_Style {
 	 * Loads styles and scripts
 	 */
 	public function action_wp_enqueue_scripts() {
-		// CSS
-		$css_suffix = '.min.css';
-		if ( isset( $_GET['debug-css'] ) || ( function_exists( 'rh_is_dev' ) && rh_is_dev() ) ) {
-			$css_suffix = '.css';
-		}
-
 		// The mediaelement styles are rolled in to the theme CSS file via Gulp
 		if ( ! is_admin() ) {
 			wp_deregister_style( 'wp-mediaelement' );
 		}
 
-		// This needs to be absctracted out so child themes can use it,
-		// also need to let other functions determine if they should be minfied or not.
-		$js_suffix = '.min.js';
-		if ( isset( $_GET['debug-js'] ) || ( function_exists( 'rh_is_dev' ) && rh_is_dev() ) ) {
-			$js_suffix = '.js';
-		}
-
 		// JavaScript
-		wp_register_script( 'post-gallery', get_template_directory_uri() . '/js/post-gallery' . $js_suffix, array( 'jquery' ), null, true );
+		wp_register_script( 'post-gallery', get_template_directory_uri() . '/js/post-gallery' . self::get_js_suffix(), array( 'jquery' ), null, true );
 
 		// Global JavaScript files bundled into one that gets loaded on every single page
 		wp_register_script( 'daddio-global-scripts', get_template_directory_uri() . '/js/global.min.js', array( 'jquery' ), null, true );
@@ -175,6 +162,36 @@ class Daddio_Scripts_Style {
 		}
 
 		return $script_element;
+	}
+
+	/**
+	 * Get the CSS suffix depending on the environment
+	 *
+	 * Production should use *.min.css
+	 * Local development should use *.css which includes sourcemaps
+	 *
+	 * @return string CSS file suffix
+	 */
+	public static function get_css_suffix() {
+		if ( isset( $_GET['debug-css'] ) || ( function_exists( 'rh_is_dev' ) && rh_is_dev() ) ) {
+			return '.css';
+		}
+		return '.min.css';
+	}
+
+	/**
+	 * Get the JavaScript suffix depending on the environment
+	 *
+	 * Production should use *.min.js
+	 * Local development should use *.js
+	 *
+	 * @return string CSS file suffix
+	 */
+	public static function get_js_suffix() {
+		if ( isset( $_GET['debug-js'] ) || ( function_exists( 'rh_is_dev' ) && rh_is_dev() ) ) {
+			return '.js';
+		}
+		return '.min.js';
 	}
 }
 Daddio_Scripts_Style::get_instance();
