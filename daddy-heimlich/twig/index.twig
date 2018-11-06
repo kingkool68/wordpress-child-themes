@@ -1,0 +1,13 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+	{{ before_content }}
+
+	{% if the_content %}
+		<div id="content">
+			{{ the_content }}
+		</div>
+	{% endif %}
+
+	{{ pagination }}
+{% endblock %}

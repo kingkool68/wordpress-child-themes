@@ -1,0 +1,30 @@
+<article class="article post">
+
+	{{ daddio_content_header }}
+
+	<h1 class="title">
+		{% if permalink_url %}
+			<a href="{{ permalink_url|esc_url }}">
+				{{ title }}
+			</a>
+		{% else %}
+			{{ title }}
+		{% endif %}
+	</h1>
+	<h2 class="time-stamp">
+		<time datetime="{{ the_machine_datetime|esc_attr }}">
+			{{ the_datetime }}
+		</time>
+		<b>&bull;</b>
+		<span class="how-old-was-zadie">
+			{{ child_age }}
+		</span>
+	</h2>
+
+	<div class="inner">
+		{{ the_content }}
+	</div>
+
+	{{ daddio_content_footer }}
+
+</article>

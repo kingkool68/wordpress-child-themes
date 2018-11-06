@@ -1,0 +1,43 @@
+<article class="article instagram h-entry">
+
+	{{ daddio_content_header }}
+
+	<div class="inner">
+		<h1 class="title">
+			<time datetime="{{ machine_datetime|esc_attr }}" class="dt-published">
+				{% if permalink_url %}
+					<a href="{{ permalink_url|esc_url }}">
+						{{ the_time }}
+					</a>
+				{% else %}
+					{{ the_time }}
+				{% endif %}
+			</time>
+		</h1>
+		<h2 class="time-stamp">
+			{{ child_age }}
+		</h2>
+
+		{{ instagram_media }}
+
+		<div class="p-name e-content">
+			{{ the_content }}
+		</div>
+
+		<p class="via">
+			(via
+			<a
+				href="{{ via_url|esc_url }}"
+				data-ga-category="instagram-via"
+				data-ga-label="@{{ instagram_username|esc_attr }}|{{ permalink_url|esc_url }}"
+				class="h-card p-author u-url"
+			>
+				@{{ instagram_username }}
+			</a>
+			)
+		</p>
+	</div>
+
+	{{ daddio_content_footer }}
+
+</article>

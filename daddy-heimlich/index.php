@@ -1,39 +1,60 @@
-<?php get_header(); ?>
-	<?php do_action( 'daddio_before_content', $post ); ?>
-	<div id="content">
-	<?php
-	if ( have_posts() ) :
-		while ( have_posts() ) : the_post();
-			get_template_part( 'content', $post->post_type );
-		endwhile;
-	endif;
-	?>
-	</div>
+<?php
 
-	<?php
-	global $wp_query, $wp_rewrite;
+$the_content = array();
+if ( have_posts() ) :
+	while ( have_posts() ) : the_post();
+		$context = array();
+		$templates = array();
+		switch ( $post->post_type ) {
+			case 'instagram' :
+				ob_start();
+				the_instagram_media();
+				$instagram_media = ob_get_clean();
 
-	// Setting up default values based on the current URL.
-	$pagenum_link = html_entity_decode( get_pagenum_link() );
-	$url_parts = explode( '?', $pagenum_link );
+				$context = array(
+					'daddio_content_header' => Sprig::do_action('daddio_content_header', get_post() ),
+					'title'                 => get_the_title(),
+					'permalink_url'         => get_permalink(),
+					'the_time'              => get_the_time( get_child_time_format() ),
+					'machine_datetime'      => get_post_time( 'c', true ),
+					'child_age'             => how_old_was_child(),
+					'instagram_media'       => $instagram_media,
+					'the_content'           => apply_filters( 'the_content', get_the_content() ),
+					'via_url'               => get_the_guid(),
+					'instagram_username'    => get_instagram_username(),
+					'daddio_content_footer' => Sprig::do_action('daddio_content_footer', get_post() ),
+				);
+				$templates[] = 'content-instagram.twig';
+				break;
 
-	// Get max pages and current page out of the current query, if available.
-	$total = isset( $wp_query->max_num_pages ) ? $wp_query->max_num_pages : 1;
-	$current = get_query_var( 'paged' ) ? intval( get_query_var( 'paged' ) ) : 1;
+			case 'page' :
+				$context = array(
+					'the_title'             => get_the_title(),
+					'the_content'           => apply_filters( 'the_content', get_the_content() ),
+					'daddio_content_footer' => Sprig::do_action('daddio_content_footer', get_post() ),
+				);
+				$templates[] = 'content-page.twig';
+				break;
 
-	// Append the format placeholder to the base URL.
-	$pagenum_link = trailingslashit( $url_parts[0] ) . '%_%';
-
-	// URL base depends on permalink settings.
-	$format = $wp_rewrite->using_index_permalinks() && ! strpos( $pagenum_link, 'index.php' ) ? 'index.php/' : '';
-	$format .= $wp_rewrite->using_permalinks() ? user_trailingslashit( $wp_rewrite->pagination_base . '/%#%', 'paged' ) : '?paged=%#%';
-
-
-	if( $current < $total ) {
-		$format = str_replace( '%#%', $current + 1, $format );
-		$url = str_replace( '%_%', $format, $pagenum_link );
-		echo '<a href="' . $url . '" class="rounded-button" id="pagination">More</a>';
-	}
-	?>
-
-<?php get_footer(); ?>
+			default :
+				$context = array(
+					'daddio_content_header' => Sprig::do_action('daddio_content_header', get_post() ),
+					'title'                 => get_the_title(),
+					'permalink_url'         => get_permalink(),
+					'the_datetime'          => get_the_time( get_child_time_format() ),
+					'the_machine_datetime'  => get_post_time( 'c', true ),
+					'child_age'             => how_old_was_child(),
+					'the_content'           => apply_filters( 'the_content', get_the_content() ),
+					'daddio_content_footer' => Sprig::do_action('daddio_content_footer', get_post() ),
+				);
+				$templates[] = 'content-post.twig';
+		}
+		$the_content[] =  Sprig::render( $templates, $context );
+	endwhile;
+endif;
+$context = array(
+	'before_content' => Sprig::do_action( 'daddio_before_content', get_post() ),
+	'the_content'    => implode( "\n", $the_content ),
+	'pagination'     => Daddio_Pagination::render_from_wp_query(),
+);
+Sprig::out( 'index.twig', $context );
