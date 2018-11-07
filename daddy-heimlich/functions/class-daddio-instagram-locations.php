@@ -9,7 +9,7 @@ class Daddio_Instagram_Locations {
 		if ( null === $instance ) {
 			$instance = new static();
 			$instance->setup();
-			$instance->setup_hooks();
+			$instance->setup_actions();
 		}
 		return $instance;
 	}
@@ -19,9 +19,9 @@ class Daddio_Instagram_Locations {
 	}
 
 	/**
-	 * Hook in to WordPress via actions and filters
+	 * Hook into WordPress via actions
 	 */
-	public function setup_hooks() {
+	public function setup_actions() {
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
 		add_action( 'wp_ajax_daddio_private_location_sync', array( $this, 'ajax_daddio_private_location_sync' ) );
