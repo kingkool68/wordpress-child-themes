@@ -7,23 +7,23 @@ class Daddio_Admin {
 		static $instance = null;
 		if ( null === $instance ) {
 			$instance = new static();
-			$instance->setup_hooks();
+			$instance->setup_actions();
 		}
 		return $instance;
 	}
 
 	/**
-	 * Setup hooks to manipulate
+	 * Hook into WordPress via actions
 	 */
-	public function setup_hooks() {
-		add_action( 'wp_dashboard_setup', array( $this, 'clear_dashboard_widgets' ), 999 );
-		add_action( 'wp_before_admin_bar_render', array( $this, 'remove_wp_menu_from_admin_bar' ), 0 );
+	public function setup_actions() {
+		add_action( 'wp_dashboard_setup', array( $this, 'action_wp_dashboard_setup' ), 999 );
+		add_action( 'wp_before_admin_bar_render', array( $this, 'action_wp_before_admin_bar_render' ), 0 );
 	}
 
 	/**
 	 * Remove Dashboard widgets we don't want
 	 */
-	public function clear_dashboard_widgets() {
+	public function action_wp_dashboard_setup() {
 		global $wp_meta_boxes;
 		$widgets = array(
 			'normal' => array(
@@ -46,7 +46,7 @@ class Daddio_Admin {
 	/**
 	 * Remove WP logo from admin bar
 	 */
-	public function remove_wp_menu_from_admin_bar() {
+	public function action_wp_before_admin_bar_render() {
 		global $wp_admin_bar;
 		$wp_admin_bar->remove_menu( 'wp-logo' );
 	}
