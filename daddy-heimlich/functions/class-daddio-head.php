@@ -14,7 +14,7 @@ class Daddio_Head {
 	}
 
 	/**
-	 * Hook in to WordPress via actions
+	 * Hook into WordPress via actions
 	 */
 	public function setup_actions() {
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
