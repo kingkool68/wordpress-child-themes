@@ -29,13 +29,13 @@ class Daddio_Admin {
 			'normal' => array(
 				'dashboard_activity',
 				'wpseo-dashboard-overview', // Yoast SEO
+				'monsterinsights_reports_widget',
 			),
 			'side' => array(
 				'dashboard_primary',
 				'dashboard_quick_press',
 			),
 		);
-
 		foreach ( $widgets as $priotity => $keys ) {
 			foreach ( $keys as $key ) {
 				unset( $wp_meta_boxes['dashboard'][ $priotity ]['core'][ $key ] );
