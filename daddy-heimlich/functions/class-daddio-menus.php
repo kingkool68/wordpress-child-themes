@@ -7,22 +7,34 @@ class Daddio_Menus {
 		static $instance = null;
 		if ( null === $instance ) {
 			$instance = new static();
-			$instance->setup_hooks();
+			$instance->setup_actions();
+			$instance->setup_filters();
 		}
 		return $instance;
 	}
 
-	public function setup_hooks() {
+	/**
+	 * Hook into WordPress via actions
+	 */
+	public function setup_actions() {
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'action_wp_enqueue_scripts' ) );
 		add_action( 'daddio_footer', array( $this, 'action_daddio_footer' ) );
+	}
 
+	/**
+	 * Hook into WordPress via filters
+	 */
+	public function setup_filters() {
 		add_filter( 'wp_nav_menu_items', array( $this, 'filter_wp_nav_menu_items' ), 10, 2 );
 		add_filter( 'nav_menu_css_class' , array( $this, 'filter_nav_menu_css_class' ) , 10 , 3 );
 		add_filter( 'nav_menu_item_id', array( $this, 'filter_nav_menu_item_id' ) );
 		add_filter( 'nav_menu_link_attributes', array( $this, 'filter_nav_menu_link_attributes' ), 10, 2 );
 	}
 
+	/**
+	 * Register nav menus
+	 */
 	public function action_init() {
 		register_nav_menus(
 			array(
@@ -36,11 +48,11 @@ class Daddio_Menus {
 	 * Enqueue the JavaScript and neccessary dependencies to make the menu work.
 	 */
 	public function action_wp_enqueue_scripts() {
-		wp_enqueue_script( 'daddio-menu', get_template_directory_uri() . '/js/menu.js', array( 'jquery' ), null, true );
+		wp_enqueue_script( 'daddio-menu', get_template_directory_uri() . '/js/menu' . Daddio_Scripts_Style::get_js_suffix(), array( 'jquery' ), null, true );
 	}
 
 	/**
-	 * Output the markup for the menu in the footer of the site using a custom action called 'daddio_footer'
+	 * Output the markup for the menu in the footer of the site using a custom action
 	 */
 	public function action_daddio_footer() {
 	?>
@@ -76,7 +88,14 @@ class Daddio_Menus {
 	<?php
 	}
 
-	public function filter_wp_nav_menu_items( $items, $args ) {
+	/**
+	 * Add the More menu item to the main menu
+	 *
+	 * @param  string $items HTML of the menu items
+	 * @param  object $args  Arguments about the nav menu
+	 * @return string        Modified menu items HTML
+	 */
+	public function filter_wp_nav_menu_items( $items = '', $args ) {
 		if ( ! is_object( $args ) || ! isset( $args->theme_location ) || 'main-menu' != $args->theme_location ) {
 			return $items;
 		}
@@ -84,14 +103,32 @@ class Daddio_Menus {
 		return $items;
 	}
 
+	/**
+	 * Remove any CSS classes for menu items
+	 *
+	 * @return array  Nothing
+	 */
 	public function filter_nav_menu_css_class( $class, $item, $args ) {
 		return array();
 	}
 
-	public function filter_nav_menu_item_id( $id ) {
+	/**
+	 * Remove the ID attribute for menu items
+	 *
+	 * @param  string $id The value of the ID attribute
+	 * @return string     Nothing so the ID attribute doesn't render
+	 */
+	public function filter_nav_menu_item_id( $id = '' ) {
 		return '';
 	}
 
+	/**
+	 * Add attributes to nav menu link elements
+	 *
+	 * @param  array  $attr Attributes for the current nav menu link
+	 * @param  object $item Details about the item being modified
+	 * @return array        Modified attributes for the current nav menu link
+	 */
 	public function filter_nav_menu_link_attributes( $attr = array(), $item ) {
 		$attr['data-ga-category'] = 'nav';
 		$attr['data-ga-label'] = $item->title;
