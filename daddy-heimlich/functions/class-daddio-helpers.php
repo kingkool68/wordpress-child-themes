@@ -43,6 +43,14 @@ class Daddio_Helpers {
 		return $return_n ? $n . $suffix : $suffix;
 	}
 
+	/**
+	 * Simplify generating taxonomy labels by only needing to enter a singular and plural verison
+	 *
+	 * @param  string $singular  The singular version of the taxonomy label
+	 * @param  string $plural    The plural version of the taxonomy label
+	 * @param  array  $overrides Specific labels to override that might not fit this pattern
+	 * @return array             Taxonomy labels
+	 */
 	public static function generate_taxonomy_labels( $singular = '', $plural = '', $overrides = array() ) {
 		$lc_plural = strtolower( $plural );
 		$uc_plural = ucwords( $lc_plural );
