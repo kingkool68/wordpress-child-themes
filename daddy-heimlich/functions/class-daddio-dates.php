@@ -27,6 +27,7 @@ class Daddio_Dates {
 	 */
 	public function setup_filters() {
 		add_filter( 'the_time', array( $this, 'filter_the_time' ) );
+		add_filter( 'get_the_time', array( $this, 'filter_the_time' ) );
 		add_filter( 'query_vars', array( $this, 'filter_query_vars' ) );
 		add_filter( 'rewrite_rules_array', array( $this, 'filter_rewrite_rules_array' ) );
 	}
