@@ -7,7 +7,8 @@ class Daddio_Scripts_Style {
 		static $instance = null;
 		if ( null === $instance ) {
 			$instance = new static();
-			$instance->setup_hooks();
+			$instance->setup_actions();
+			$instance->setup_filters();
 		}
 		return $instance;
 	}
@@ -15,7 +16,9 @@ class Daddio_Scripts_Style {
 	public function setup_hooks() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'action_wp_enqueue_scripts' ) );
 		add_action( 'after_setup_theme', array( $this, 'action_after_setup_theme' ) );
+	}
 
+	public function setup_filters() {
 		add_filter( 'style_loader_tag', array( $this, 'filter_style_loader_tag' ), 10, 4 );
 		add_filter( 'script_loader_tag', array( $this, 'filter_script_loader_tag' ), 10, 3 );
 		add_filter( 'body_class', array( $this, 'filter_body_class' ), 10, 1 );
@@ -34,7 +37,7 @@ class Daddio_Scripts_Style {
 		wp_register_script( 'post-gallery', get_template_directory_uri() . '/js/post-gallery' . self::get_js_suffix(), array( 'jquery' ), null, true );
 
 		// Global JavaScript files bundled into one that gets loaded on every single page
-		wp_register_script( 'daddio-global-scripts', get_template_directory_uri() . '/js/global.min.js', array( 'jquery' ), null, true );
+		wp_register_script( 'daddio-global-scripts', get_template_directory_uri() . '/js/global' . self::get_js_suffix(), array( 'jquery' ), null, true );
 		if ( $this->maybe_use_global_script_file() ) {
 			add_filter( 'script_loader_tag', array( $this, 'dont_load_bundled_scripts' ), 10, 3 );
 			wp_enqueue_script( 'daddio-global-scripts' );
@@ -42,7 +45,8 @@ class Daddio_Scripts_Style {
 	}
 
 	/**
-	 * Move any scripts enquued to the wp_head action to the wp_footer action for performance reasons.
+	 * Move any scripts enquued to the wp_head action to the wp_footer action for performance reasons
+	 *
 	 * @see http://www.kevinleary.net/move-javascript-bottom-wordpress/
 	 */
 	public function action_after_setup_theme() {
@@ -59,13 +63,15 @@ class Daddio_Scripts_Style {
 	}
 
 	/**
-	 * Adds a pre-connect <link> element to start establishing a connection for Google Fonts to speed up page rendering.
+	 * Adds a pre-connect <link> element to start establishing a connection for Google Fonts to speed up page rendering
+	 *
+	 * @see https://www.igvita.com/2015/08/17/eliminating-roundtrips-with-preconnect/
+	 *
 	 * @param  [type] $html   HTML to be printed
 	 * @param  [type] $handle Handle of the style being filtered
 	 * @param  [type] $href   href attribute of the style being printed
 	 * @param  [type] $media  media attribute of the style being printed
 	 * @return [type]         HTML to be printed
-	 * @see https://www.igvita.com/2015/08/17/eliminating-roundtrips-with-preconnect/
 	 */
 	public function filter_style_loader_tag( $html, $handle, $href, $media ) {
 		if ( 'zah-google-fonts' != $handle ) {
@@ -77,10 +83,11 @@ class Daddio_Scripts_Style {
 
 	/**
 	 * Serve jQuery via conditional comments so IE 8 and below get jQuery 1.x and everyone else is served jQuery 2.x
-	 * @param  [string] $script_element		<script> element to be rendered
-	 * @param  [string] $handle 			script handle that was registered
-	 * @param  [string] $script_src			src sttribute of the <script>
-	 * @return [string]						New <script> element
+	 *
+	 * @param  string $script_element  <script> element to be rendered
+	 * @param  string $handle          script handle that was registered
+	 * @param  string $script_src      src sttribute of the <script>
+	 * @return string                  New <script> element
 	 */
 	public function filter_script_loader_tag( $script_element, $handle, $script_src ) {
 		if ( is_admin() ) {
@@ -122,7 +129,8 @@ class Daddio_Scripts_Style {
 
 	/**
 	 * Conditional helper to determine if we should use the concatenated global JavaScript file built by Gulp.js
-	 * @return [boolean]
+	 *
+	 * @return boolean
 	 */
 	public function maybe_use_global_script_file() {
 		if ( is_admin() ) {
@@ -136,11 +144,12 @@ class Daddio_Scripts_Style {
 	}
 
 	/**
-	 * If we're loading a bundled version of scripts then we don't want to load individual JavaScript files for certain script handles.
-	 * @param  [string] $script_element     <script> element to be rendered
-	 * @param  [string] $handle             script handle that was registered
-	 * @param  [string] $script_src         src sttribute of the <script>
-	 * @return [string]                     New <script> element
+	 * If we're loading a bundled version of scripts then we don't want to load individual JavaScript files for certain script handles
+	 *
+	 * @param  string $script_element     <script> element to be rendered
+	 * @param  string $handle             script handle that was registered
+	 * @param  string $script_src         src sttribute of the <script>
+	 * @return string                     New <script> element
 	 */
 	public function dont_load_bundled_scripts( $script_element, $handle, $script_src ) {
 		if ( ! $this->maybe_use_global_script_file() ) {
