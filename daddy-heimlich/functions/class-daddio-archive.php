@@ -1,7 +1,7 @@
 <?php
 class Daddio_Archive {
 
-	public $is_date_query = false;
+	private $is_date_query = false;
 
 	/**
 	 * Get an instance of this class
@@ -10,21 +10,35 @@ class Daddio_Archive {
 		static $instance = null;
 		if ( null === $instance ) {
 			$instance = new static();
-			$instance->setup_hooks();
+			$instance->setup_actions();
+			$instance->setup_filters();
 		}
 		return $instance;
 	}
 
-	public function setup_hooks() {
-		add_action( 'daddio_before_content', array( $this, 'daddio_before_content' ) );
+	/**
+	 * Hook into WordPress via actions
+	 */
+	public function setup_actions() {
+		add_action( 'daddio_before_content', array( $this, 'action_daddio_before_content' ) );
 		add_action( 'parse_query', array( $this, 'action_parse_query' ) );
+	}
 
+	/**
+	 * Hook into WordPress via filters
+	 */
+	public function setup_filters() {
 		add_filter( 'query_vars', array( $this, 'filter_query_vars' ) );
 		add_filter( 'rewrite_rules_array', array( $this, 'filter_rewrite_rules_array' ) );
 		add_filter( 'template_include', array( $this, 'filter_template_include' ) );
 	}
 
-	public function daddio_before_content( $post ) {
+	/**
+	 * Add a header before the list of archive items
+	 *
+	 * @param  WP_Post $post The current post
+	 */
+	public function action_daddio_before_content( $post ) {
 		global $wp_query;
 		$obj = get_queried_object();
 		$heading = '';
@@ -99,17 +113,34 @@ class Daddio_Archive {
 		}
 	}
 
+	/**
+	 * Set whether the request is a date query or not
+	 *
+	 * @param  WP_Query $query The current wp_query object
+	 */
 	public function action_parse_query( $query ) {
 		if ( isset( $query->is_date ) ) {
 			$this->is_date_query = $query->is_date;
 		}
 	}
 
+	/**
+	 * Make WordPress aware of our custom query vars
+	 *
+	 * @param  array  $vars Query vars previously registered
+	 * @return array        Modified query vars
+	 */
 	public function filter_query_vars( $vars = array() ) {
 		$vars[] = 'daddio-archives-page';
 		return $vars;
 	}
 
+	/**
+	 * Add archive specific rewrite rules
+	 *
+	 * @param  array  $rules Current rewrite rules
+	 * @return array         Modified rewrite rules
+	 */
 	public function filter_rewrite_rules_array( $rules = array() ) {
 		global $wp_rewrite;
 
@@ -119,6 +150,12 @@ class Daddio_Archive {
 		return $new_rules + $rules;
 	}
 
+	/**
+	 * Use different templates depending on the query
+	 *
+	 * @param  string $template Location of the current template WordPress will use
+	 * @return string           Modified template location
+	 */
 	public function filter_template_include( $template = '' ) {
 		global $wp_query;
 		$template_paths = array();
