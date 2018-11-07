@@ -8,20 +8,32 @@ class Daddio_Dates {
 		static $instance = null;
 		if ( null === $instance ) {
 			$instance = new static();
-			$instance->setup_hooks();
+			$instance->setup_actions();
+			$instance->setup_filters();
 		}
 		return $instance;
 	}
 
-	public function setup_hooks() {
+	/**
+	 * Hook into WordPress via actions
+	 */
+	public function setup_actions() {
 		add_action( 'init', array( $this, 'init_add_rewrite_tags' ) );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
+	}
 
+	/**
+	 * Hook into WordPress via filters
+	 */
+	public function setup_filters() {
 		add_filter( 'the_time', array( $this, 'filter_the_time' ) );
 		add_filter( 'query_vars', array( $this, 'filter_query_vars' ) );
 		add_filter( 'rewrite_rules_array', array( $this, 'filter_rewrite_rules_array' ) );
 	}
 
+	/**
+	 * Setup rewrite tags for age
+	 */
 	public function init_add_rewrite_tags() {
 		global $wp_rewrite;
 
@@ -33,6 +45,11 @@ class Daddio_Dates {
 		}
 	}
 
+	/**
+	 * Modify the query if it is an age-based query
+	 *
+	 * @param  WP_Query $query The WP_Query being run
+	 */
 	public function action_pre_get_posts( $query ) {
 		$age = get_query_var( 'age' );
 		if ( ! $age || ! $query->is_main_query() ) {
@@ -86,15 +103,33 @@ class Daddio_Dates {
 		$query->set( 'date_query', $date_query );
 	}
 
+	/**
+	 * Wrap different parts of the time for styling purposes
+	 *
+	 * @param  string $time The time to be displayed
+	 * @return string       The time with additional markup added
+	 */
 	public function filter_the_time( $time = '' ) {
 		return preg_replace( '/(\d+):(\d+) (am|pm)/i', '<span class="time">$1<span class="colon">:</span>$2 <span class="am-pm">$3</span></span>', $time );
 	}
 
+	/**
+	 * Make WordPress aware of our custom query vars
+	 *
+	 * @param  array  $vars Query vars previously registered
+	 * @return array        Modified query vars
+	 */
 	public function filter_query_vars( $vars = array() ) {
 		$vars[] = 'age';
 		return $vars;
 	}
 
+	/**
+	 * Add rewrite rules for age based URLs
+	 *
+	 * @param  array  $rules Previously registered rewrite rules
+	 * @return array         Modified rewrite rules
+	 */
 	public function filter_rewrite_rules_array( $rules = array() ) {
 		global $wp_rewrite;
 		$root = $wp_rewrite->root;
@@ -112,10 +147,10 @@ class Daddio_Dates {
 	/**
 	 * My own human time diff function from http://www.php.net/manual/en/ref.datetime.php#90989
 	 *
-	 * @param  integer $levels [description]
-	 * @param  [type]  $from   [description]
-	 * @param  boolean $to     [description]
-	 * @return [type]          [description]
+	 * @param  integer       $levels Precision of time diff
+	 * @param  integer       $from   Time to start at in seconds
+	 * @param  integer|false $to     Time to end at in seconds
+	 * @return string                Human-friendly time diff
 	 */
 	public function human_time_diff( $levels = 2, $from, $to = false ) {
 		if ( ! $to ) {
@@ -152,10 +187,22 @@ class Daddio_Dates {
 		return implode( ' ', $result );
 	}
 
+	/**
+	 * Get the datetime of the child's date of birth in seconds
+	 *
+	 * @return integer Datetime of child's birth since epoch
+	 */
 	public function get_childs_birthday() {
 		return strtotime( CHILD_DATE_OF_BIRTH );
 	}
 
+	/**
+	 * Get huma-friendly time difference between child's birthdate and the datetime of the current post
+	 *
+	 * @param  integer $levels      Level of precision of the time difference
+	 * @param  string  $time_offset Ending time to use for calculations
+	 * @return string               Human friendly time differnece between child's birthdate and post's datetime
+	 */
 	public function get_childs_birthday_diff( $levels = 2, $time_offset = '' ) {
 		if ( ! $time_offset ) {
 			$time_offset = get_the_time( 'U' );
@@ -163,10 +210,21 @@ class Daddio_Dates {
 		return $this->human_time_diff( $levels,  get_childs_birthday(), $time_offset );
 	}
 
+	/**
+	 * Get the child's current age as a human-friendly time difference
+	 *
+	 * @param  integer $levels Level of precision of the time differecne
+	 * @return string          Human friendly time differnece of child's age and now
+	 */
 	public function get_childs_current_age( $levels = 2 ) {
 		return $this->human_time_diff( $levels,  get_childs_birthday() );
 	}
 
+	/**
+	 * Generate a statement about how old the child is
+	 *
+	 * @return string How old was the child compared to the given datetime of the current post
+	 */
 	public function how_old_was_child() {
 		if ( get_the_time( 'U' ) < $this->get_childs_birthday() ) {
 			return $this->get_childs_birthday_diff() . ' before ' . CHILD_NAME . ' was born.';
@@ -174,10 +232,20 @@ class Daddio_Dates {
 		return CHILD_NAME . ' was ' . $this->get_childs_birthday_diff() . ' old.';
 	}
 
+	/**
+	 * Get the preferred datetime format
+	 *
+	 * @return string Datetime format
+	 */
 	public function get_child_time_format() {
 		return get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
 	}
 
+	/**
+	 * Get the number of posts grouped by month
+	 *
+	 * @return object Post counts broken down by year and month
+	 */
 	public function get_monthly_post_counts() {
 		global $wpdb;
 		$where = "WHERE `post_type` IN ( 'instagram', 'post' ) AND `post_status` = 'publish'";
@@ -185,6 +253,11 @@ class Daddio_Dates {
 		return $wpdb->get_results( $query );
 	}
 
+	/**
+	 * Get a breakdown of post counts by year and month between the child's birthdate and the end of the current year
+	 *
+	 * @return array Post counts by year and month
+	 */
 	public function get_monthly_archive_links() {
 		$month_format = 'n';
 		$months = array();
@@ -219,6 +292,11 @@ class Daddio_Dates {
 		return array_reverse( $output, $preserve_keys = true );
 	}
 
+	/**
+	 * Get a collection of date for age archive pages
+	 *
+	 * @return array Age archive data
+	 */
 	public function get_age_archive_data() {
 		$month_of_birth = date( 'm', $this->get_childs_birthday() );
 		$month_after_birth = intval( $month_of_birth ) + 1;
@@ -261,6 +339,12 @@ class Daddio_Dates {
 		return $output;
 	}
 
+	/**
+	 * Given a string timestamp get the smallest unit of time
+	 *
+	 * @param  string $timestamp A string of spelled out duration of time (ex. 1 year 3 months)
+	 * @return stirng            A string of the last unit of time
+	 */
 	public function get_smallest_time_unit( $timestamp = '' ) {
 		if ( ! $timestamp ) {
 			return false;
