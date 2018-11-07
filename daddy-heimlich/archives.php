@@ -7,7 +7,7 @@
 		<section class="archive-section date-archive">
 			<h2 class="heading">By Date</h2>
 			<?php
-			$data = get_monthly_archive_links();
+			$data = Daddio_Dates::get_monthly_archive_links();
 			foreach ( $data as $year => $month_data ) {
 				?>
 				<h2 class="year-heading"><a href="<?php echo esc_url( get_site_url() . '/' . $year . '/' ); ?>"><?php echo $year; ?></a></h2>
@@ -31,7 +31,7 @@
 		<section class="archive-section age-archive">
 			<h2 class="heading">By Age</h2>
 			<?php
-			$data = get_age_archive_data();
+			$data = Daddio_Dates::get_age_archive_data();
 			// We can better group the dates by reversing our data
 			$data = array_reverse( $data );
 			?>

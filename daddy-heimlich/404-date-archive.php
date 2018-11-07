@@ -35,10 +35,10 @@ if ( $relative_date->format( 'U' ) < date( 'U' ) ) {
 	$tense = 'past';
 }
 $offset = $relative_date->format( 'U' ) - date( 'U' );
-$calculated_date = $offset + get_childs_birthday(); // integer since epoch
+$calculated_date = $offset + Daddio_Dates::get_childs_birthday(); // integer since epoch
 $smallest_unit = $daddio_dates->get_smallest_time_unit( $timestamp );
 
-$age = get_childs_birthday_diff( $levels, $relative_date->format( 'U' ) );
+$age = Daddio_Dates::get_childs_birthday_diff( $levels, $relative_date->format( 'U' ) );
 $date = $relative_date->format( $time_format );
 
 get_header();

@@ -3,7 +3,7 @@ add_filter( 'body_class', function( $classes = array() ) {
 	$classes[] = 'error404';
 	return $classes;
 } );
-$daddio_dates = Daddio_Dates::get_instance();
+
 $age_query_var = get_query_var( 'age' );
 if ( $age_query_var ) {
 	$age = preg_replace( '/(\d+)/', ' $1 ', $age_query_var );
@@ -11,8 +11,8 @@ if ( $age_query_var ) {
 }
 $relative_date = new DateTime( $age_query_var );
 $offset = $relative_date->format( 'U' ) - date( 'U' );
-$calculated_date = $offset + get_childs_birthday(); // integer since epoch
-$smallest_unit = $daddio_dates->get_smallest_time_unit( $age_query_var );
+$calculated_date = $offset + Daddio_Dates::get_childs_birthday(); // integer since epoch
+$smallest_unit = Daddio_Dates::get_smallest_time_unit( $age_query_var );
 $time_format = get_option( 'date_format' );
 switch( $smallest_unit ) {
 	case 'hour':

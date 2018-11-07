@@ -2,7 +2,7 @@
 
 		<div class="inner">
 
-			<h1 class="title" title="<?php esc_attr_e( how_old_was_child() ); ?>"><?php the_title(); ?></h1>
+			<h1 class="title" title="<?php esc_attr_e( Daddio_Dates::how_old_was_child() ); ?>"><?php the_title(); ?></h1>
 			<?php
 				$attachment_size = get_query_var('size');
 				if( !$attachment_size || in_array( $attachment_size, array('full', 'original') ) ) {
