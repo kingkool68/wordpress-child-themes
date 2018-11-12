@@ -103,8 +103,11 @@ class Daddio_Instagram_Locations {
 		);
 	}
 
+	/**
+	 * Render the private location sync submenu page
+	 */
 	public function handle_private_location_sync_submenu() {
-		// Get all published instagram posts that have a needs-private-location-data meta key set...
+		// Get all published instagram posts that have a `needs-private-location-data` meta key set...
 		$args = array(
 			'post_type'      => 'instagram',
 			'post_status'    => 'public',
@@ -120,14 +123,14 @@ class Daddio_Instagram_Locations {
 		$query = new WP_Query( $args );
 		$context = array(
 			'found_posts' => $query->found_posts,
-			'posts' => array(),
+			'posts'       => array(),
 		);
 		foreach ( $query->posts as $post ) {
 			$post_id = $post->ID;
-			$guid = $post->guid;
-			$parts = explode( 'com/p/', $guid );
-			$code = $parts[1];
-			$code = str_replace( '/', '', $code );
+			$guid    = $post->guid;
+			$parts   = explode( 'com/p/', $guid );
+			$code    = $parts[1];
+			$code    = str_replace( '/', '', $code );
 
 			$featured_image_id = get_post_thumbnail_id( $post_id );
 			$img_attrs = array(
@@ -148,73 +151,20 @@ class Daddio_Instagram_Locations {
 			get_template_directory_uri() . '/js/admin-private-location-sync-submenu.js',
 			array( 'jquery' )
 		);
-		echo $this->render_private_location_sync_submenu( $context );
+		Sprig::out( 'admin/instagram-location-sync-submenu.twig', $context );
 	}
 
-	public function render_private_location_sync_submenu( $data = array() ) {
-		$defaults = array(
-			'found_posts' => 0,
-			'posts' => array(),
-		);
-		$x = wp_parse_args( $data, $defaults );
-		ob_start();
-		?>
-		<style>
-			.post {
-				overflow: auto;
-				padding: 15px;
-				margin-bottom: 30px;
-			}
-			.post.loading {
-				opacity: 0.35;
-			}
-			.post.success {
-				background-color: green;
-				color: #fff;
-			}
-			.post.success a {
-				color: #fff;
-			}
-			.post.fail {
-				background-color: red;
-				color: #fff;
-			}
-			.post .text-fields {
-				overflow: auto;
-				padding: 0 15px;
-			}
-			.post .instagram-url,
-			.post textarea {
-				margin-bottom: 15px;
-				width: 99%;
-			}
-		</style>
-		<h1>Privte Instagram Posts that Need Location Data Synced</h1>
-		<?php foreach ( $x['posts'] as $post ) : ?>
-			<div class="post">
-				<a href="<?php echo esc_url( $post->edit_link ); ?>" target="_blank">
-					<?php echo $post->thumbnail; ?>
-				</a>
-				<div class="text-fields">
-					<input type="text" class="instagram-url" value="view-source:<?php echo esc_url( $post->instagram_url ); ?>" onfocus="this.select();" readonly>
-					<input type="hidden" class="post-id" name="post-id" value="<?php echo absint( $post->post_id ); ?>">
-					<textarea rows="5" class="instagram-source"></textarea>
-				</div>
-			</div>
-		<?php endforeach; ?>
-		<p><?php echo $x['found_posts']; ?> private Instagram posts need location data</p>
-		<?php
-		return ob_get_clean();
-	}
-
+	/**
+	 * Handle AJAX request for location sync
+	 */
 	public function ajax_daddio_private_location_sync() {
 		$post_id = absint( $_POST['post-id'] );
 		if ( ! $post_id ) {
 			wp_send_json_fail( array( 'message' => 'Bad post-id' ) );
 		}
-		$html = wp_unslash( $_POST['instagram-source'] );
+		$html  = wp_unslash( $_POST['instagram-source'] );
 		$insta = Daddio_Instagram::get_instance();
-		$json = $insta->get_instagram_json_from_html( $html );
+		$json  = $insta->get_instagram_json_from_html( $html );
 		if ( isset( $json->entry_data->PostPage[0] ) ) {
 			$node = $json->entry_data->PostPage[0]->graphql->shortcode_media;
 			$node = $insta->normalize_instagram_data( $node );
@@ -234,13 +184,19 @@ class Daddio_Instagram_Locations {
 		die();
 	}
 
-	public function action_daddio_after_instagram_inserted( $post_id, $node ) {
+	/**
+	 * Handle associating terms and post meta for location data for a given Instagram node
+	 *
+	 * @param  integer $post_id WordPress Post ID location data is to be associated with
+	 * @param  object  $node    Normalized Instagram data
+	 */
+	public function action_daddio_after_instagram_inserted( $post_id = 0, $node ) {
 		$post = get_post( $post_id );
 		if ( $post->post_type != 'instagram' ) {
 			return;
 		}
-		$location_data = $this->get_location_data_from_node( $node );
 
+		$location_data = $this->get_location_data_from_node( $node );
 		if ( empty( $location_data ) ) {
 			$description = 'No location set';
 			$args = array(
@@ -322,9 +278,15 @@ class Daddio_Instagram_Locations {
 		}
 	}
 
+	/**
+	 * Add form fields to the edit Location term screen for displaying meta data
+	 *
+	 * @param  WP_Term $term WordPress term being edited
+	 */
 	public function action_location_edit_form_fields( $term ) {
 		$location_data = $this->get_location_data( $term );
-		wp_log( $location_data );
+
+		// Display link to Instagram location page
 		if ( ! empty( $location_data['id'] ) ) {
 			$url = 'https://www.instagram.com/explore/locations/' . $location_data['id'] . '/';
 			$link = '<a href="' . esc_url( $url ) . '" target="_blank">' . $location_data['id'] . '</a>';
@@ -334,6 +296,7 @@ class Daddio_Instagram_Locations {
 			);
 		}
 
+		// Display link to reverse geocode data for lat/long coordinates
 		$query_args = array(
 			'format'         => 'json',
 			'lat'            => $location_data['lat'],
@@ -349,6 +312,7 @@ class Daddio_Instagram_Locations {
 			$request_link
 		);
 
+		// Display Instagram location meta data
 		$blacklisted_keys = array( 'id', 'name', 'has_public_page' );
 		$meta_data = array();
 		foreach ( $location_data as $key => $val ) {
@@ -365,6 +329,12 @@ class Daddio_Instagram_Locations {
 		);
 	}
 
+	/**
+	 * Helper for rendering form field markup for edit term screen
+	 *
+	 * @param  string $label Label for form field
+	 * @param  string $value Value of form field
+	 */
 	public function edit_form_field( $label = '', $value = '' ) {
 		ob_start();
 		?>
@@ -380,7 +350,13 @@ class Daddio_Instagram_Locations {
 		return ob_get_clean();
 	}
 
-	public function get_location_data_from_node( $node = array() ) {
+	/**
+	 * Get location data for a given Instagram node
+	 *
+	 * @param  object  $node Instagram node data
+	 * @return array         Location data
+	 */
+	public function get_location_data_from_node( $node ) {
 		$location_term_id = false;
 		if ( ! empty( $node->location_id ) ) {
 			$location_args = array(
@@ -395,6 +371,12 @@ class Daddio_Instagram_Locations {
 		return array();
 	}
 
+	/**
+	 * Add a term if it doesn't exist and associate with a post ID
+	 *
+	 * @param array $args Arguments of the term to maybe create
+	 *                    and the post ID to associate the term with
+	 */
 	public function maybe_add_term_and_associate_with_post( $args = array() ) {
 		$default_args = array(
 			'term_name'        => '',
@@ -432,6 +414,12 @@ class Daddio_Instagram_Locations {
 		}
 	}
 
+	/**
+	 * Maybe add Location term if it doesn't already exist
+	 *
+	 * @param array $args     Arguments about the term to possibly add
+	 * @return integer|False  Term ID or false if Location ID not provided
+	 */
 	public function maybe_add_location( $args = array() ) {
 		global $wpdb;
 
@@ -490,6 +478,12 @@ class Daddio_Instagram_Locations {
 		return $term_id;
 	}
 
+	/**
+	 * Get the term ID for a given Instagram location ID
+	 *
+	 * @param  integer $location_id ID of Instagram location
+	 * @return integer              WordPress term ID
+	 */
 	public function get_term_id_from_location_id( $location_id = 0 ) {
 		global $wpdb;
 
@@ -514,6 +508,12 @@ class Daddio_Instagram_Locations {
 		return 0;
 	}
 
+	/**
+	 * Fetch HTML for a given Instagram location ID
+	 *
+	 * @param  string $location_id Instagram Location ID to fetch data for
+	 * @return object              JSON data found from scraping the Instagram Location page
+	 */
 	public function fetch_instagram_location( $location_id = '' ) {
 		if ( ! $location_id ) {
 			return false;
@@ -524,6 +524,12 @@ class Daddio_Instagram_Locations {
 		return $this->instagram_class->get_instagram_json_from_html( $response['body'] );
 	}
 
+	/**
+	 * Get meta data for given location term
+	 *
+	 * @param  string $term WordPress Term or term ID
+	 * @return array        Term meta data
+	 */
 	public function get_location_data( $term = '' ) {
 		$term_id = false;
 		if ( is_numeric( $term ) ) {
@@ -540,6 +546,13 @@ class Daddio_Instagram_Locations {
 		return get_term_meta( $term_id, 'location-data', true );
 	}
 
+	/**
+	 * Reverse geocode a piar of lat/long coordinates
+	 *
+	 * @param  string $lat  Latitude coordinates
+	 * @param  string $long Longitude coordinates
+	 * @return array        Geocode data
+	 */
 	public function reverse_geocode( $lat = '', $long = '' ) {
 		$output = array(
 			'locality'      => '',
@@ -588,6 +601,12 @@ class Daddio_Instagram_Locations {
 		return $output;
 	}
 
+	/**
+	 * Given a state return the state abbreviation
+	 *
+	 * @param  string $state Full state name
+	 * @return string|False  State abbreviation or false if not found
+	 */
 	public function get_state_abbreviation( $state = '' ) {
 		$key = ucwords( strtolower( $state ) );
 		// via https://gist.github.com/maxrice/2776900#gistcomment-1172963
