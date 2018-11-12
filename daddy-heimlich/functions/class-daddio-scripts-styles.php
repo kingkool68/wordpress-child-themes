@@ -13,11 +13,17 @@ class Daddio_Scripts_Style {
 		return $instance;
 	}
 
-	public function setup_hooks() {
+	/**
+	 * Hook in to WordPress via actions
+	 */
+	public function setup_actions() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'action_wp_enqueue_scripts' ) );
 		add_action( 'after_setup_theme', array( $this, 'action_after_setup_theme' ) );
 	}
 
+	/**
+	 * Hook in to WordPress via filters
+	 */
 	public function setup_filters() {
 		add_filter( 'style_loader_tag', array( $this, 'filter_style_loader_tag' ), 10, 4 );
 		add_filter( 'script_loader_tag', array( $this, 'filter_script_loader_tag' ), 10, 3 );
