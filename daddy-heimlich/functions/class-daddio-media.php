@@ -182,13 +182,3 @@ class Daddio_Media {
 	}
 }
 Daddio_Media::get_instance();
-
-/* Helpers */
-
-function daddio_svg_icon( $icon = '' ) {
-	if ( ! $icon ) {
-		return;
-	}
-
-	return '<svg class="icon icon-' . esc_attr( $icon ) . '" role="img"><use xlink:href="#icon-' . ec_attr( $icon ) . '"></use></svg>';
-}

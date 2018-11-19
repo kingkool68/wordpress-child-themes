@@ -74,13 +74,13 @@ class Daddio_Menus {
 				?>
 				<p class="social-links">
 					<a href="https://github.com/kingkool68/wordpress-child-themes" class="github u-url" title="The code that powers this site is on GitHub" data-ga-category="nav" data-ga-label="GitHub Icon">
-						<?php echo daddio_svg_icon( 'github' ); ?>
+						<?php echo $this->get_svg_icon( 'github' ); ?>
 					</a>
 					<a href="https://www.instagram.com/<?php echo esc_attr( CHILD_INSTAGRAM_HANDLE ); ?>/" class="instagram u-url" rel="me" title="Follow <?php echo esc_attr( CHILD_NAME ); ?> on Instagram @<?php echo esc_attr( CHILD_INSTAGRAM_HANDLE ); ?>" data-ga-category="nav" data-ga-label="Instagram Icon">
-						<?php echo daddio_svg_icon( 'instagram' ); ?>
+						<?php echo $this->get_svg_icon( 'instagram' ); ?>
 					</a>
 					<a href="<?php echo esc_url( CHILD_FACEBOOK_URL ); ?>" title="<?php echo esc_attr( CHILD_NAME ); ?> is on Facebook" data-ga-category="nav" data-ga-label="Facebook Icon" class="u-url">
-						<?php echo daddio_svg_icon( 'facebook' ); ?>
+						<?php echo $this->get_svg_icon( 'facebook' ); ?>
 					</a>
 				</p>
 			</section>
@@ -124,6 +124,14 @@ class Daddio_Menus {
 		$attr['data-ga-category'] = 'nav';
 		$attr['data-ga-label']    = $item->title;
 		return $attr;
+	}
+
+	public function get_svg_icon( $icon = '' ) {
+		if ( ! $icon ) {
+			return;
+		}
+
+		return '<svg class="icon icon-' . esc_attr( $icon ) . '" role="img"><use xlink:href="#icon-' . esc_attr( $icon ) . '"></use></svg>';
 	}
 }
 Daddio_Menus::get_instance();
