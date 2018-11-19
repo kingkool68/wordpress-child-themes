@@ -27,9 +27,9 @@ class Daddio_Menus {
 	 */
 	public function setup_filters() {
 		add_filter( 'wp_nav_menu_items', array( $this, 'filter_wp_nav_menu_items' ), 10, 2 );
-		add_filter( 'nav_menu_item_id', array( $this, 'filter_nav_menu_item_id' ) );
 		add_filter( 'nav_menu_link_attributes', array( $this, 'filter_nav_menu_link_attributes' ), 10, 2 );
-		add_filter( 'nav_menu_css_class' , '__return_empty_array' , 10 , 3 );
+		add_filter( 'nav_menu_item_id', '__return_empty_string' );
+		add_filter( 'nav_menu_css_class' , '__return_empty_array', 10 , 3 );
 	}
 
 	/**
@@ -55,37 +55,26 @@ class Daddio_Menus {
 	 * Output the markup for the menu in the footer of the site using a custom action
 	 */
 	public function action_daddio_footer() {
-	?>
-		<nav id="more-menu" class="more-menu">
-			<section>
-				<h2 class="title">Main Menu</h2>
-				<a href="#close" class="close" data-ga-category="nav" data-ga-label="Close">
-					<span aria-hidden="true">&times;</span>
-					<span class="alt-text">Close</span>
-				</a>
-				<?php
-				$args = array(
-					'theme_location' => 'more-menu',
-					'container' => false,
-					'menu_class' => false,
-					'menu_id' => false,
-				);
-				wp_nav_menu( $args );
-				?>
-				<p class="social-links">
-					<a href="https://github.com/kingkool68/wordpress-child-themes" class="github u-url" title="The code that powers this site is on GitHub" data-ga-category="nav" data-ga-label="GitHub Icon">
-						<?php echo $this->get_svg_icon( 'github' ); ?>
-					</a>
-					<a href="https://www.instagram.com/<?php echo esc_attr( CHILD_INSTAGRAM_HANDLE ); ?>/" class="instagram u-url" rel="me" title="Follow <?php echo esc_attr( CHILD_NAME ); ?> on Instagram @<?php echo esc_attr( CHILD_INSTAGRAM_HANDLE ); ?>" data-ga-category="nav" data-ga-label="Instagram Icon">
-						<?php echo $this->get_svg_icon( 'instagram' ); ?>
-					</a>
-					<a href="<?php echo esc_url( CHILD_FACEBOOK_URL ); ?>" title="<?php echo esc_attr( CHILD_NAME ); ?> is on Facebook" data-ga-category="nav" data-ga-label="Facebook Icon" class="u-url">
-						<?php echo $this->get_svg_icon( 'facebook' ); ?>
-					</a>
-				</p>
-			</section>
-		</nav>
-	<?php
+		$args = array(
+			'theme_location' => 'more-menu',
+			'container'      => false,
+			'menu_class'     => false,
+			'menu_id'        => false,
+			'echo'           => false,
+		);
+		$more_menu = wp_nav_menu( $args );
+
+		$context = array(
+			'more_menu'              => $more_menu,
+			'github_icon'            => $this->get_svg_icon( 'github' ),
+			'instagram_icon'         => $this->get_svg_icon( 'instagram' ),
+			'facebook_icon'          => $this->get_svg_icon( 'facebook' ),
+			'child_name'             => CHILD_NAME,
+			'child_instagram_handle' => CHILD_INSTAGRAM_HANDLE,
+			'child_facebook_url'     => CHILD_FACEBOOK_URL,
+
+		);
+		Sprig::out( 'more-menu.twig' );
 	}
 
 	/**
@@ -101,16 +90,6 @@ class Daddio_Menus {
 		}
 		$items .= '<li><a href="#more-menu" class="more-nav" data-ga-category="nav" data-ga-label="More +">More +</a></li>';
 		return $items;
-	}
-
-	/**
-	 * Remove the ID attribute for menu items
-	 *
-	 * @param  string $id The value of the ID attribute
-	 * @return string     Nothing so the ID attribute doesn't render
-	 */
-	public function filter_nav_menu_item_id( $id = '' ) {
-		return '';
 	}
 
 	/**
