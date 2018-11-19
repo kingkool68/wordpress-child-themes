@@ -148,8 +148,6 @@ class Daddio_Media {
 	/**
 	 * Display Instagram photo or video for a given Instagram post
 	 *
-	 * @TODO: Make this return a string
-	 *
 	 * @param  integer $post_id Post ID of Instagram post
 	 * @return string           HTML of media
 	 */
