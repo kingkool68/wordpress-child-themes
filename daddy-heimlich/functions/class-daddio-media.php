@@ -185,51 +185,10 @@ Daddio_Media::get_instance();
 
 /* Helpers */
 
-function daddio_get_attachment_link( $id = 0, $size = 'thumbnail', $permalink = false, $icon = false, $text = false, $attr = '' ) {
-	$id = intval( $id );
-	$_post = get_post( $id );
-	$parent_post = get_post();
-
-	if ( empty( $_post ) || ( 'attachment' != $_post->post_type ) || ! $url = wp_get_attachment_url( $_post->ID ) ) {
-		return __( 'Missing Attachment' );
-	}
-	if ( $permalink ) {
-		//$url = get_attachment_link( $_post->ID );
-		$url = daddio_get_post_gallery_link( $parent_post->ID, $_post->post_name );
-	}
-
-	if ( $text ) {
-		$link_text = $text;
-	} elseif ( $size && 'none' != $size ) {
-		$link_text = wp_get_attachment_image( $id, $size, $icon, $attr );
-	} else {
-		$link_text = '';
-	}
-
-	if ( trim( $link_text ) == '' ) {
-		$link_text = $_post->post_title;
-	}
-
-	/**
-	 * Filter a retrieved attachment page link.
-	 *
-	 * @since 2.7.0
-	 *
-	 * @param string      $link_html The page link HTML output.
-	 * @param int         $id        Post ID.
-	 * @param string      $size      Image size. Default 'thumbnail'.
-	 * @param bool        $permalink Whether to add permalink to image. Default false.
-	 * @param bool        $icon      Whether to include an icon. Default false.
-	 * @param string|bool $text      If string, will be link text. Default false.
-	 */
-	return apply_filters( 'wp_get_attachment_link', "<a href='$url'>$link_text</a>", $id, $size, $permalink, $icon, $text );
-}
-
 function daddio_svg_icon( $icon = '' ) {
 	if ( ! $icon ) {
 		return;
 	}
-	$icon = esc_attr( $icon );
 
-	return '<svg class="icon icon-' . $icon . '" role="img"><use xlink:href="#icon-' . $icon . '"></use></svg>';
+	return '<svg class="icon icon-' . esc_attr( $icon ) . '" role="img"><use xlink:href="#icon-' . ec_attr( $icon ) . '"></use></svg>';
 }
