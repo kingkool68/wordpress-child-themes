@@ -27,9 +27,9 @@ class Daddio_Menus {
 	 */
 	public function setup_filters() {
 		add_filter( 'wp_nav_menu_items', array( $this, 'filter_wp_nav_menu_items' ), 10, 2 );
-		add_filter( 'nav_menu_css_class' , array( $this, 'filter_nav_menu_css_class' ) , 10 , 3 );
 		add_filter( 'nav_menu_item_id', array( $this, 'filter_nav_menu_item_id' ) );
 		add_filter( 'nav_menu_link_attributes', array( $this, 'filter_nav_menu_link_attributes' ), 10, 2 );
+		add_filter( 'nav_menu_css_class' , '__return_empty_array' , 10 , 3 );
 	}
 
 	/**
@@ -104,15 +104,6 @@ class Daddio_Menus {
 	}
 
 	/**
-	 * Remove any CSS classes for menu items
-	 *
-	 * @return array  Nothing
-	 */
-	public function filter_nav_menu_css_class( $class, $item, $args ) {
-		return array();
-	}
-
-	/**
 	 * Remove the ID attribute for menu items
 	 *
 	 * @param  string $id The value of the ID attribute
@@ -131,7 +122,7 @@ class Daddio_Menus {
 	 */
 	public function filter_nav_menu_link_attributes( $attr = array(), $item ) {
 		$attr['data-ga-category'] = 'nav';
-		$attr['data-ga-label'] = $item->title;
+		$attr['data-ga-label']    = $item->title;
 		return $attr;
 	}
 }
