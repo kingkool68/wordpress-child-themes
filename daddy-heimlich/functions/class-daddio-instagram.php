@@ -501,12 +501,13 @@ class Daddio_Instagram {
 	/**
 	 * Given an HTML page from Instagram, return a JSON of the data from that page
 	 *
+	 * @link https://github.com/raiym/instagram-php-scraper/blob/849f464bf53f84a93f86d1ecc6c806cc61c27fdc/src/InstagramScraper/Instagram.php#L32
+	 *
 	 * @param  string $html HTML from an Instagram URL
 	 * @return json         Instagram data embedded in the page
 	 */
 	public function get_instagram_json_from_html( $html = '' ) {
-		// Parse the page response and extract the JSON string.
-		// via https://github.com/raiym/instagram-php-scraper/blob/849f464bf53f84a93f86d1ecc6c806cc61c27fdc/src/InstagramScraper/Instagram.php#L32
+		// Parse the page response and extract the JSON string
 		$arr = explode( 'window._sharedData = ', $html );
 		$json = explode( ';</script>', $arr[1] );
 		$json = $json[0];
