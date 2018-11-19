@@ -74,7 +74,7 @@ class Daddio_Menus {
 			'child_facebook_url'     => CHILD_FACEBOOK_URL,
 
 		);
-		Sprig::out( 'more-menu.twig' );
+		Sprig::out( 'more-menu.twig', $context );
 	}
 
 	/**
