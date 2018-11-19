@@ -7,10 +7,6 @@ if ( have_posts() ) :
 		$templates = array();
 		switch ( $post->post_type ) {
 			case 'instagram' :
-				ob_start();
-				the_instagram_media();
-				$instagram_media = ob_get_clean();
-
 				$context = array(
 					'daddio_content_header' => Sprig::do_action('daddio_content_header', get_post() ),
 					'title'                 => get_the_title(),
@@ -18,7 +14,7 @@ if ( have_posts() ) :
 					'the_time'              => get_the_time( Daddio_Dates::get_child_time_format() ),
 					'machine_datetime'      => get_post_time( 'c', true ),
 					'child_age'             => Daddio_Dates::how_old_was_child(),
-					'instagram_media'       => $instagram_media,
+					'instagram_media'       => Daddio_Media::get_the_instagram_media(),
 					'the_content'           => apply_filters( 'the_content', get_the_content() ),
 					'via_url'               => get_the_guid(),
 					'instagram_username'    => get_instagram_username(),

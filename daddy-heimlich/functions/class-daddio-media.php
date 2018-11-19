@@ -35,7 +35,7 @@ class Daddio_Media {
 	 * Setup custom image sizes
 	 */
 	public function action_init() {
-		//Custom image sizes
+		// Custom image sizes
 		add_image_size( '320-wide', 320 );
 		add_image_size( '360-wide', 360 );
 		add_image_size( '480-wide', 480 );
@@ -148,32 +148,29 @@ class Daddio_Media {
 	/**
 	 * Display Instagram photo or video for a given Instagram post
 	 *
-	 * @TODO: Make this return a string 
+	 * @TODO: Make this return a string
 	 *
 	 * @param  integer $post_id Post ID of Instagram post
 	 * @return string           HTML of media
 	 */
-	public function the_instagram_media( $post_id = 0 ) {
-		$post_id = absint( $post_id );
-		if ( ! $post_id ) {
-			$post_id = '';
-		}
+	public static function get_the_instagram_media( $post_id = 0 ) {
 		$post = get_post( $post_id );
 		$featured_image_id = get_post_thumbnail_id( $post->ID );
 		$featured_video_id = get_post_meta( $post->ID, '_video_id', true );
 		if ( $featured_video_id ) {
 			$video_src = wp_get_attachment_url( $featured_video_id );
-			$poster = wp_get_attachment_image_src( $featured_image_id, 'full' );
+			$poster    = wp_get_attachment_image_src( $featured_image_id, 'full' );
 			if ( ! empty( $poster[0] ) ) {
 				$poster = $poster[0];
 			}
 			if ( $video_src && $poster ) {
 				$args = array(
-					'src' => $video_src,
+					'src'    => $video_src,
 					'poster' => $poster,
 				);
+				ob_start();
 				echo wp_video_shortcode( $args );
-				return;
+				return ob_get_clean();
 			}
 		}
 
@@ -181,7 +178,7 @@ class Daddio_Media {
 			'class' => 'aligncenter from-instagram',
 			'alt'   => '',
 		);
-		echo wp_get_attachment_image( $featured_image_id, 'full', false, $img_attrs );
+		return wp_get_attachment_image( $featured_image_id, 'full', false, $img_attrs );
 	}
 }
 Daddio_Media::get_instance();
@@ -235,9 +232,4 @@ function daddio_svg_icon( $icon = '' ) {
 	$icon = esc_attr( $icon );
 
 	return '<svg class="icon icon-' . $icon . '" role="img"><use xlink:href="#icon-' . $icon . '"></use></svg>';
-}
-
-function the_instagram_media( $post_id = 0 ) {
-	$instance = Daddio_Media::get_instance();
-	return $instance->the_instagram_media( $post_id );
 }
