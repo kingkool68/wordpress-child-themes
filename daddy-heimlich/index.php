@@ -3,7 +3,7 @@
 $the_content = array();
 if ( have_posts() ) :
 	while ( have_posts() ) : the_post();
-		$context = array();
+		$context   = array();
 		$templates = array();
 		switch ( $post->post_type ) {
 			case 'instagram' :
@@ -48,6 +48,7 @@ if ( have_posts() ) :
 		$the_content[] =  Sprig::render( $templates, $context );
 	endwhile;
 endif;
+
 $context = array(
 	'before_content' => Sprig::do_action( 'daddio_before_content', get_post() ),
 	'the_content'    => implode( "\n", $the_content ),
