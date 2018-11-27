@@ -196,7 +196,7 @@ class Daddio_Instagram {
 			break;
 
 			case 'instagram_permalink':
-				echo '<a href="' . esc_url( $post->guid ) . '" target="_blank">@' . get_instagram_username() . '</a>';
+				echo '<a href="' . esc_url( $post->guid ) . '" target="_blank">@' . self::get_instagram_username() . '</a>';
 			break;
 		}
 
@@ -848,16 +848,9 @@ class Daddio_Instagram {
 	 * @param  Integer $post_id  Post ID get the username for
 	 * @return String            Instagram username
 	 */
-	public function get_instagram_username( $post_id = false ) {
-		if ( $post_id ) {
-			$post_id = intval( $post_id );
-		}
-
-		if ( ! $post_id ) {
-			$post_id = get_the_ID();
-		}
-
-		$output = get_post_meta( $post_id, 'instagram_username', true );
+	public static function get_instagram_username( $post_id = false ) {
+		$post = get_post( $post_id );
+		$output = get_post_meta( $post->ID, 'instagram_username', true );
 		if ( ! $output ) {
 			$output = '';
 		}
@@ -928,10 +921,5 @@ class Daddio_Instagram {
 		}
 	}
 }
-Daddio_Instagram::get_instance();
 
-// Global helper functions
-function get_instagram_username( $post_id = false ) {
-	$daddio_instagram = Daddio_Instagram::get_instance();
-	return $daddio_instagram->get_instagram_username( $post_id );
-}
+Daddio_Instagram::get_instance();
