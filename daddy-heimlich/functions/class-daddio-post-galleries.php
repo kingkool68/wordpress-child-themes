@@ -11,12 +11,16 @@ class Daddio_Post_Galleries {
 		static $instance = null;
 		if ( null === $instance ) {
 			$instance = new static();
-			$instance->setup_hooks();
+			$instance->setup_actions();
+			$instance->setup_filters();
 		}
 		return $instance;
 	}
 
-	public function setup_hooks() {
+	/**
+	 * Hook in to WordPress via actions
+	 */
+	public function setup_actions() {
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'parse_request', array( $this, 'action_parse_request' ) );
 		add_action( 'template_redirect', array( $this, 'action_template_redirect' ) );
@@ -24,7 +28,12 @@ class Daddio_Post_Galleries {
 		add_action( 'daddio_attachment_before_template_part', array( $this, 'action_daddio_attachment_before_template_part' ) );
 		add_action( 'daddio_attachment_after_article', array( $this, 'action_daddio_attachment_after_article' ) );
 		add_action( 'wpseo_head', array( $this, 'action_wpseo_head' ) );
+	}
 
+	/**
+	 * Hook in to WordPress via filters
+	 */
+	public function setup_filters() {
 		add_filter( 'generate_rewrite_rules', array( $this, 'filter_generate_rewrite_rules' ) );
 		add_filter( 'query_vars', array( $this, 'filter_query_vars' ) );
 		add_filter( 'redirect_canonical', array( $this, 'filter_redirect_canonical' ), 10, 2 );
@@ -33,9 +42,21 @@ class Daddio_Post_Galleries {
 		add_filter( 'post_gallery', array( $this, 'filter_post_gallery' ), 10, 2 );
 	}
 
+	/**
+	 * Setup a non persistant cache group
+	 */
 	public function action_init() {
 		// Setup a non-persistant caching group
 		wp_cache_add_non_persistent_groups( $this->cache_group );
+
+		// Register script
+		wp_register_script(
+			$handle    = 'post-gallery',
+			get_template_directory_uri() . '/js/post-gallery' . Daddio_Scripts_Styles::get_js_suffix(),
+			$deps      = array( 'jquery' ),
+			$ver       = null,
+			$in_footer = true
+		);
 	}
 
 	// URLs like /category/gallery/ wouldn't work because our rewrite rules tell WordPress this is a post_gallery when it is really not intended that way. This function sets everything right. Sort of.
@@ -51,6 +72,9 @@ class Daddio_Post_Galleries {
 		}
 	}
 
+	/**
+	 * If the request is a post gallery and not for an attachment then redirect
+	 */
 	public function action_template_redirect() {
 		if ( $this->is_post_gallery() && ! get_query_var( 'attachment' ) ) {
 			$post = get_post();
@@ -105,13 +129,20 @@ class Daddio_Post_Galleries {
 	<?php
 	}
 
-	// Add noindex to pages that have the size query var added
+	/**
+	 * Add noindex to pages that have the size query var added
+	 */
 	public function action_wpseo_head() {
 		if ( $this->is_post_gallery() && get_query_var( 'size' ) ) {
 			echo '<meta name="robots" content="noindex">' . PHPEOL;
 		}
 	}
 
+	/**
+	 * Add rewrite rules for post galleries.
+	 *
+	 * @param  object $wp_rewrite WP_Rewrite object to modify
+	 */
 	public function filter_generate_rewrite_rules( $wp_rewrite ) {
 		$new_rules = array(
 			'([^/]+)/gallery/([^/]+)?/size/([^/]+)/?' => 'index.php?name=$matches[1]&post_gallery=1&attachment=$matches[2]&size=$matches[3]',
@@ -121,13 +152,26 @@ class Daddio_Post_Galleries {
 		$wp_rewrite->rules = $new_rules + $wp_rewrite->rules;
 	}
 
+	/**
+	 * Make WordPress aware of our custom query vars
+	 *
+	 * @param  array  $query_vars Previously registered query vars
+	 * @return array              Modified query_vars
+	 */
 	public function filter_query_vars( $query_vars = array() ) {
 		$query_vars[] = 'post_gallery';
 		$query_vars[] = 'size';
 		return $query_vars;
 	}
 
-	public function filter_redirect_canonical( $redirect_url, $requested_url ) {
+	/**
+	 * If the request is for a post gallery then kill the canonical redirect
+	 *
+	 * @param  string $redirect_url  URL WordPress is trying to redirect to
+	 * @param  string $requested_url The requested URL
+	 * @return string|false          The URL to redirect to or false to cancel the redirect
+	 */
+	public function filter_redirect_canonical( $redirect_url = '', $requested_url = '' ) {
 		if ( $this->is_post_gallery() ) {
 			return false;
 		}

@@ -1,5 +1,5 @@
 <?php
-class Daddio_Scripts_Style {
+class Daddio_Scripts_Styles {
 	/**
 	 * Get an instance of this class
 	 */
@@ -17,6 +17,7 @@ class Daddio_Scripts_Style {
 	 * Hook in to WordPress via actions
 	 */
 	public function setup_actions() {
+		add_action( 'init', array( $this, 'action_init_register_scripts' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'action_wp_enqueue_scripts' ) );
 		add_action( 'after_setup_theme', array( $this, 'action_after_setup_theme' ) );
 	}
@@ -31,19 +32,22 @@ class Daddio_Scripts_Style {
 	}
 
 	/**
-	 * Loads styles and scripts
+	 * Register scripts early enough for other hooks to make use of them
 	 */
-	public function action_wp_enqueue_scripts() {
+	public function action_init_register_scripts() {
 		// The mediaelement styles are rolled in to the theme CSS file via Gulp
 		if ( ! is_admin() ) {
 			wp_deregister_style( 'wp-mediaelement' );
 		}
 
-		// JavaScript
-		wp_register_script( 'post-gallery', get_template_directory_uri() . '/js/post-gallery' . self::get_js_suffix(), array( 'jquery' ), null, true );
-
 		// Global JavaScript files bundled into one that gets loaded on every single page
 		wp_register_script( 'daddio-global-scripts', get_template_directory_uri() . '/js/global' . self::get_js_suffix(), array( 'jquery' ), null, true );
+	}
+
+	/**
+	 * Enqueue scripts at the right time
+	 */
+	public function action_wp_enqueue_scripts() {
 		if ( $this->maybe_use_global_script_file() ) {
 			add_filter( 'script_loader_tag', array( $this, 'dont_load_bundled_scripts' ), 10, 3 );
 			wp_enqueue_script( 'daddio-global-scripts' );
@@ -209,4 +213,4 @@ class Daddio_Scripts_Style {
 		return '.min.js';
 	}
 }
-Daddio_Scripts_Style::get_instance();
+Daddio_Scripts_Styles::get_instance();

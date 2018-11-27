@@ -48,7 +48,7 @@ class Daddio_Menus {
 	 * Enqueue the JavaScript and neccessary dependencies to make the menu work.
 	 */
 	public function action_wp_enqueue_scripts() {
-		wp_enqueue_script( 'daddio-menu', get_template_directory_uri() . '/js/menu' . Daddio_Scripts_Style::get_js_suffix(), array( 'jquery' ), null, true );
+		wp_enqueue_script( 'daddio-menu', get_template_directory_uri() . '/js/menu' . Daddio_Scripts_Styles::get_js_suffix(), array( 'jquery' ), null, true );
 	}
 
 	/**
