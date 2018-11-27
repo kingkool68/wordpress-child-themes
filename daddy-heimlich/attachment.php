@@ -31,13 +31,16 @@ if ( have_posts() ) :
 			}
 
 			$context = array(
-				'daddio_content_header' => Sprig::do_action( 'daddio_content_header', $post ),
-				'the_title'             => get_the_title(),
-				'how_old'               => Daddio_Dates::how_old_was_child(),
-				'the_image'             => wp_get_attachment_image( get_the_ID(), $attachment_size ),
-				'max_width'             => $max_width,
-				'the_content'           => apply_filters( 'the_content', get_the_content() ),
-				'daddio_content_footer' => Sprig::do_action( 'daddio_content_footer', $post ),
+				'attachment_type'                        => $attachment_type,
+				'daddio_attachment_before_template_part' => Sprig::do_action( 'daddio_attachment_before_template_part', $post ),
+				'daddio_content_header'                  => Sprig::do_action( 'daddio_content_header', $post ),
+				'the_title'                              => get_the_title(),
+				'how_old'                                => Daddio_Dates::how_old_was_child(),
+				'the_image'                              => wp_get_attachment_image( get_the_ID(), $attachment_size ),
+				'max_width'                              => $max_width,
+				'the_content'                            => apply_filters( 'the_content', get_the_content() ),
+				'daddio_content_footer'                  => Sprig::do_action( 'daddio_content_footer', $post ),
+				'daddio_attachment_after_article'        => Sprig::do_action( 'daddio_attachment_after_article', $post ),
 			);
 			$templates[] = 'attachment-image.twig';
 			break;

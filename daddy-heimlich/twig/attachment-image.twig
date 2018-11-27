@@ -1,13 +1,19 @@
-{{ daddio_content_header }}
+{{ daddio_attachment_before_template_part }}
 
-<div class="inner">
-	<h1 class="title" title="{{ how_old|esc_attr }}">
-		{{ the_title }}
-	</h1>
-	<div class="container" style="max-width: {{ max_width|esc_attr }}em">
-		{{ the_image }}
-		{{ the_content }}
+<article class="article attachment-{{ attachment_type|esc_attr }}">
+	{{ daddio_content_header }}
+
+	<div class="inner">
+		<h1 class="title" title="{{ how_old|esc_attr }}">
+			{{ the_title }}
+		</h1>
+		<div class="container" style="max-width: {{ max_width|esc_attr }}em">
+			{{ the_image }}
+			{{ the_content }}
+		</div>
 	</div>
-</div>
 
-{{ daddio_content_footer }}
+	{{ daddio_content_footer }}
+</article>
+
+{{ daddio_attachment_after_article }}
