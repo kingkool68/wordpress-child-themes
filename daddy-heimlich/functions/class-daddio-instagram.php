@@ -11,15 +11,16 @@ class Daddio_Instagram {
 		static $instance = null;
 		if ( null === $instance ) {
 			$instance = new static();
-			$instance->setup_hooks();
+			$instance->setup_actions();
+			$instance->setup_filters();
 		}
 		return $instance;
 	}
 
 	/**
-	 * Hook in to WordPress via actions and filters
+	 * Hook in to WordPress via actions
 	 */
-	public function setup_hooks() {
+	public function setup_actions() {
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
 		add_action( 'before_delete_post', array( $this, 'action_before_delete_post' ) );
@@ -28,7 +29,12 @@ class Daddio_Instagram {
 		add_action( 'manage_posts_custom_column' , array( $this, 'action_manage_posts_custom_column' ) );
 		add_action( 'restrict_manage_posts', array( $this, 'action_restrict_manage_posts' ) );
 		add_action( 'wp_dashboard_setup', array( $this, 'action_wp_dashboard_setup' ) );
+	}
 
+	/**
+	 * Hook in to WordPress via filters
+	 */
+	public function setup_filters() {
 		add_filter( 'the_content', array( $this, 'filter_the_content' ) );
 		add_filter( 'manage_instagram_posts_columns', array( $this, 'filter_manage_instagram_posts_columns' ) );
 	}
@@ -485,17 +491,6 @@ class Daddio_Instagram {
 			<input type="submit" class="button button-primary" value="Private Sync">
 		</form>
 		<?php
-	}
-
-
-
-	// Helper Methods
-
-	/**
-	 * Set text/html mime type for emails
-	 */
-	public function set_html_content_type() {
-		return 'text/html';
 	}
 
 	/**
