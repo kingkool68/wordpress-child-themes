@@ -52,8 +52,8 @@ class Daddio_Helpers {
 	 * @return array             Taxonomy labels
 	 */
 	public static function generate_taxonomy_labels( $singular = '', $plural = '', $overrides = array() ) {
-		$lc_plural = strtolower( $plural );
-		$uc_plural = ucwords( $lc_plural );
+		$lc_plural   = strtolower( $plural );
+		$uc_plural   = ucwords( $lc_plural );
 		$lc_singular = strtolower( $singular );
 		$uc_singular = ucwords( $lc_singular );
 
