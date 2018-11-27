@@ -8,7 +8,7 @@ if ( have_posts() ) :
 		switch ( $post->post_type ) {
 			case 'instagram' :
 				$context = array(
-					'daddio_content_header' => Sprig::do_action('daddio_content_header', get_post() ),
+					'daddio_content_header' => Sprig::do_action( 'daddio_content_header', get_post() ),
 					'title'                 => get_the_title(),
 					'permalink_url'         => get_permalink(),
 					'the_time'              => get_the_time( Daddio_Dates::get_child_time_format() ),
@@ -17,8 +17,8 @@ if ( have_posts() ) :
 					'instagram_media'       => Daddio_Media::get_the_instagram_media(),
 					'the_content'           => apply_filters( 'the_content', get_the_content() ),
 					'via_url'               => get_the_guid(),
-					'instagram_username'    => get_instagram_username(),
-					'daddio_content_footer' => Sprig::do_action('daddio_content_footer', get_post() ),
+					'instagram_username'    => Daddio_Instagram::get_instagram_username(),
+					'daddio_content_footer' => Sprig::do_action( 'daddio_content_footer', get_post() ),
 				);
 				$templates[] = 'content-instagram.twig';
 				break;
@@ -27,21 +27,21 @@ if ( have_posts() ) :
 				$context = array(
 					'the_title'             => get_the_title(),
 					'the_content'           => apply_filters( 'the_content', get_the_content() ),
-					'daddio_content_footer' => Sprig::do_action('daddio_content_footer', get_post() ),
+					'daddio_content_footer' => Sprig::do_action( 'daddio_content_footer', get_post() ),
 				);
 				$templates[] = 'content-page.twig';
 				break;
 
 			default :
 				$context = array(
-					'daddio_content_header' => Sprig::do_action('daddio_content_header', get_post() ),
+					'daddio_content_header' => Sprig::do_action( 'daddio_content_header', get_post() ),
 					'title'                 => get_the_title(),
 					'permalink_url'         => get_permalink(),
 					'the_datetime'          => get_the_time( Daddio_Dates::get_child_time_format() ),
 					'the_machine_datetime'  => get_post_time( 'c', true ),
 					'child_age'             => Daddio_Dates::how_old_was_child(),
 					'the_content'           => apply_filters( 'the_content', get_the_content() ),
-					'daddio_content_footer' => Sprig::do_action('daddio_content_footer', get_post() ),
+					'daddio_content_footer' => Sprig::do_action( 'daddio_content_footer', get_post() ),
 				);
 				$templates[] = 'content-post.twig';
 		}
