@@ -679,6 +679,7 @@ class Daddio_Instagram {
 
 	/**
 	 * Makes sure the node data is from a single page otherwise it fetches a single page's data
+	 *
 	 * @param  object $node Instagram node data
 	 * @return object       Instagram node data
 	 */
