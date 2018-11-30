@@ -26,7 +26,7 @@ if ( have_posts() ) :
 			$img = wp_get_attachment_image_src( get_the_ID(), $attachment_size );
 
 			$max_width = 'none';
-			if ( ! empty( $img[1] ) && is_numeric( $imag[1] ) ) {
+			if ( ! empty( $img[1] ) && is_numeric( $img[1] ) ) {
 				$max_width = $img[1] / 16;
 			}
 
