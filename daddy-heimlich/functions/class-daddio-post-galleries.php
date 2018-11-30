@@ -59,13 +59,21 @@ class Daddio_Post_Galleries {
 		);
 	}
 
-	// URLs like /category/gallery/ wouldn't work because our rewrite rules tell WordPress this is a post_gallery when it is really not intended that way. This function sets everything right. Sort of.
+	/**
+	 * Make URLs like /category/gallery/ work due to the rewrite rules
+	 * which tell WordPress the request is a post_gallery when it is really not.
+	 *
+	 * @param  WP_Query $query WP_Query to modify
+	 */
 	public function action_parse_request( $query ) {
-		if ( ! isset( $query->query_vars['name'] ) ) {
+		if ( empty( $query->query_vars['name'] ) ) {
 			return;
 		}
 
-		if ( 'category' == $query->query_vars['name'] ) {
+		if (
+			'category' == $query->query_vars['name']
+			&& '1' == $query->query_vars['post_gallery']
+		) {
 			$query->query_vars['name'] = '';
 			$query->query_vars['post_gallery'] = '';
 			$query->query_vars['category_name'] = 'gallery';
@@ -77,19 +85,32 @@ class Daddio_Post_Galleries {
 	 */
 	public function action_template_redirect() {
 		if ( $this->is_post_gallery() && ! get_query_var( 'attachment' ) ) {
-			$post = get_post();
-			wp_redirect( get_permalink( $post->ID ), 301 );
+			wp_redirect( get_permalink( get_the_ID() ), 301 );
 			die();
 		}
 	}
 
+	/**
+	 * Juggle some query vars for post gallery requests
+	 *
+	 * @param  WP_Query $query WP_Query to modify
+	 */
 	public function action_pre_get_posts( $query ) {
-		if ( $this->is_post_gallery() && get_query_var( 'attachment' ) && $query->is_main_query() ) {
+		if (
+			$this->is_post_gallery()
+			&& get_query_var( 'attachment' )
+			&& $query->is_main_query()
+		) {
 			$query->set( 'original_name', get_query_var( 'name' ) );
 			$query->set( 'name', get_query_var( 'attachment' ) );
 		}
 	}
 
+	/**
+	 * Render the parent post link at the top of the attachment template
+	 *
+	 * @param  WP_Post $post The post data of the attachment being rendered
+	 */
 	public function action_daddio_attachment_before_template_part( $post ) {
 		if ( ! $this->is_post_gallery() ) {
 			return;
@@ -108,6 +129,11 @@ class Daddio_Post_Galleries {
 	<?php
 	}
 
+	/**
+	 * Render the gallery navigation at the bottom of the attachment template
+	 *
+	 * @param  WP_Post $post The post data of the attachment being rendered
+	 */
 	public function action_daddio_attachment_after_article( $post ) {
 		if ( ! $this->is_post_gallery() ) {
 			return;
@@ -178,6 +204,13 @@ class Daddio_Post_Galleries {
 		return $redirect_url;
 	}
 
+	/**
+	 * Load the appropriate template for a post gallery request
+	 * Defaults to the attachment template and fallsback to the single template
+	 *
+	 * @param  string $orig_template The original template to be used
+	 * @return string                The possibly modified template to use
+	 */
 	public function filter_template_include( $orig_template = '' ) {
 		if ( $this->is_post_gallery() ) {
 			if ( $new_template = get_attachment_template() ) {
@@ -191,6 +224,12 @@ class Daddio_Post_Galleries {
 		return $orig_template;
 	}
 
+	/**
+	 * For post_gallery requests set the canonical URL to the post gallery link
+	 *
+	 * @param  string $canonical The canonical URL
+	 * @return string            The modified canonical URL
+	 */
 	public function filter_wpseo_canonical( $canonical = '' ) {
 		$post = get_post();
 		if ( $this->is_post_gallery() ) {
@@ -201,9 +240,10 @@ class Daddio_Post_Galleries {
 	}
 
 	/**
-	 * Helper Functions
+	 * Is the request a post gallery request?
+	 *
+	 * @return boolean Whether the request is a post gallery request
 	 */
-
 	public function is_post_gallery() {
 		if ( get_query_var( 'post_gallery' ) == '1' ) {
 			return true;
@@ -211,16 +251,19 @@ class Daddio_Post_Galleries {
 		return false;
 	}
 
+	/**
+	 * Get data about all of the gallery posts associated with a given post ID
+	 *
+	 * @param  integer $post_id ID of the post to get data for
+	 * @return object           Post gallery data
+	 */
 	public function get_gallery_posts( $post_id = 0 ) {
 		if ( ! $this->is_post_gallery() || ! get_query_var( 'attachment' ) ) {
 			return array();
 		}
 
-		$post_id = intval( $post_id );
-		if ( ! $post_id ) {
-			$post = get_post();
-			$post_id = $post->ID;
-		}
+		$post = get_post( $post_id );
+		$post_id = $post->ID;
 
 		$parent_post = get_page_by_path( get_query_var( 'original_name' ), 'OBJECT', get_post_types() );
 
@@ -231,7 +274,7 @@ class Daddio_Post_Galleries {
 			'ids'                    => '',
 			'include'                => '',
 			'exclude'                => '',
-			'numberposts'            => -1,
+			'numberposts'            => 99,
 
 			// For performance. See https://10up.github.io/Engineering-Best-Practices/php/
 			'no_found_rows'          => true,
@@ -239,13 +282,16 @@ class Daddio_Post_Galleries {
 			'update_post_term_cache' => false,
 		);
 
-		// Find all [gallery] shortcodes in the parent post and process them to see which gallery the current $post belongs to
+		// Find all [gallery] shortcodes in the parent post and process them
+		// to see which gallery the current $post belongs to
 		preg_match_all( '/\[gallery(.+)?\]/i', $parent_post->post_content, $matches );
 		foreach ( $matches[1] as $atts ) {
-			$atts = shortcode_parse_atts( $atts );
+			$atts      = shortcode_parse_atts( $atts );
 			$sort_args = wp_parse_args( $atts, $defaults );
 			if ( $haystack = $sort_args['ids'] ) {
-				// Make it easier to match IDs while avoiding partial matches. Searching for "1" in "9,10,11" would be a false positive so we normalize everything with a trailing comma.
+				// Make it easier to match IDs while avoiding partial matches.
+				// Searching for "1" in "9,10,11" would be a false positive
+				// so we normalize everything with a trailing comma.
 				$haystack .= ',';
 				$needle    = $post_id . ',';
 				$we_good   = strstr( $haystack, $needle );
@@ -257,7 +303,7 @@ class Daddio_Post_Galleries {
 		}
 
 		$post_in = explode( ',', $sort_args['ids'] );
-		$args = array(
+		$args    = array(
 			'post_type'   => 'attachment',
 			'orderby'     => $sort_args['orderby'],
 			'order'       => $sort_args['order'],
