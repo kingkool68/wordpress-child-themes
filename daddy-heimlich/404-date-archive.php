@@ -53,7 +53,6 @@ get_header();
 					<?php echo $future_prefix; ?> <?php echo $date; ?> <?php echo CHILD_NAME ?> will be <?php echo $age; ?> old.
 				<?php endif; ?>
 			</p>
-			<?php do_action( 'daddio_content_footer', $post ); ?>
 		</article>
 	</div>
 

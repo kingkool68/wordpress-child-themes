@@ -37,7 +37,6 @@ get_header();
 		<article class="article page">
 			<h1 class="title">Nothing Found!</h1>
 				<p class="date-explanation"><?php echo CHILD_NAME ?> <?php echo $tense; ?> <?php echo $age; ?> on <?php echo $date; ?></p>
-			<?php do_action( 'daddio_content_footer', $post ); ?>
 		</article>
 	</div>
 

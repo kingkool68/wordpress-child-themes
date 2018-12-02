@@ -17,7 +17,6 @@ if ( have_posts() ) :
 					'the_content'           => apply_filters( 'the_content', get_the_content() ),
 					'via_url'               => get_the_guid(),
 					'instagram_username'    => Daddio_Instagram::get_instagram_username(),
-					'daddio_content_footer' => Sprig::do_action( 'daddio_content_footer', get_post() ),
 				);
 				$templates[] = 'content-instagram.twig';
 				break;
@@ -26,7 +25,6 @@ if ( have_posts() ) :
 				$context = array(
 					'the_title'             => get_the_title(),
 					'the_content'           => apply_filters( 'the_content', get_the_content() ),
-					'daddio_content_footer' => Sprig::do_action( 'daddio_content_footer', get_post() ),
 				);
 				$templates[] = 'content-page.twig';
 				break;
@@ -39,7 +37,6 @@ if ( have_posts() ) :
 					'the_machine_datetime'  => get_post_time( 'c', true ),
 					'child_age'             => Daddio_Dates::how_old_was_child(),
 					'the_content'           => apply_filters( 'the_content', get_the_content() ),
-					'daddio_content_footer' => Sprig::do_action( 'daddio_content_footer', get_post() ),
 				);
 				$templates[] = 'content-post.twig';
 		}
