@@ -1,8 +1,6 @@
-{{ daddio_attachment_before_template_part }}
+{{ parent_link }}
 
 <article class="article attachment-{{ attachment_type|esc_attr }}">
-	{{ daddio_content_header }}
-
 	<div class="inner">
 		<h1 class="title" title="{{ how_old|esc_attr }}">
 			{{ the_title }}
@@ -12,8 +10,6 @@
 			{{ the_content }}
 		</div>
 	</div>
-
-	{{ daddio_content_footer }}
 </article>
 
-{{ daddio_attachment_after_article }}
+{{ gallery_navigation }}

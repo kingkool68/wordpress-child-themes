@@ -1,8 +1,8 @@
 <?php
 class Daddio_Post_Galleries {
 
-	private $cache_key = 'daddio_post_galleries_nav';
-	private $cache_group = 'daddio_post_galleries_cache_group';
+	private static $cache_key   = 'daddio_post_galleries_nav';
+	private static $cache_group = 'daddio_post_galleries_cache_group';
 
 	/**
 	 * Get an instance of this class
@@ -25,8 +25,6 @@ class Daddio_Post_Galleries {
 		add_action( 'parse_request', array( $this, 'action_parse_request' ) );
 		add_action( 'template_redirect', array( $this, 'action_template_redirect' ) );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ) );
-		add_action( 'daddio_attachment_before_template_part', array( $this, 'action_daddio_attachment_before_template_part' ) );
-		add_action( 'daddio_attachment_after_article', array( $this, 'action_daddio_attachment_after_article' ) );
 		add_action( 'wpseo_head', array( $this, 'action_wpseo_head' ) );
 	}
 
@@ -47,7 +45,7 @@ class Daddio_Post_Galleries {
 	 */
 	public function action_init() {
 		// Setup a non-persistant caching group
-		wp_cache_add_non_persistent_groups( $this->cache_group );
+		wp_cache_add_non_persistent_groups( self::$cache_group );
 
 		// Register script
 		wp_register_script(
@@ -84,7 +82,7 @@ class Daddio_Post_Galleries {
 	 * If the request is a post gallery and not for an attachment then redirect
 	 */
 	public function action_template_redirect() {
-		if ( $this->is_post_gallery() && ! get_query_var( 'attachment' ) ) {
+		if ( self::is_post_gallery() && ! get_query_var( 'attachment' ) ) {
 			wp_redirect( get_permalink( get_the_ID() ), 301 );
 			die();
 		}
@@ -97,7 +95,7 @@ class Daddio_Post_Galleries {
 	 */
 	public function action_pre_get_posts( $query ) {
 		if (
-			$this->is_post_gallery()
+			self::is_post_gallery()
 			&& get_query_var( 'attachment' )
 			&& $query->is_main_query()
 		) {
@@ -107,59 +105,10 @@ class Daddio_Post_Galleries {
 	}
 
 	/**
-	 * Render the parent post link at the top of the attachment template
-	 *
-	 * @param  WP_Post $post The post data of the attachment being rendered
-	 */
-	public function action_daddio_attachment_before_template_part( $post ) {
-		if ( ! $this->is_post_gallery() ) {
-			return;
-		}
-
-		$nav = $this->get_nav();
-		$parent_post = $nav->parent;
-	?>
-
-	<p class="parent-post">
-		<a href="<?php echo get_permalink( $parent_post->ID ); ?>">
-			<span class="arrow">&larr;</span> <?php echo $parent_post->post_title; ?>
-		</a>
-	</p>
-
-	<?php
-	}
-
-	/**
-	 * Render the gallery navigation at the bottom of the attachment template
-	 *
-	 * @param  WP_Post $post The post data of the attachment being rendered
-	 */
-	public function action_daddio_attachment_after_article( $post ) {
-		if ( ! $this->is_post_gallery() ) {
-			return;
-		}
-
-		$nav = $this->get_nav();
-		$parent_post = $nav->parent;
-
-		wp_enqueue_script( 'post-gallery' );
-	?>
-
-	<nav>
-		<a href="<?php echo $nav->next_permalink ?>#content" class="next rounded-button">Next <span class="arrow">&rarr;</span></a>
-		<a href="<?php echo $nav->prev_permalink ?>#content" class="prev rounded-button"><span class="arrow">&larr;</span> Prev</a>
-		<p class="progress"><?php echo $nav->current;?>/<?php echo $nav->total;?></p>
-	</nav>
-
-	<input type="hidden" id="post-gallery-urls" value="<?php esc_attr_e( implode( ' ', $nav->attachments ) ); ?>">
-	<?php
-	}
-
-	/**
 	 * Add noindex to pages that have the size query var added
 	 */
 	public function action_wpseo_head() {
-		if ( $this->is_post_gallery() && get_query_var( 'size' ) ) {
+		if ( self::is_post_gallery() && get_query_var( 'size' ) ) {
 			echo '<meta name="robots" content="noindex">' . PHPEOL;
 		}
 	}
@@ -198,7 +147,7 @@ class Daddio_Post_Galleries {
 	 * @return string|false          The URL to redirect to or false to cancel the redirect
 	 */
 	public function filter_redirect_canonical( $redirect_url = '', $requested_url = '' ) {
-		if ( $this->is_post_gallery() ) {
+		if ( self::is_post_gallery() ) {
 			return false;
 		}
 		return $redirect_url;
@@ -212,7 +161,7 @@ class Daddio_Post_Galleries {
 	 * @return string                The possibly modified template to use
 	 */
 	public function filter_template_include( $orig_template = '' ) {
-		if ( $this->is_post_gallery() ) {
+		if ( self::is_post_gallery() ) {
 			if ( $new_template = get_attachment_template() ) {
 				return $new_template;
 			}
@@ -232,9 +181,9 @@ class Daddio_Post_Galleries {
 	 */
 	public function filter_wpseo_canonical( $canonical = '' ) {
 		$post = get_post();
-		if ( $this->is_post_gallery() ) {
-			$nav = $this->get_nav();
-			return $this->get_post_gallery_link( $nav->parent->ID, $post->post_name );
+		if ( self::is_post_gallery() ) {
+			$nav = self::get_nav();
+			return self::get_post_gallery_link( $nav->parent->ID, $post->post_name );
 		}
 		return $canonical;
 	}
@@ -244,7 +193,7 @@ class Daddio_Post_Galleries {
 	 *
 	 * @return boolean Whether the request is a post gallery request
 	 */
-	public function is_post_gallery() {
+	public static function is_post_gallery() {
 		if ( get_query_var( 'post_gallery' ) == '1' ) {
 			return true;
 		}
@@ -257,12 +206,12 @@ class Daddio_Post_Galleries {
 	 * @param  integer $post_id ID of the post to get data for
 	 * @return object           Post gallery data
 	 */
-	public function get_gallery_posts( $post_id = 0 ) {
-		if ( ! $this->is_post_gallery() || ! get_query_var( 'attachment' ) ) {
+	public static function get_gallery_posts( $post_id = 0 ) {
+		if ( ! self::is_post_gallery() || ! get_query_var( 'attachment' ) ) {
 			return array();
 		}
 
-		$post = get_post( $post_id );
+		$post    = get_post( $post_id );
 		$post_id = $post->ID;
 
 		$parent_post = get_page_by_path( get_query_var( 'original_name' ), 'OBJECT', get_post_types() );
@@ -289,7 +238,7 @@ class Daddio_Post_Galleries {
 			$atts      = shortcode_parse_atts( $atts );
 			$sort_args = wp_parse_args( $atts, $defaults );
 			if ( ! empty( $sort_args['ids'] ) ) {
-				$haystack = $sort_args['ids']
+				$haystack = $sort_args['ids'];
 				// Make it easier to match IDs while avoiding partial matches.
 				// Searching for "1" in "9,10,11" would be a false positive
 				// so we normalize everything with a trailing comma.
@@ -322,7 +271,7 @@ class Daddio_Post_Galleries {
 				'post_name'        => $post->post_name,
 				'post_title'       => $post->post_title,
 				'post_url'         => get_permalink( $post->ID ),
-				'post_gallery_url' => $this->get_post_gallery_link( $parent_post->ID, $post->post_name ),
+				'post_gallery_url' => self::get_post_gallery_link( $parent_post->ID, $post->post_name ),
 			);
 		endforeach;
 
@@ -334,13 +283,13 @@ class Daddio_Post_Galleries {
 	 *
 	 * @return object Gallery post navigation data
 	 */
-	public function get_nav() {
+	public static function get_nav() {
 		// Inter request caching
-		if ( $output = wp_cache_get( $this->cache_key, $this->cache_group ) ) {
+		if ( $output = wp_cache_get( self::$cache_key, self::$cache_group ) ) {
 			return $output;
 		}
 
-		$posts = $this->get_gallery_posts();
+		$posts = self::get_gallery_posts();
 		if ( ! $posts ) {
 			return array();
 		}
@@ -377,12 +326,12 @@ class Daddio_Post_Galleries {
 		$output = (object) array(
 			'attachments'    => $attachments,
 			'parent'         => get_post( $posts->parent_id ),
-			'next_permalink' => $this->get_post_gallery_link( $posts->parent_id, $next_slug ),
-			'prev_permalink' => $this->get_post_gallery_link( $posts->parent_id, $prev_slug ),
+			'next_permalink' => self::get_post_gallery_link( $posts->parent_id, $next_slug ),
+			'prev_permalink' => self::get_post_gallery_link( $posts->parent_id, $prev_slug ),
 			'total'          => $total_attachments,
 			'current'        => $current + 1,
 		);
-		wp_cache_set( $this->cache_key, $output, $this->cache_group );
+		wp_cache_set( self::$cache_key, $output, self::$cache_group );
 		return $output;
 	}
 
@@ -393,7 +342,7 @@ class Daddio_Post_Galleries {
 	 * @param  string  $attachment_slug Slug of the gallery item
 	 * @return string                   URL of post gallery permalink
 	 */
-	public function get_post_gallery_link( $parent_id = 0, $attachment_slug = '' ) {
+	public static function get_post_gallery_link( $parent_id = 0, $attachment_slug = '' ) {
 		if ( ! $parent_id || ! $attachment_slug ) {
 			return '';
 		}
@@ -560,7 +509,7 @@ class Daddio_Post_Galleries {
 		}
 		if ( $permalink ) {
 			//$url = get_attachment_link( $_post->ID );
-			$url = $this->get_post_gallery_link( $parent_post->ID, $_post->post_name );
+			$url = self::get_post_gallery_link( $parent_post->ID, $_post->post_name );
 		}
 
 		if ( $text ) {
@@ -588,6 +537,48 @@ class Daddio_Post_Galleries {
 		 * @param string|bool $text      If string, will be link text. Default false.
 		 */
 		return apply_filters( 'wp_get_attachment_link', "<a href='$url'>$link_text</a>", $id, $size, $permalink, $icon, $text );
+	}
+
+	/**
+	 * Render the parent post link at the top of the attachment template
+	 */
+	public static function render_parent_post_link() {
+		if ( ! self::is_post_gallery() ) {
+			return;
+		}
+
+		$nav         = self::get_nav();
+		$parent_post = $nav->parent;
+
+		$context = array(
+			'parent_post_url'   => get_permalink( $parent_post->ID ),
+			'parent_post_title' => get_the_title( $parent_post ),
+		);
+		return Sprig::render( 'post-gallery-parent-post-link.twig', $context );
+	}
+
+	/**
+	 * Render the gallery navigation at the bottom of the attachment template
+	 */
+	public static function render_gallery_navigation() {
+		if ( ! self::is_post_gallery() ) {
+			return;
+		}
+
+		$nav = self::get_nav();
+		$parent_post = $nav->parent;
+
+		wp_enqueue_script( 'post-gallery' );
+
+		$context = array(
+			'next_url'          => $nav->next_permalink . '#content',
+			'prev_url'          => $nav->prev_permalink . '#content',
+			'current'           => $nav->current,
+			'total'             => $nav->total,
+			'post_gallery_urls' => implode( ' ', $nav->attachments ),
+
+		);
+		return Sprig::render( 'post-gallery-navigation.twig', $context );
 	}
 }
 Daddio_Post_Galleries::get_instance();
