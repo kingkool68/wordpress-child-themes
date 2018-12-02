@@ -8,7 +8,6 @@ if ( have_posts() ) :
 		switch ( $post->post_type ) {
 			case 'instagram' :
 				$context = array(
-					'daddio_content_header' => Sprig::do_action( 'daddio_content_header', get_post() ),
 					'title'                 => get_the_title(),
 					'permalink_url'         => get_permalink(),
 					'the_time'              => get_the_time( Daddio_Dates::get_child_time_format() ),
@@ -34,7 +33,6 @@ if ( have_posts() ) :
 
 			default :
 				$context = array(
-					'daddio_content_header' => Sprig::do_action( 'daddio_content_header', get_post() ),
 					'title'                 => get_the_title(),
 					'permalink_url'         => get_permalink(),
 					'the_datetime'          => get_the_time( Daddio_Dates::get_child_time_format() ),
