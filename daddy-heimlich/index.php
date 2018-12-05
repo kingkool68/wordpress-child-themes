@@ -45,8 +45,11 @@ if ( have_posts() ) :
 endif;
 
 $context = array(
-	'before_content' => Sprig::do_action( 'daddio_before_content', get_post() ),
+	'archive_header' => Daddio_Archive::get_archive_header(),
 	'the_content'    => implode( "\n", $the_content ),
 	'pagination'     => Daddio_Pagination::render_from_wp_query(),
 );
+if ( Daddio_On_This_Day::is_on_this_day() ) {
+	$context['archive_header'] = Daddio_On_This_Day::get_switch_date_form();
+}
 Sprig::out( 'index.twig', $context );

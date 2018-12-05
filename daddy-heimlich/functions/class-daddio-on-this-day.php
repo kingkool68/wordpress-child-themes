@@ -22,7 +22,6 @@ class Daddio_On_This_Day {
 	public function setup_actions() {
 		add_action( 'template_redirect', array( $this, 'action_template_redirect' ) );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ), 9 );
-		add_action( 'daddio_before_content', array( $this, 'action_daddio_before_content' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'action_wp_enqueue_scripts' ) );
 	}
 
@@ -190,9 +189,9 @@ class Daddio_On_This_Day {
 	 * Conditional for determining if the current request is a On This Day request
 	 * @return boolean Whether the request is an On This Day request
 	 */
-	public function is_on_this_day() {
+	public static function is_on_this_day() {
 		$month = get_query_var( 'zah-on-this-month' );
-		$day = get_query_var( 'zah-on-this-day' );
+		$day   = get_query_var( 'zah-on-this-day' );
 		return ( $month && $day );
 	}
 
@@ -236,16 +235,6 @@ class Daddio_On_This_Day {
 			'the_day'   => get_query_var( 'zah-on-this-day' ),
 		);
 		return Sprig::render( 'on-this-day-switch-date-form.twig', $context );
-	}
-
-	/**
-	 * Load On This Day form at the top of the page
-	 */
-	public function action_daddio_before_content() {
-		if ( ! $this->is_on_this_day() ) {
-			return;
-		}
-		echo self::get_switch_date_form();
 	}
 
 	/**
