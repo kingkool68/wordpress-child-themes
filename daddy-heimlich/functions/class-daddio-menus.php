@@ -19,7 +19,6 @@ class Daddio_Menus {
 	public function setup_actions() {
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'action_wp_enqueue_scripts' ) );
-		add_action( 'daddio_footer', array( $this, 'action_daddio_footer' ) );
 	}
 
 	/**
@@ -52,32 +51,6 @@ class Daddio_Menus {
 	}
 
 	/**
-	 * Output the markup for the menu in the footer of the site using a custom action
-	 */
-	public function action_daddio_footer() {
-		$args = array(
-			'theme_location' => 'more-menu',
-			'container'      => false,
-			'menu_class'     => false,
-			'menu_id'        => false,
-			'echo'           => false,
-		);
-		$more_menu = wp_nav_menu( $args );
-
-		$context = array(
-			'more_menu'              => $more_menu,
-			'github_icon'            => $this->get_svg_icon( 'github' ),
-			'instagram_icon'         => $this->get_svg_icon( 'instagram' ),
-			'facebook_icon'          => $this->get_svg_icon( 'facebook' ),
-			'child_name'             => CHILD_NAME,
-			'child_instagram_handle' => CHILD_INSTAGRAM_HANDLE,
-			'child_facebook_url'     => CHILD_FACEBOOK_URL,
-
-		);
-		Sprig::out( 'more-menu.twig', $context );
-	}
-
-	/**
 	 * Add the More menu item to the main menu
 	 *
 	 * @param  string $items HTML of the menu items
@@ -105,12 +78,38 @@ class Daddio_Menus {
 		return $attr;
 	}
 
-	public function get_svg_icon( $icon = '' ) {
+	public static function get_svg_icon( $icon = '' ) {
 		if ( ! $icon ) {
 			return;
 		}
 
 		return '<svg class="icon icon-' . esc_attr( $icon ) . '" role="img"><use xlink:href="#icon-' . esc_attr( $icon ) . '"></use></svg>';
+	}
+
+	/**
+	 * Output the markup for the More Menu
+	 */
+	public static function get_more_menu() {
+		$args = array(
+			'theme_location' => 'more-menu',
+			'container'      => false,
+			'menu_class'     => false,
+			'menu_id'        => false,
+			'echo'           => false,
+		);
+		$more_menu = wp_nav_menu( $args );
+
+		$context = array(
+			'more_menu'              => $more_menu,
+			'github_icon'            => self::get_svg_icon( 'github' ),
+			'instagram_icon'         => self::get_svg_icon( 'instagram' ),
+			'facebook_icon'          => self::get_svg_icon( 'facebook' ),
+			'child_name'             => CHILD_NAME,
+			'child_instagram_handle' => CHILD_INSTAGRAM_HANDLE,
+			'child_facebook_url'     => CHILD_FACEBOOK_URL,
+
+		);
+		return Sprig::render( 'more-menu.twig', $context );
 	}
 }
 Daddio_Menus::get_instance();

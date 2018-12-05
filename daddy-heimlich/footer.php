@@ -1,1 +1,1 @@
-<?php do_action( 'daddio_footer' );
+<?php echo Daddio_Menus::get_more_menu();
