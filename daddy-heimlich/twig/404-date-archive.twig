@@ -1,0 +1,18 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+
+	<div id="content">
+		<article class="article page">
+			<h1 class="title">Nothing Found!</h1>
+			<p class="date-explanation">
+				{% if tense == 'past' %}
+					{{ date }} was {{ age }} before {{ child_name }} &rsquo;s birthday.
+				{% else %}
+					{{ future_prefix }} {{ date }} {{ child_name }} will be {{ age }} old.
+				{% endif %}
+			</p>
+		</article>
+	</div>
+
+{% endblock %}
