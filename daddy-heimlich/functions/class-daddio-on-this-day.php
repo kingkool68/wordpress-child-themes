@@ -20,9 +20,9 @@ class Daddio_On_This_Day {
 	 * Hook in to WordPress via actions
 	 */
 	public function setup_actions() {
+		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'template_redirect', array( $this, 'action_template_redirect' ) );
 		add_action( 'pre_get_posts', array( $this, 'action_pre_get_posts' ), 9 );
-		add_action( 'wp_enqueue_scripts', array( $this, 'action_wp_enqueue_scripts' ) );
 	}
 
 	/**
@@ -35,33 +35,10 @@ class Daddio_On_This_Day {
 	}
 
 	/**
-	 * Make WordPress aware of our custom query vars
-	 *
-	 * @param  array $vars Query vars to modify
-	 * @return array       Modified query vars
+	 * Rgister the On This Day JavaScript
 	 */
-	public function filter_query_vars( $vars = array() ) {
-		$vars[] = 'zah-on-this-month';
-		$vars[] = 'zah-on-this-day';
-
-		return $vars;
-	}
-
-	/**
-	 * Add custom rewrite rules so the On This Day feature works
-	 *
-	 * @param  array $rules Rewrite rules
-	 * @return array        Modified rewrite rules
-	 */
-	public function filter_rewrite_rules_array( $rules = array() ) {
-		global $wp_rewrite;
-
-		$root = $wp_rewrite->root . $this->pagename;
-		$new_rules = array(
-			$root . '/([0-9]{2})/([0-9]{2})/?' => 'index.php?pagename=' . $this->pagename . '&zah-on-this-month=$matches[1]&zah-on-this-day=$matches[2]',
-		);
-
-		return $new_rules + $rules;
+	public function action_init() {
+		wp_register_script( 'on-this-day', get_template_directory_uri() . '/js/on-this-day.js', array( 'jquery' ), null, true );
 	}
 
 	/**
@@ -119,30 +96,6 @@ class Daddio_On_This_Day {
 	}
 
 	/**
-	 * Handle 404 template for On this Day errors
-	 *
-	 * @param  string $template The current template to be used as chosen by WordPress
-	 * @return string           Maybe modified template
-	 */
-	public function filter_template_include( $template = '' ) {
-		global $wp_query;
-		$month = get_query_var( 'zah-on-this-month' );
-		$day = get_query_var( 'zah-on-this-day' );
-
-		if ( $month && $day && is_404() ) {
-			$template_paths = array(
-				'404-' . $this->pagename . '.php',
-				'404.php',
-			);
-			if ( $new_template = locate_template( $template_paths ) ) {
-				return $new_template;
-			}
-		}
-
-		return $template;
-	}
-
-	/**
 	 * Modify the query for On This Day requests
 	 *
 	 * @param  WP_Query $query The query
@@ -183,6 +136,59 @@ class Daddio_On_This_Day {
 		$query->is_404     = false;
 		$query->is_date    = true;
 		$query->is_archive = true;
+	}
+
+	/**
+	 * Make WordPress aware of our custom query vars
+	 *
+	 * @param  array $vars Query vars to modify
+	 * @return array       Modified query vars
+	 */
+	public function filter_query_vars( $vars = array() ) {
+		$vars[] = 'zah-on-this-month';
+		$vars[] = 'zah-on-this-day';
+
+		return $vars;
+	}
+
+	/**
+	 * Add custom rewrite rules so the On This Day feature works
+	 *
+	 * @param  array $rules Rewrite rules
+	 * @return array        Modified rewrite rules
+	 */
+	public function filter_rewrite_rules_array( $rules = array() ) {
+		global $wp_rewrite;
+
+		$root = $wp_rewrite->root . $this->pagename;
+		$new_rules = array(
+			$root . '/([0-9]{2})/([0-9]{2})/?' => 'index.php?pagename=' . $this->pagename . '&zah-on-this-month=$matches[1]&zah-on-this-day=$matches[2]',
+		);
+
+		return $new_rules + $rules;
+	}
+
+	/**
+	 * Handle 404 template for On this Day errors
+	 *
+	 * @param  string $template The current template to be used as chosen by WordPress
+	 * @return string           Maybe modified template
+	 */
+	public function filter_template_include( $template = '' ) {
+		global $wp_query;
+		$month = get_query_var( 'zah-on-this-month' );
+		$day = get_query_var( 'zah-on-this-day' );
+
+		if ( $month && $day && is_404() ) {
+			$template_paths = array(
+				'404-' . $this->pagename . '.php',
+				'404.php',
+			);
+			if ( $new_template = locate_template( $template_paths ) ) {
+				return $new_template;
+			}
+		}
+		return $template;
 	}
 
 	/**
@@ -235,13 +241,6 @@ class Daddio_On_This_Day {
 			'the_day'   => get_query_var( 'zah-on-this-day' ),
 		);
 		return Sprig::render( 'on-this-day-switch-date-form.twig', $context );
-	}
-
-	/**
-	 * Rgister the On This Day JavaScript
-	 */
-	public function action_wp_enqueue_scripts() {
-		wp_register_script( 'on-this-day', get_template_directory_uri() . '/js/on-this-day.js', array( 'jquery' ), null, true );
 	}
 }
 Daddio_On_This_Day::get_instance();
