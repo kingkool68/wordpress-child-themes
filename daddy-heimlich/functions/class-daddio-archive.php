@@ -176,6 +176,10 @@ class Daddio_Archive {
 			$subheading = implode( $separator, $subheading );
 		}
 
+		if ( empty( $heading ) ) {
+			return;
+		}
+
 		$context = array(
 			'heading'    => $heading,
 			'subheading' => $subheading,
