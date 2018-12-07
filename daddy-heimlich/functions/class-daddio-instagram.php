@@ -10,17 +10,17 @@ class Daddio_Instagram {
 	public static function get_instance() {
 		static $instance = null;
 		if ( null === $instance ) {
-			// Late static binding (PHP 5.3+)
 			$instance = new static();
-			$instance->setup_hooks();
+			$instance->setup_actions();
+			$instance->setup_filters();
 		}
 		return $instance;
 	}
 
 	/**
-	 * Hook in to WordPress via actions and filters
+	 * Hook in to WordPress via actions
 	 */
-	public function setup_hooks() {
+	public function setup_actions() {
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
 		add_action( 'before_delete_post', array( $this, 'action_before_delete_post' ) );
@@ -29,7 +29,12 @@ class Daddio_Instagram {
 		add_action( 'manage_posts_custom_column' , array( $this, 'action_manage_posts_custom_column' ) );
 		add_action( 'restrict_manage_posts', array( $this, 'action_restrict_manage_posts' ) );
 		add_action( 'wp_dashboard_setup', array( $this, 'action_wp_dashboard_setup' ) );
+	}
 
+	/**
+	 * Hook in to WordPress via filters
+	 */
+	public function setup_filters() {
 		add_filter( 'the_content', array( $this, 'filter_the_content' ) );
 		add_filter( 'manage_instagram_posts_columns', array( $this, 'filter_manage_instagram_posts_columns' ) );
 	}
@@ -191,7 +196,7 @@ class Daddio_Instagram {
 			break;
 
 			case 'instagram_permalink':
-				echo '<a href="' . esc_url( $post->guid ) . '" target="_blank">@' . get_instagram_username() . '</a>';
+				echo '<a href="' . esc_url( $post->guid ) . '" target="_blank">@' . self::get_instagram_username() . '</a>';
 			break;
 		}
 
@@ -488,26 +493,16 @@ class Daddio_Instagram {
 		<?php
 	}
 
-
-
-	// Helper Methods
-
-	/**
-	 * Set text/html mime type for emails
-	 */
-	public function set_html_content_type() {
-		return 'text/html';
-	}
-
 	/**
 	 * Given an HTML page from Instagram, return a JSON of the data from that page
+	 *
+	 * @link https://github.com/raiym/instagram-php-scraper/blob/849f464bf53f84a93f86d1ecc6c806cc61c27fdc/src/InstagramScraper/Instagram.php#L32
 	 *
 	 * @param  string $html HTML from an Instagram URL
 	 * @return json         Instagram data embedded in the page
 	 */
 	public function get_instagram_json_from_html( $html = '' ) {
-		// Parse the page response and extract the JSON string.
-		// via https://github.com/raiym/instagram-php-scraper/blob/849f464bf53f84a93f86d1ecc6c806cc61c27fdc/src/InstagramScraper/Instagram.php#L32
+		// Parse the page response and extract the JSON string
 		$arr = explode( 'window._sharedData = ', $html );
 		$json = explode( ';</script>', $arr[1] );
 		$json = $json[0];
@@ -684,6 +679,7 @@ class Daddio_Instagram {
 
 	/**
 	 * Makes sure the node data is from a single page otherwise it fetches a single page's data
+	 *
 	 * @param  object $node Instagram node data
 	 * @return object       Instagram node data
 	 */
@@ -852,16 +848,9 @@ class Daddio_Instagram {
 	 * @param  Integer $post_id  Post ID get the username for
 	 * @return String            Instagram username
 	 */
-	public function get_instagram_username( $post_id = false ) {
-		if ( $post_id ) {
-			$post_id = intval( $post_id );
-		}
-
-		if ( ! $post_id ) {
-			$post_id = get_the_ID();
-		}
-
-		$output = get_post_meta( $post_id, 'instagram_username', true );
+	public static function get_instagram_username( $post_id = false ) {
+		$post = get_post( $post_id );
+		$output = get_post_meta( $post->ID, 'instagram_username', true );
 		if ( ! $output ) {
 			$output = '';
 		}
@@ -932,10 +921,5 @@ class Daddio_Instagram {
 		}
 	}
 }
-Daddio_Instagram::get_instance();
 
-// Global helper functions
-function get_instagram_username( $post_id = false ) {
-	$daddio_instagram = Daddio_Instagram::get_instance();
-	return $daddio_instagram->get_instagram_username( $post_id );
-}
+Daddio_Instagram::get_instance();

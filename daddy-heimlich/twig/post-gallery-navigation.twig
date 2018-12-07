@@ -1,0 +1,11 @@
+<nav>
+	<a href="{{ next_url|esc_url }}" class="next rounded-button">
+		Next <span class="arrow" aria-hidden="true">&rarr;</span>
+	</a>
+	<a href="{{ prev_url|esc_url }}" class="prev rounded-button">
+		<span class="arrow" aria-hidden="true">&larr;</span> Prev
+	</a>
+	<p class="progress">{{ current }}/{{ total }}</p>
+</nav>
+
+<input type="hidden" id="post-gallery-urls" value="{{ post_gallery_urls|esc_attr }}">

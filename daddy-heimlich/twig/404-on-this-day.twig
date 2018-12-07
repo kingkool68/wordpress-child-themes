@@ -1,0 +1,11 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+
+	{{ switch_date_form }}
+	<div id="content">
+		<article class="article page">
+			<h1 class="title">Nothing happened on {{ the_date }}</h1>
+		</article>
+	</div>
+{% endblock %}

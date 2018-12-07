@@ -1,0 +1,21 @@
+<form class="on-this-day-date-switcher" action="<{{ site_url|esc_url }}/on-this-day/">
+	<label class="hidden" for="zah-on-this-month">Select a month</label>
+	<select name="zah-on-this-month" id="zah-on-this-month">
+		{% for val, month in months %}
+			<option value="{{ val|esc_attr }}" {{ selected( val, the_month ) }}>{{ month }}</option>
+		{% endfor %}
+	</select>
+
+	<label class="hidden" for="zah-on-this-day">Select a day</label>
+	<select name="zah-on-this-day" id="zah-on-this-day">
+		{% for day in days %}
+			{% set val = loop.index %}
+			{% if ( val < 10 ) %}
+				{% set val = 0 ~ val %}
+			{% endif %}
+			<option value="{{ val|esc_attr }}" {{ selected( val, the_day ) }}>{{ day }}</option>
+		{% endfor %}
+	</select>
+
+	<input type="submit" class="submit" value="Try Another Date">
+</form>

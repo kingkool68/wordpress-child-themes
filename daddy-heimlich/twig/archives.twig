@@ -1,0 +1,81 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+	<div id="content">
+		<section class="archive-header">
+			<h1 class="heading">Archives</h1>
+		</section>
+		<section class="archive-section date-archive">
+			<h2 class="heading">By Date</h2>
+			{% for year, month_data in month_archive_data %}
+				<h2 class="year-heading"><a href="{{ site_url|esc_url }}/{{ year }}/">{{ year }}</a></h2>
+				{% for month_num, month in month_data %}
+					{% if month.link %}
+
+					<a
+						href="{{ month.link|esc_url }}"
+						title="View {{ month.count|esc_attr }} items from {{ month.month_name|esc_attr }} {{ year|absint }}"
+						class="rounded-button item"
+					>
+						<span aria-label="{{ month.month_name|esc_attr }} {{ year|absint }}">
+							{{ month.month_abbr }}
+						</span>
+					</a>
+
+					{% else %}
+
+						<span
+							class="item rounded-button"
+							aria-label="{{ month.month_name|esc_attr }} {{ year|absint }}"
+						>
+							{{ month.month_abbr }}
+						</span>
+
+					{% endif %}
+				{% endfor %}
+			{% endfor %}
+		</section>
+
+		<section class="archive-section age-archive">
+			<h2 class="heading">By Age</h2>
+			<div class="age-group">
+				<h3 class="year-heading">
+					<a href="#">0 years</a>
+				</h3>
+				{% for item in age_archive_data %}
+					{% if not item.has_month  %}
+
+						</div>
+						<div class="age-group">
+							<h3 class="year-heading">
+								<a
+									href="{{ item.permalink|esc_url }}"
+									title="View {{ item.count|esc_attr }} items from when {{ child_name|esc_attr }} was {{ item.timestamp|esc_attr }} old"
+								>
+									{{ item.timestamp }}
+								</a>
+							</h3>
+
+					{% else %}
+
+						<a
+							href="{{ item.permalink|esc_url }}"
+							title="View {{ item.count|esc_attr }} items from when {{ child_name|esc_attr }} was {{ item.timestamp|esc_attr }} old"
+							class="age-item"
+						>
+							{{ item.timestamp }}
+						</a>
+
+					{% endif %}
+				{% endfor %}
+			</div>
+		</section>
+
+		{% if tag_cloud %}
+			<section class="archive-section tag-archive">
+				<h2 class="heading">By Tag</h2>
+				{{ tag_cloud }}
+			</section>
+		{% endif %}
+	</div>
+{% endblock %}

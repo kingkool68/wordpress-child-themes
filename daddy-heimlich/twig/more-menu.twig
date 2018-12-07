@@ -1,0 +1,44 @@
+<nav id="more-menu" class="more-menu">
+	<section>
+		<h2 class="title">Main Menu</h2>
+		<a href="#close" class="close" data-ga-category="nav" data-ga-label="Close">
+			<span aria-hidden="true">&times;</span>
+			<span class="alt-text">Close</span>
+		</a>
+
+		{{ more_menu }}
+
+		<p class="social-links">
+			<a
+				href="https://github.com/kingkool68/wordpress-child-themes"
+				class="github u-url"
+				title="The code that powers this site is on GitHub"
+				data-ga-category="nav"
+				data-ga-label="GitHub Icon"
+			>
+				{{ github_icon }}
+			</a>
+
+			<a
+				href="https://www.instagram.com/{{ child_instagram_handle|esc_attr }}/"
+				class="instagram u-url"
+				rel="me"
+				title="Follow {{ child_name|esc_attr }} on Instagram @{{ child_instagram_handle|esc_attr }}"
+				data-ga-category="nav"
+				data-ga-label="Instagram Icon"
+			>
+				{{ instagram_icon }}
+			</a>
+
+			<a
+				href="{{ child_facebook_url|esc_url }}"
+				title="{{ child_name|esc_attr }} is on Facebook"
+				data-ga-category="nav"
+				data-ga-label="Facebook Icon"
+				class="u-url"
+			>
+				{{ facebook_icon }}
+			</a>
+		</p>
+	</section>
+</nav>
