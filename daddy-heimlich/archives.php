@@ -3,6 +3,9 @@
 $month_archive_data = Daddio_Dates::get_monthly_archive_links();
 foreach ( $month_archive_data as $year => $month_data ) {
 	foreach ( $month_data as $month_num => $obj ) {
+		if ( ! is_object( $obj ) ) {
+			$obj = new stdClass;
+		}
 		$obj->month_abbr                           = date( 'M', strtotime( '2001-' . $month_num . '-01' ) );
 		$obj->month_name                           = date( 'F', strtotime( '2001-' . $month_num . '-01' ) );
 		$month_archive_data[ $year ][ $month_num ] = $obj;
