@@ -684,7 +684,8 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 /* End: Error */
 .mejs-container {
   clear: both;
-  max-width: 100%; }
+  max-width: 100%;
+  max-height: 100vh; }
 
 .mejs-container * {
   font-family: Helvetica, Arial; }
@@ -693,11 +694,14 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 .mejs-embed,
 .mejs-embed body,
 .mejs-container .mejs-controls {
-  background: #222; }
+  background: transparent; }
 
 .mejs-time {
   font-weight: normal;
   word-wrap: normal; }
+
+.mejs-controls {
+  display: none; }
 
 .mejs-controls a.mejs-horizontal-volume-slider {
   display: table; }
@@ -833,7 +837,6 @@ video.wp-video-shortcode,
 .wp-playlist-item .wp-playlist-caption {
   text-decoration: none;
   color: #000;
-  max-width: -webkit-calc(100% - 40px);
   max-width: calc(100% - 40px); }
 
 .wp-playlist-item-meta {
