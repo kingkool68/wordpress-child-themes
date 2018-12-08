@@ -156,8 +156,9 @@ class Daddio_Media {
 		$featured_image_id = get_post_thumbnail_id( $post->ID );
 		$featured_video_id = get_post_meta( $post->ID, '_video_id', true );
 		if ( $featured_video_id ) {
-			$video_src = wp_get_attachment_url( $featured_video_id );
-			$poster    = wp_get_attachment_image_src( $featured_image_id, 'full' );
+			$video_src  = wp_get_attachment_url( $featured_video_id );
+			$video_meta = wp_get_attachment_metadata( $featured_video_id );
+			$poster     = wp_get_attachment_image_src( $featured_image_id, 'full' );
 			if ( ! empty( $poster[0] ) ) {
 				$poster = $poster[0];
 			}
@@ -166,6 +167,18 @@ class Daddio_Media {
 					'src'    => $video_src,
 					'poster' => $poster,
 				);
+
+				// Set the width and height to null to make the player responsive
+				// We store the src_width and src_height in case we want to
+				// calculate a proper aspect ratio for responsive scaling
+				if ( ! empty( $video_meta['width'] ) ) {
+					$args['src_width'] = $video_meta['width'];
+					$args['width'] = null;
+				}
+				if ( ! empty( $video_meta['height'] ) ) {
+					$args['src_height'] = $video_meta['height'];
+					$args['height'] = null;
+				}
 				ob_start();
 				echo wp_video_shortcode( $args );
 				return ob_get_clean();
