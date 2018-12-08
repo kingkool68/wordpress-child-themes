@@ -181,17 +181,17 @@ class Daddio_Media {
 				}
 				$output = wp_video_shortcode( $args );
 
-				// Set the width and height attributes of the <video> element
-				// Mediaelement.js uses these to figure out the dimensions to display the player
-				if ( ! empty( $args['src_width'] ) ) {
-					$replacement = sprintf( 'width="%d"', absint( $args['src_width'] ) );
-					$output = str_replace( 'width="0"', $replacement, $output );
+				// Set the width and height of the <video> element to 100%
+				// CSS is already in place to make videos responsive
+				// and the 100% values make poster images responsive as well
+				if ( ! empty( $args['src_width'] ) && ! empty( $args['src_height'] ) ) {
+					$aspect_ratio = $args['src_height'] / $args['src_width'] * 100;
+					$aspect_ratio = round( $aspect_ratio, 2 );
+					$output = str_replace( 'width="0"', 'data-aspect-ratio="' . $aspect_ratio . '%" width="100%"', $output );
+					$output = str_replace( 'height="0"', 'height="100%"', $output );
 				}
 
-				if ( ! empty( $args['src_height'] ) ) {
-					$replacement = sprintf( 'height="%d"', absint( $args['src_height'] ) );
-					$output = str_replace( 'height="0"', $replacement, $output );
-				}
+
 				return $output;
 			}
 		}

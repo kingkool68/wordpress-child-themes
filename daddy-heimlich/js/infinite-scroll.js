@@ -148,13 +148,19 @@ jQuery(document).ready(function($) {
 				// Update the #pagination button with the value from the AJAX'd page
 				$('#pagination').before( $data.find('#pagination').outerHTML() ).remove();
 
-				// Unblock more requests (reset loading status)
-				scrollLoading = false;
-
 				// Instantiate media element player for new video and audio elements injected on to the page
 				if( typeof $.fn.mediaelementplayer === 'function' ) {
-					$('video,audio').mediaelementplayer();
+					$('video').mediaelementplayer({
+						success: function( mediaelement, elem ) {
+							$elem = $(elem);
+							var aspectRatio = $elem.data('aspect-ratio');
+							$elem.parents('.mejs-container').css( 'paddingTop', aspectRatio );
+						}
+					});
 				}
+
+				// Unblock more requests (reset loading status)
+				scrollLoading = false;
 
 				// Fire off a Google Analytics event
 				if( typeof __gaTracker === 'function' ) {
@@ -180,7 +186,6 @@ jQuery(document).ready(function($) {
 	$window.on('scroll', function() {
 		toInfinityAndBeyond();
 	});
-
 });
 
 // Get the HTML of the entire element in a selector instead of just child elements.
@@ -188,3 +193,11 @@ jQuery(document).ready(function($) {
 jQuery.fn.outerHTML = function() {
   return jQuery('<div />').append( this.eq(0).clone() ).html();
 };
+
+jQuery(document).ready(function($) {
+	$('video[data-aspect-ratio]').each(function(i, elem) {
+		$elem = $(elem);
+		var aspectRatio = $elem.data('aspect-ratio');
+		$elem.parents('.mejs-container').css( 'paddingTop', aspectRatio );
+	});
+});
