@@ -179,9 +179,20 @@ class Daddio_Media {
 					$args['src_height'] = $video_meta['height'];
 					$args['height'] = null;
 				}
-				ob_start();
-				echo wp_video_shortcode( $args );
-				return ob_get_clean();
+				$output = wp_video_shortcode( $args );
+
+				// Set the width and height attributes of the <video> element
+				// Mediaelement.js uses these to figure out the dimensions to display the player
+				if ( ! empty( $args['src_width'] ) ) {
+					$replacement = sprintf( 'width="%d"', absint( $args['src_width'] ) );
+					$output = str_replace( 'width="0"', $replacement, $output );
+				}
+
+				if ( ! empty( $args['src_height'] ) ) {
+					$replacement = sprintf( 'height="%d"', absint( $args['src_height'] ) );
+					$output = str_replace( 'height="0"', $replacement, $output );
+				}
+				return $output;
 			}
 		}
 
