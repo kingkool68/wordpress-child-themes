@@ -111,6 +111,9 @@ class Daddio_Dates {
 	 * @return string       The time with additional markup added
 	 */
 	public function filter_the_time( $time = '' ) {
+		if ( is_admin() ) {
+			return $time;
+		}
 		return preg_replace( '/(\d+):(\d+) (am|pm)/i', '<span class="time">$1<span class="colon">:</span>$2 <span class="am-pm">$3</span></span>', $time );
 	}
 
