@@ -141,6 +141,10 @@ class Daddio_Instagram {
 			&& ! is_admin()
 		) {
 			$query->set( 'post_type', array( 'post', 'instagram' ) );
+			$query->set( 'orderby', array(
+				'date' => 'DESC',
+				'ID'   => 'DESC',
+			) );
 		}
 	}
 
