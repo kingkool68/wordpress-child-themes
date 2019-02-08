@@ -195,7 +195,7 @@ class Daddio_Instagram {
 				}
 
 				$img = wp_get_attachment_image_src( $featured_id, 'thumbnail' );
-				echo '<a href="' . esc_url( get_permalink( $post->ID ) ) . '"><img src="' . esc_url( $img[0] ) . '" width="' . esc_attr( $img[1] ) . '" height="' . esc_attr( $img[2] ) . '"></a>';
+				echo '<a href="' . esc_url( get_permalink( $post->ID ) ) . '"><img src="' . esc_url( $img[0] ) . '" width="' . esc_attr( $img[1] ) . '" height="' . esc_attr( $img[2] ) . '" style="height: auto; max-width: 100%;"></a>';
 
 			break;
 
