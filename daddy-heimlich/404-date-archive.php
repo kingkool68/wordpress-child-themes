@@ -30,14 +30,15 @@ if ( $year && $month && $day ) {
 	$levels      = 3;
 }
 
-$tense = 'future';
-if ( $relative_date->format( 'U' ) < date( 'U' ) ) {
-	$tense = 'past';
-}
 $relative_date   = new DateTime( $timestamp );
 $offset          = $relative_date->format( 'U' ) - date( 'U' );
 $calculated_date = $offset + Daddio_Dates::get_childs_birthday(); // integer since epoch
 $smallest_unit   = Daddio_Dates::get_smallest_time_unit( $timestamp );
+
+$tense = 'future';
+if ( $relative_date->format( 'U' ) < date( 'U' ) ) {
+	$tense = 'past';
+}
 
 $age  = Daddio_Dates::get_childs_birthday_diff( $levels, $relative_date->format( 'U' ) );
 $date = $relative_date->format( $time_format );
