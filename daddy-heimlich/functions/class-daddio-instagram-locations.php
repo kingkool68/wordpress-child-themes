@@ -359,12 +359,13 @@ class Daddio_Instagram_Locations {
 	public function get_location_data_from_node( $node ) {
 		$location_term_id = false;
 		if ( ! empty( $node->location_id ) ) {
-			$location_args    = array(
+			$location_args = array(
 				'id'              => $node->location_id,
 				'name'            => $node->location_name,
 				'slug'            => $node->location_slug,
 				'has_public_page' => $node->location_has_public_page,
 			);
+			wp_dump( $location_args );
 			$location_term_id = $this->maybe_add_location( $location_args );
 			return $this->get_location_data( $location_term_id );
 		}
@@ -446,6 +447,7 @@ class Daddio_Instagram_Locations {
 			'lat'             => '',
 			'lng'             => '',
 			'slug'            => '',
+			'blurb'           => '',
 		);
 		if ( isset( $raw_location_data->entry_data->LocationsPage[0]->location ) ) {
 			$location_obj = $raw_location_data->entry_data->LocationsPage[0]->location;
@@ -455,10 +457,21 @@ class Daddio_Instagram_Locations {
 				}
 			}
 		}
+		if ( isset( $raw_location_data->entry_data->LocationsPage[0]->graphql->location ) ) {
+			$location_obj = $raw_location_data->entry_data->LocationsPage[0]->graphql->location;
+			foreach ( $location_data as $key => $val ) {
+				if ( isset( $location_obj->{ $key } ) ) {
+					$location_data[ $key ] = $location_obj->{ $key };
+				}
+			}
+			$address = json_decode( $location_obj->address_json );
+			var_dump( $address );
+		}
 		$address_data = array();
 		if ( ! empty( $location_data['lat'] ) && ! empty( $location_data['lng'] ) ) {
 			$address_data = $this->reverse_geocode( $location_data['lat'], $location_data['lng'] );
 		}
+		var_dump( $address_data );
 
 		$location_data = array_merge( $location_data, $address_data );
 		$custom_slug   = $args['slug'] . '-' . $args['id'];
