@@ -31,7 +31,7 @@ class Daddio_Admin {
 				'wpseo-dashboard-overview', // Yoast SEO
 				'monsterinsights_reports_widget',
 			),
-			'side' => array(
+			'side'   => array(
 				'dashboard_primary',
 				'dashboard_quick_press',
 			),

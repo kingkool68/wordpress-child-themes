@@ -1,7 +1,7 @@
 <?php
 class Daddio_Infinite_Scroll {
 
-	private $cache_key = 'daddio_infinite_scroll_page_details';
+	private $cache_key   = 'daddio_infinite_scroll_page_details';
 	private $cache_group = 'daddio_infinite_scroll_cache_group';
 
 	/**
@@ -84,6 +84,7 @@ class Daddio_Infinite_Scroll {
 
 	/**
 	 * Adjust the limit clause of the main SQL query
+	 *
 	 * @param  string $limit Limit clause of SQL query
 	 * @return string        Modified limit clause
 	 */
@@ -98,7 +99,7 @@ class Daddio_Infinite_Scroll {
 				return $limit;
 			}
 			$new_limit = $pages->diff * $pages->posts_per_page + $pages->posts_per_page;
-			$limit = str_replace( ', ' . $pages->posts_per_page, ', ' . $new_limit, $limit );
+			$limit     = str_replace( ', ' . $pages->posts_per_page, ', ' . $new_limit, $limit );
 		}
 		return $limit;
 	}
@@ -120,6 +121,7 @@ class Daddio_Infinite_Scroll {
 
 	/**
 	 * Strip out pages values from pagenum links
+	 *
 	 * @TODO: Inspect this method more closely to see what it does
 	 *
 	 * @param  string $result The pagenum URL
@@ -156,7 +158,7 @@ class Daddio_Infinite_Scroll {
 		if ( count( $pages ) < 2 && isset( $pages[0] ) && ! empty( $pages[0] ) ) {
 			if ( strtolower( $pages[0] ) == 'all' ) {
 				$start = -1;
-				$end = false;
+				$end   = false;
 			} else {
 				$end = intval( $pages[0] );
 			}
@@ -172,9 +174,9 @@ class Daddio_Infinite_Scroll {
 		}
 
 		$output = (object) array(
-			'start' => $start,
-			'end' => $end,
-			'diff' => abs( $end - $start ),
+			'start'          => $start,
+			'end'            => $end,
+			'diff'           => abs( $end - $start ),
 			'posts_per_page' => intval( get_option( 'posts_per_page' ) ),
 		);
 		wp_cache_set( $this->cache_key, $output, $this->cache_group );

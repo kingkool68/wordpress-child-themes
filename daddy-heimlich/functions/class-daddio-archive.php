@@ -78,7 +78,7 @@ class Daddio_Archive {
 	public function filter_template_include( $template = '' ) {
 		global $wp_query;
 		$template_paths = array();
-		if ( '1' == get_query_var( 'daddio-archives-page' ) ) {
+		if ( '1' === get_query_var( 'daddio-archives-page' ) ) {
 			$template_paths = array(
 				'archives.php',
 			);

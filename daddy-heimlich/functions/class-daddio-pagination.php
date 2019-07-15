@@ -21,14 +21,14 @@ class Daddio_Pagination {
 	 * @return string       HTML
 	 */
 	public static function render( $args = array() ) {
-		$data     = self::get_data( $args );
+		$data = self::get_data( $args );
 		if ( ! $data->next_url ) {
 			return;
 		}
 		$defaults = array(
-			'next_url'          => $data->next_url,
-			'next_page_num'     => $data->next_page_num,
-			'next_text'         => 'More',
+			'next_url'      => $data->next_url,
+			'next_page_num' => $data->next_page_num,
+			'next_text'     => 'More',
 		);
 		$context  = wp_parse_args( $args, $defaults );
 		return Sprig::render( 'pagination.twig', $context );

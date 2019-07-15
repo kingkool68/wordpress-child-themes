@@ -16,5 +16,6 @@
 !.gitignore
 !daddy-heimlich/
 daddy-heimlich/node_modules/
+daddy-heimlich/vendor/
 !zadie-heimlich/
 !vera-heimlich/

@@ -57,15 +57,15 @@ class Daddio_Dates {
 			return;
 		}
 
-		$unit = self::get_smallest_time_unit( $age );
+		$unit          = self::get_smallest_time_unit( $age );
 		$relative_date = strtotime( $age );
-		$offset = $relative_date - date( 'U' );
+		$offset        = $relative_date - date( 'U' );
 		$ending_offset = 0;
 		switch ( $unit ) {
 			case 'years':
 			case 'year':
 				$ending_offset = YEAR_IN_SECONDS;
-			 	break;
+				break;
 
 			case 'months':
 			case 'month':
@@ -92,12 +92,12 @@ class Daddio_Dates {
 				$ending_offset = MINUTE_IN_SECONDS;
 				break;
 		}
-		$start = self::get_childs_birthday() + $offset; // In seconds
-		$end = $start + $ending_offset;
+		$start      = self::get_childs_birthday() + $offset; // In seconds
+		$end        = $start + $ending_offset;
 		$date_query = array(
 			array(
-				'before' => date( 'Y-m-d g:ia', $end ),
-				'after' => date( 'Y-m-d g:ia', $start ),
+				'before'    => date( 'Y-m-d g:ia', $end ),
+				'after'     => date( 'Y-m-d g:ia', $start ),
 				'inclusive' => false,
 			),
 		);
@@ -136,7 +136,7 @@ class Daddio_Dates {
 	 */
 	public function filter_rewrite_rules_array( $rules = array() ) {
 		global $wp_rewrite;
-		$root = $wp_rewrite->root;
+		$root                 = $wp_rewrite->root;
 		$permalink_structures = array(
 			$root . '/%age%/',
 		);
@@ -161,21 +161,43 @@ class Daddio_Dates {
 			$to = current_time( 'U' );
 		}
 		$blocks = array(
-			array( 'name' => 'year',   'amount' => 60 * 60 * 24 * 365 ),
-			array( 'name' => 'month',  'amount' => 60 * 60 * 24 * 31 ),
-			array( 'name' => 'week',   'amount' => 60 * 60 * 24 * 7 ),
-			array( 'name' => 'day',    'amount' => 60 * 60 * 24 ),
-			array( 'name' => 'hour',   'amount' => 60 * 60 ),
-			array( 'name' => 'minute', 'amount' => 60 ),
-			array( 'name' => 'second', 'amount' => 1 ),
+			array(
+				'name'   => 'year',
+				'amount' => 60 * 60 * 24 * 365,
+			),
+			array(
+				'name'   => 'month',
+				'amount' => 60 * 60 * 24 * 31,
+			),
+			array(
+				'name'   => 'week',
+				'amount' => 60 * 60 * 24 * 7,
+			),
+			array(
+				'name'   => 'day',
+				'amount' => 60 * 60 * 24,
+			),
+			array(
+				'name'   => 'hour',
+				'amount' => 60 * 60,
+			),
+			array(
+				'name'   => 'minute',
+				'amount' => 60,
+			),
+			array(
+				'name'   => 'second',
+				'amount' => 1,
+			),
 		);
 
 		$diff = abs( $from - $to );
 
 		$current_level = 1;
-		$result = array();
+		$result        = array();
 		foreach ( $blocks as $block ) {
-			if ( $current_level > $levels ) { break; }
+			if ( $current_level > $levels ) {
+				break; }
 			if ( $diff / $block['amount'] >= 1 ) {
 				$amount = floor( $diff / $block['amount'] );
 				$plural = '';
@@ -183,7 +205,7 @@ class Daddio_Dates {
 					$plural = 's';
 				}
 				$result[] = $amount . ' ' . $block['name'] . $plural;
-				$diff -= $amount * $block['amount'];
+				$diff    -= $amount * $block['amount'];
 				$current_level++;
 			}
 		}
@@ -211,7 +233,7 @@ class Daddio_Dates {
 		if ( ! $time_offset ) {
 			$time_offset = get_the_time( 'U' );
 		}
-		return self::human_time_diff( $levels,  self::get_childs_birthday(), $time_offset );
+		return self::human_time_diff( $levels, self::get_childs_birthday(), $time_offset );
 	}
 
 	/**
@@ -221,7 +243,7 @@ class Daddio_Dates {
 	 * @return string          Human friendly time differnece of child's age and now
 	 */
 	public static function get_childs_current_age( $levels = 2 ) {
-		return self::human_time_diff( $levels,  self::get_childs_birthday() );
+		return self::human_time_diff( $levels, self::get_childs_birthday() );
 	}
 
 	/**
@@ -264,30 +286,30 @@ class Daddio_Dates {
 	 */
 	public static function get_monthly_archive_links() {
 		$month_format = 'n';
-		$months = array();
+		$months       = array();
 		for ( $m = 1; $m <= 12; $m++ ) {
 			$months[ $m ] = date( $month_format, mktime( 0, 0, 0, $m, 1, date( 'Y' ) ) );
 		}
 
 		$raw_post_data = self::get_monthly_post_counts();
-		$post_data = array();
+		$post_data     = array();
 		foreach ( $raw_post_data as $raw ) {
 			$post_data[ $raw->year ][ $raw->month ] = $raw->count;
 		}
 
-		$start = new DateTime( CHILD_DATE_OF_BIRTH );
-		$end = new DateTime( '12/31/' . date( 'Y' ) );
+		$start    = new DateTime( CHILD_DATE_OF_BIRTH );
+		$end      = new DateTime( '12/31/' . date( 'Y' ) );
 		$interval = DateInterval::createFromDateString( '1 year' );
-		$period = new DatePeriod( $start, $interval, $end );
-		$output = array();
+		$period   = new DatePeriod( $start, $interval, $end );
+		$output   = array();
 		foreach ( $period as $dt ) {
-			$year = $dt->format( 'Y' );
+			$year            = $dt->format( 'Y' );
 			$output[ $year ] = array();
 			foreach ( $months as $month_num => $month ) {
 				$output[ $year ][ $month ] = '';
 				if ( isset( $post_data[ $year ][ $month_num ] ) ) {
 					$output[ $year ][ $month ] = (object) array(
-						'link' => get_month_link( $year, $month_num ),
+						'link'  => get_month_link( $year, $month_num ),
 						'count' => $post_data[ $year ][ $month_num ],
 					);
 				}
@@ -302,36 +324,36 @@ class Daddio_Dates {
 	 * @return array Age archive data
 	 */
 	public static function get_age_archive_data() {
-		$month_of_birth = date( 'm', self::get_childs_birthday() );
+		$month_of_birth    = date( 'm', self::get_childs_birthday() );
 		$month_after_birth = intval( $month_of_birth ) + 1;
 		if ( $month_after_birth > 12 ) {
 			$month_after_birth = 1;
 		}
 
-		$day_of_birth = date( 'd', self::get_childs_birthday() );
+		$day_of_birth     = date( 'd', self::get_childs_birthday() );
 		$day_before_birth = intval( $day_of_birth ) - 1;
-		$permalink = get_site_url() . '/age/';
+		$permalink        = get_site_url() . '/age/';
 
 		$raw_post_data = self::get_monthly_post_counts();
-		$output = array();
+		$output        = array();
 		foreach ( $raw_post_data as $raw ) {
 			$time_offset = date( 'U', strtotime( $raw->year . '-' . $raw->month . '-' . $day_before_birth ) );
 			if ( $time_offset < self::get_childs_birthday() + MONTH_IN_SECONDS ) {
 				continue;
 			}
-			$levels = 2;
+			$levels    = 2;
 			$has_month = true;
 			if ( $month_after_birth == $raw->month ) {
-				$levels = 1;
+				$levels    = 1;
 				$has_month = false;
 			}
 
 			if ( $time_offset < self::get_childs_birthday() + YEAR_IN_SECONDS ) {
 				$levels = 1;
 			}
-			$diff = self::get_childs_birthday_diff( $levels, $time_offset );
+			$diff      = self::get_childs_birthday_diff( $levels, $time_offset );
 			$diff_slug = str_replace( ' ', '', $diff );
-			$output[] = array(
+			$output[]  = array(
 				'timestamp' => $diff,
 				'permalink' => $permalink . $diff_slug . '/',
 				'has_month' => $has_month,
@@ -354,7 +376,7 @@ class Daddio_Dates {
 			return false;
 		}
 
-		$timestamp       = strtolower( $timestamp );
+		$timestamp = strtolower( $timestamp );
 		// Strip out everything except numbers and letters
 		$timestamp       = preg_replace( '/[^\w]+/', '', $timestamp );
 		$timestamp_words = preg_replace( '/(\d+)/', '-', $timestamp );

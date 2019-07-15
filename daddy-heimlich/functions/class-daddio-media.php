@@ -64,32 +64,32 @@ class Daddio_Media {
 	 * @param  string $content Content inside of the caption shortcode
 	 * @return string          Modified image caption
 	 */
-	function filter_img_caption_shortcode( $string = '', $attr = array(), $content = null ) {
-		$atts = shortcode_atts( array(
-			'id'    => '',
-			'align' => 'alignnone',
-			'width' => '',
-			'caption' => '',
-			'class' => '',
-		), $attr );
+	public function filter_img_caption_shortcode( $string = '', $attr = array(), $content = null ) {
+		$atts = shortcode_atts(
+			array(
+				'id'      => '',
+				'align'   => 'alignnone',
+				'width'   => '',
+				'caption' => '',
+				'class'   => '',
+			),
+			$attr
+		);
 
 		if ( (int) $atts['width'] < 1 || empty( $atts['caption'] ) ) {
 			return $content;
 		}
 
 		$described_by = '';
-		$id = '';
+		$id           = '';
 		if ( $atts['id'] ) {
 			// Underscores in attributes are yucky.
-			$id_attr = str_replace( '_', '-', esc_attr( $atts['id'] ) );
+			$id_attr      = str_replace( '_', '-', esc_attr( $atts['id'] ) );
 			$described_by = 'aria-describedby="' . $id_attr . '"';
-			$id = 'id="' . esc_attr( $id_attr ) . '" ';
+			$id           = 'id="' . esc_attr( $id_attr ) . '" ';
 		}
 
-		$inline_width = '';
-		if ( 'alignleft' === $atts['align'] || 'alignright' === $atts['align'] ) {
-			// $inline_width = 'style="width: '. (10 + (int) $width) . 'px"';
-		}
+		$inline_width   = '';
 		$atts['class'] .= ' wp-caption ' . esc_attr( $atts['align'] );
 
 		return '<figure ' . $described_by . 'class="' . $atts['class'] . '" ' . $inline_width . '>' .
@@ -111,10 +111,10 @@ class Daddio_Media {
 		switch ( $data->type ) {
 			case 'video':
 			case 'rich':
-				if ( ! empty( $data->html ) && is_string( $data->html ) && ! in_array( $data->provider_url, $not_rich_embeds ) ) {
+				if ( ! empty( $data->html ) && is_string( $data->html ) && ! in_array( $data->provider_url, $not_rich_embeds, true ) ) {
 					$return = '<div class="responsive-embed">' . $return . '</div>';
 				}
-			break;
+				break;
 		}
 		return $return;
 	}
@@ -127,7 +127,7 @@ class Daddio_Media {
 	 * @return string           New attachment link
 	 */
 	public function filter_attachment_link( $link, $post_id ) {
-		$post = get_post( $post_id );
+		$post     = get_post( $post_id );
 		$new_link = get_site_url() . '/attachment/' . $post->post_name . '/';
 		return $new_link;
 	}
@@ -152,7 +152,7 @@ class Daddio_Media {
 	 * @return string           HTML of media
 	 */
 	public static function get_the_instagram_media( $post_id = 0 ) {
-		$post = get_post( $post_id );
+		$post              = get_post( $post_id );
 		$featured_image_id = get_post_thumbnail_id( $post->ID );
 		$featured_video_id = get_post_meta( $post->ID, '_video_id', true );
 		if ( $featured_video_id ) {
@@ -173,11 +173,11 @@ class Daddio_Media {
 				// calculate a proper aspect ratio for responsive scaling
 				if ( ! empty( $video_meta['width'] ) ) {
 					$args['src_width'] = $video_meta['width'];
-					$args['width'] = null;
+					$args['width']     = null;
 				}
 				if ( ! empty( $video_meta['height'] ) ) {
 					$args['src_height'] = $video_meta['height'];
-					$args['height'] = null;
+					$args['height']     = null;
 				}
 				$output = wp_video_shortcode( $args );
 
@@ -187,10 +187,9 @@ class Daddio_Media {
 				if ( ! empty( $args['src_width'] ) && ! empty( $args['src_height'] ) ) {
 					$aspect_ratio = $args['src_height'] / $args['src_width'] * 100;
 					$aspect_ratio = round( $aspect_ratio, 2 );
-					$output = str_replace( 'width="0"', 'data-aspect-ratio="' . $aspect_ratio . '%" width="100%"', $output );
-					$output = str_replace( 'height="0"', 'height="100%"', $output );
+					$output       = str_replace( 'width="0"', 'data-aspect-ratio="' . $aspect_ratio . '%" width="100%"', $output );
+					$output       = str_replace( 'height="0"', 'height="100%"', $output );
 				}
-
 
 				return $output;
 			}

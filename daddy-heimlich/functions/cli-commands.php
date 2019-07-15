@@ -6,19 +6,19 @@ if ( ! class_exists( 'WP_CLI' ) ) {
 function fix_zadies_instagram_images() {
 	$modified_posts = 0;
 	// Get all Instagram posts
-	$args = array(
+	$args  = array(
 		'posts_per_page' => -1,
-		'post_type' => 'instagram',
-		'post_status' => 'any',
+		'post_type'      => 'instagram',
+		'post_status'    => 'any',
 	);
 	$posts = get_posts( $args );
 	foreach ( $posts as $post ) {
 		$new_post_content = $post->post_content;
 		if ( has_shortcode( $post->post_content, 'video' ) ) {
 			// Get the ID of the Video attachment and store it as post_meta
-			$args = array(
-				'post_type' => 'attachment',
-				'post_parent' => $post->ID,
+			$args        = array(
+				'post_type'      => 'attachment',
+				'post_parent'    => $post->ID,
 				'post_mime_type' => 'video/mp4',
 			);
 			$video_posts = get_posts( $args );
@@ -28,14 +28,14 @@ function fix_zadies_instagram_images() {
 		}
 
 		// Strip inline images
-		$new_post_content = preg_replace('/<img(.+) \/>/i', '', $new_post_content );
+		$new_post_content = preg_replace( '/<img(.+) \/>/i', '', $new_post_content );
 
 		// Strip all shortcodes
 		$new_post_content = trim( strip_shortcodes( $new_post_content ) );
 
-		if ( $new_post_content != $post->post_content ) {
+		if ( $new_post_content !== $post->post_content ) {
 			$new_post = array(
-				'ID' => $post->ID,
+				'ID'           => $post->ID,
 				'post_content' => $new_post_content,
 			);
 			wp_update_post( $new_post );
@@ -48,7 +48,7 @@ function fix_zadies_instagram_images() {
 WP_CLI::add_command( 'zah-fix-instagrams', 'fix_zadies_instagram_images' );
 
 function zah_prep_locations() {
-	$args = array(
+	$args  = array(
 		'post_type'      => 'instagram',
 		'post_status'    => 'public',
 		'posts_per_page' => -1,
@@ -56,7 +56,7 @@ function zah_prep_locations() {
 	$query = new WP_Query( $args );
 	$count = 0;
 	foreach ( $query->posts as $post ) {
-		$post_id = $post->ID;
+		$post_id         = $post->ID;
 		$has_location_id = get_post_meta( $post_id, 'instagram_location_id', true );
 		if ( ! $has_location_id ) {
 			update_post_meta( $post_id, 'needs-location-data', '1' );
@@ -69,7 +69,7 @@ WP_CLI::add_command( 'zah-prep-locations', 'zah_prep_locations' );
 
 function zah_add_locations() {
 	// Get all published instagram posts that don't have a instagram_location_id meta key set...
-	$args = array(
+	$args  = array(
 		'post_type'      => 'instagram',
 		'post_status'    => 'public',
 		'posts_per_page' => -1,
@@ -85,11 +85,11 @@ function zah_add_locations() {
 	$insta = Daddio_Instagram::get_instance();
 	foreach ( $query->posts as $post ) {
 		$post_id = $post->ID;
-		$guid = $post->guid;
-		$parts = explode( 'com/p/', $guid );
-		$code = $parts[1];
-		$code = str_replace( '/', '', $code );
-		$json = $insta->fetch_single_instagram( $code );
+		$guid    = $post->guid;
+		$parts   = explode( 'com/p/', $guid );
+		$code    = $parts[1];
+		$code    = str_replace( '/', '', $code );
+		$json    = $insta->fetch_single_instagram( $code );
 		if ( isset( $json->entry_data->PostPage[0] ) ) {
 			$node = $json->entry_data->PostPage[0]->graphql->shortcode_media;
 			$node = $insta->normalize_instagram_data( $node );

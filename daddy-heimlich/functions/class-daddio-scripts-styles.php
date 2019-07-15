@@ -84,7 +84,7 @@ class Daddio_Scripts_Styles {
 	 * @return [type]         HTML to be printed
 	 */
 	public function filter_style_loader_tag( $html, $handle, $href, $media ) {
-		if ( 'zah-google-fonts' != $handle ) {
+		if ( 'zah-google-fonts' !== $handle ) {
 			return $html;
 		}
 
@@ -104,7 +104,7 @@ class Daddio_Scripts_Styles {
 			return $script_element;
 		}
 
-		if ( 'jquery-core' == $handle || 'jquery' == $handle ) {
+		if ( 'jquery-core' === $handle || 'jquery' === $handle ) {
 			$new_script_element = '';
 
 			// jQuery 1.x gets served to IE8 and below...
@@ -113,7 +113,7 @@ class Daddio_Scripts_Styles {
 			$new_script_element .= '<![endif]-->';
 
 			// jQuery 2.x gets served to everyone else...
-			$jquery2_src = apply_filters( 'script_loader_src', get_template_directory_uri() . '/js/jquery-2.min.js' );
+			$jquery2_src         = apply_filters( 'script_loader_src', get_template_directory_uri() . '/js/jquery-2.min.js' );
 			$new_script_element .= '<!--[if (gte IE 9) | (!IE)]><!-->';
 			$new_script_element .= "<script type='text/javascript' src='" . $jquery2_src . "'></script>";
 			$new_script_element .= '<!--<![endif]-->';
@@ -176,7 +176,7 @@ class Daddio_Scripts_Styles {
 			'wp-mediaelement',
 			'mediaelement-vimeo',
 		);
-		if ( in_array( $handle, $blacklisted ) ) {
+		if ( in_array( $handle, $blacklisted, true ) ) {
 			return '';
 		}
 

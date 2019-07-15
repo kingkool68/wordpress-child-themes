@@ -51,24 +51,24 @@ class Daddio_On_This_Day {
 
 		if ( $day && $month ) {
 			$days_in_month = 31;
-			switch (  $month ) {
+			switch ( $month ) {
 				// 30 days
 				case '04':
 				case '06':
 				case '09':
 				case '11':
 					$days_in_month = 30;
-				break;
+					break;
 
 				// 29 days because of leap years
 				case '02':
 					$days_in_month = 29;
-				break;
+					break;
 			}
 			if ( intval( $day ) > $days_in_month ) {
 				$day         = $days_in_month;
 				$redirect_to = get_site_url() . '/' . $this->pagename . '/' . $month . '/' . $day . '/';
-				wp_redirect( $redirect_to );
+				wp_safe_redirect( $redirect_to );
 				die();
 			}
 		}
@@ -79,13 +79,13 @@ class Daddio_On_This_Day {
 			$query_string = wp_parse_args( $query_string[1] );
 			if ( isset( $query_string['zah-on-this-month'] ) && isset( $query_string['zah-on-this-day'] ) ) {
 				$redirect_to = get_site_url() . '/' . $this->pagename . '/' . $month . '/' . $day . '/';
-				wp_redirect( $redirect_to );
+				wp_safe_redirect( $redirect_to );
 				die();
 			}
 		}
 
 		// No pagename so bail.
-		if ( ! $pagename || $pagename != $this->pagename ) {
+		if ( ! $pagename || $pagename !== $this->pagename ) {
 			return;
 		}
 
@@ -109,19 +109,22 @@ class Daddio_On_This_Day {
 		if ( ! $pagename ) {
 			$pagename = get_query_var( 'name' );
 		}
-		if ( ! $pagename || $pagename != $this->pagename ) {
+		if ( ! $pagename || $pagename !== $this->pagename ) {
 			return;
 		}
 
 		$date_query = array();
-		if ( $month = get_query_var( 'zah-on-this-month' ) ) {
-			$month  = ltrim( $month, '0' );
-			$month  = intval( $month );
+		$month      = get_query_var( 'zah-on-this-month' );
+		if ( ! empty( $month ) ) {
+			$month               = ltrim( $month, '0' );
+			$month               = intval( $month );
 			$date_query['month'] = $month;
 		}
-		if ( $day = get_query_var( 'zah-on-this-day' ) ) {
-			$day  = ltrim( $day, '0' );
-			$day  = intval( $day );
+
+		$day = get_query_var( 'zah-on-this-day' );
+		if ( ! empty( $day ) ) {
+			$day               = ltrim( $day, '0' );
+			$day               = intval( $day );
 			$date_query['day'] = $day;
 		}
 
@@ -160,7 +163,7 @@ class Daddio_On_This_Day {
 	public function filter_rewrite_rules_array( $rules = array() ) {
 		global $wp_rewrite;
 
-		$root = $wp_rewrite->root . $this->pagename;
+		$root      = $wp_rewrite->root . $this->pagename;
 		$new_rules = array(
 			$root . '/([0-9]{2})/([0-9]{2})/?' => 'index.php?pagename=' . $this->pagename . '&zah-on-this-month=$matches[1]&zah-on-this-day=$matches[2]',
 		);
@@ -177,14 +180,15 @@ class Daddio_On_This_Day {
 	public function filter_template_include( $template = '' ) {
 		global $wp_query;
 		$month = get_query_var( 'zah-on-this-month' );
-		$day = get_query_var( 'zah-on-this-day' );
+		$day   = get_query_var( 'zah-on-this-day' );
 
 		if ( $month && $day && is_404() ) {
 			$template_paths = array(
 				'404-' . $this->pagename . '.php',
 				'404.php',
 			);
-			if ( $new_template = locate_template( $template_paths ) ) {
+			$new_template   = locate_template( $template_paths );
+			if ( ! empty( $new_template ) ) {
 				return $new_template;
 			}
 		}
@@ -193,6 +197,7 @@ class Daddio_On_This_Day {
 
 	/**
 	 * Conditional for determining if the current request is a On This Day request
+	 *
 	 * @return boolean Whether the request is an On This Day request
 	 */
 	public static function is_on_this_day() {
@@ -236,7 +241,7 @@ class Daddio_On_This_Day {
 		$context = array(
 			'site_url'  => get_site_url(),
 			'months'    => $months,
-			'days'      => range(1, 31),
+			'days'      => range( 1, 31 ),
 			'the_month' => get_query_var( 'zah-on-this-month' ),
 			'the_day'   => get_query_var( 'zah-on-this-day' ),
 		);

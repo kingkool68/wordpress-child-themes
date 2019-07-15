@@ -28,7 +28,7 @@ class Daddio_Menus {
 		add_filter( 'wp_nav_menu_items', array( $this, 'filter_wp_nav_menu_items' ), 10, 2 );
 		add_filter( 'nav_menu_link_attributes', array( $this, 'filter_nav_menu_link_attributes' ), 10, 2 );
 		add_filter( 'nav_menu_item_id', '__return_empty_string' );
-		add_filter( 'nav_menu_css_class' , '__return_empty_array', 10 , 3 );
+		add_filter( 'nav_menu_css_class', '__return_empty_array', 10, 3 );
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Daddio_Menus {
 	 * @return string        Modified menu items HTML
 	 */
 	public function filter_wp_nav_menu_items( $items = '', $args ) {
-		if ( ! is_object( $args ) || ! isset( $args->theme_location ) || 'main-menu' != $args->theme_location ) {
+		if ( ! is_object( $args ) || ! isset( $args->theme_location ) || 'main-menu' !== $args->theme_location ) {
 			return $items;
 		}
 		$items .= '<li><a href="#more-menu" class="more-nav" data-ga-category="nav" data-ga-label="More +">More +</a></li>';
@@ -90,7 +90,7 @@ class Daddio_Menus {
 	 * Output the markup for the More Menu
 	 */
 	public static function get_more_menu() {
-		$args = array(
+		$args      = array(
 			'theme_location' => 'more-menu',
 			'container'      => false,
 			'menu_class'     => false,

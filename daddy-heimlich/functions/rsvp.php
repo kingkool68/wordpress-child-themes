@@ -1,6 +1,7 @@
 <?php
-/* These functions enable us to make an RSVP form and store the results in a database table. */
-/*
+/***
+ These functions enable us to make an RSVP form and store the results in a database table.
+
 SQL to make the table to store the RSVPS:
 
 CREATE TABLE `wp_3_rsvps` (
@@ -13,9 +14,7 @@ CREATE TABLE `wp_3_rsvps` (
   `timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
  */
-
 function daddio_redirect_rsvp_vanity_url() {
 	global $wp_query;
 	if ( ! is_404() ) {
@@ -47,7 +46,7 @@ function daddio_add_rsvp_form_to_the_content( $content ) {
 		return daddio_show_rsvp_response_page( 'no' );
 	}
 
-$the_form = <<<'EOD'
+	$the_form = <<<'EOD'
 	<form class="rsvp" method="POST" action="?submitted">
 		<fieldset class="name">
 			<label for="your-name">Your Name</label>
@@ -100,7 +99,7 @@ function daddio_rsvp_process_form() {
 		wp_die( 'We suspect you are not a real person.' );
 	}
 
-	if ( ! isset( $_POST['current-year'] ) || $_POST['current-year'] != date('Y') ) {
+	if ( ! isset( $_POST['current-year'] ) || $_POST['current-year'] != date( 'Y' ) ) {
 		wp_die( 'You didn\'t fill in the correct year. We suspect you are not a real person.' );
 	}
 
@@ -131,11 +130,11 @@ function daddio_rsvp_process_form() {
 	}
 
 	$answers = array(
-		'Name' => $name,
-		'Attending' => $attending,
-		'Number of Adults' => $number_of_adults,
+		'Name'               => $name,
+		'Attending'          => $attending,
+		'Number of Adults'   => $number_of_adults,
 		'Number of Children' => $number_of_children,
-		'Message' => $message,
+		'Message'            => $message,
 	);
 
 	$email_message = '';
@@ -145,10 +144,10 @@ function daddio_rsvp_process_form() {
 
 	$status = 'can\'t make it!';
 	if ( $attending == 'Yes' ) {
-		$status = 'is coming';
+		$status       = 'is coming';
 		$total_guests = $number_of_adults + $number_of_children;
 		if ( $total_guests > 1 ) {
-			$total_guests = $total_guests - 1;
+			$total_guests--;
 			$status .= ' with ' . $total_guests . ' guest!';
 			if ( $total_guests > 1 ) {
 				$status = str_replace( '!', 's!', $status );
@@ -156,16 +155,16 @@ function daddio_rsvp_process_form() {
 		}
 	}
 	$subject = '[RSVP] ' . $name . ' ' . $status;
-	$sent = wp_mail( 'us@12hugo.com', $subject, $email_message );
+	$sent    = wp_mail( 'us@12hugo.com', $subject, $email_message );
 
-	$db_data = array(
-		'name' => $name,
+	$db_data  = array(
+		'name'      => $name,
 		'attending' => $attending,
-		'adults' => $number_of_adults,
-		'children' => $number_of_children,
-		'message' => $message,
+		'adults'    => $number_of_adults,
+		'children'  => $number_of_children,
+		'message'   => $message,
 	);
-	$formats = array(
+	$formats  = array(
 		'%s', // name
 		'%s', // attending
 		'%d', // adults
@@ -173,11 +172,11 @@ function daddio_rsvp_process_form() {
 		'%s', // message
 	);
 	$inserted = $wpdb->insert( $wpdb->prefix . 'rsvps', $db_data, $formats );
-	$thing = $wpdb->last_error;
+	$thing    = $wpdb->last_error;
 
 	$slug = apply_filters( 'daddio_rsvp_page_slug', '' );
 	$page = get_page_by_path( $slug );
-	$url = add_query_arg( 'attending', strtolower( $attending ), get_permalink( $page->ID ) );
+	$url  = add_query_arg( 'attending', strtolower( $attending ), get_permalink( $page->ID ) );
 
 	wp_safe_redirect( $url );
 	die();
@@ -185,10 +184,10 @@ function daddio_rsvp_process_form() {
 add_action( 'init', 'daddio_rsvp_process_form' );
 
 function daddio_show_rsvp_response_page( $status = 'no' ) {
-	if ( $status == 'yes' ) {
+	if ( $status === 'yes' ) {
 		$content = apply_filters( 'daddio_rsvp_yes_content', '' );
 	}
-	if ( $status == 'no' ) {
+	if ( $status === 'no' ) {
 		$content = '<h2 class="birthday-rsvp-title">Aw shucks! Maybe next year.</h2>';
 	}
 	return $content;
