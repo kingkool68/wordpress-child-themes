@@ -1,2 +1,20 @@
-<h1>Instagram Debug</h1>
-<p>Hello world!</p>
+<style>
+	#instagram-source {
+		display: block;
+		max-width: 800px;
+		width: 95%;
+	}
+</style>
+
+<div class="wrap">
+	{{ result }}
+
+	<h1>Instagram Debug</h1>
+	<p>Paste the HTML source of an Instagram page to display the parsed information.</p>
+	<form action="{{ form_action_url|esc_url }}" method="post">
+		{{ nonce_field }}
+		<label for="instagram-source">HTML Source</label>
+		<textarea name="instagram-source" id="instagram-source" rows="5"></textarea>
+		{{ submit_button }}
+	</form>
+</div>

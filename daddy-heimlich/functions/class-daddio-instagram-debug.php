@@ -2,6 +2,13 @@
 class Daddio_Instagram_Debug {
 
 	/**
+	 * Nonce field for the submenu form
+	 *
+	 * @var string
+	 */
+	public static $nonce_field_action = 'instagram-debug';
+
+	/**
 	 * Get an instance of this class
 	 */
 	public static function get_instance() {
@@ -15,7 +22,7 @@ class Daddio_Instagram_Debug {
 	}
 
 	public function setup() {
-		$this->instagram_class = Daddio_Instagram::get_instance();
+		$this->instagram_class          = Daddio_Instagram::get_instance();
 		$this->instagram_location_class = Daddio_Instagram_Locations::get_instance();
 	}
 
@@ -41,11 +48,10 @@ class Daddio_Instagram_Debug {
 	}
 
 	public function handle_debug_instagram_submenu() {
-		$result = '';
+		$result = array();
 		if (
-			isset( $_POST['instagram-source'] )
-			&& ! empty( $_POST['instagram-source'] )
-			&& check_admin_referer( 'zah-instagram-private-sync' )
+			! empty( $_POST['instagram-source'] )
+			&& check_admin_referer( static::$nonce_field_action )
 		) {
 			$instagram_source = wp_unslash( $_POST['instagram-source'] );
 			$json             = $this->instagram_class->get_instagram_json_from_html( $instagram_source );
@@ -75,44 +81,29 @@ class Daddio_Instagram_Debug {
 			foreach ( $nodes as $node ) :
 				$node           = $this->instagram_class->normalize_instagram_data( $node );
 				$instagram_link = 'https://www.instagram.com/p/' . $node->code . '/';
-
-				wp_dump( $node );
+				$result[]      = '<xmp>' . wp_json_encode( $node, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . '</xmp>';
 				$location_data = $this->instagram_location_class->get_location_data_from_node( $node );
 				wp_dump( $location_data );
 			endforeach;
 		}
-		?>
-		<style>
-			#instagram-source {
-				display: block;
-				max-width: 800px;
-				width: 95%;
-			}
-			.children {
-				padding-left: 25px;
-			}
-			.delete-link {
-				color: red;
-			}
-		</style>
-		<div class="wrap">
-			<?php
-			if ( $result ) {
-				echo $result; }
-			?>
 
-			<h1>Instagram Debug</h1>
-			<p>Paste the HTML source of the private Instagram post to scrape and sync it with this site.</p>
-			<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=instagram-debug' ) ); ?>" method="post">
-				<?php wp_nonce_field( 'zah-instagram-private-sync' ); ?>
-				<label for="instagram-source">HTML Source</label>
-				<textarea name="instagram-source" id="instagram-source" rows="5"></textarea>
-				<?php submit_button( 'Debug', 'primary' ); ?>
-			</form>
-		</div>
-		<?php
-		// $context = array();
-		// Sprig::out( 'admin/instagram-debug-submenu.twig', $context );
+		$action  = static::$nonce_field_action;
+		$name    = '_wpnonce';
+		$referer = true;
+		$echo    = false;
+
+		$context = array(
+			'result'          => implode( "\n", $result ),
+			'nonce_field'     => wp_nonce_field(
+				$action,
+				$name,
+				$referer,
+				$echo
+			),
+			'form_action_url' => admin_url( 'edit.php?post_type=instagram&page=instagram-debug' ),
+			'submit_button'   => get_submit_button( 'Debug', 'primary' ),
+		);
+		Sprig::out( 'admin/instagram-debug-submenu.twig', $context );
 	}
 }
 Daddio_Instagram_Debug::get_instance();
