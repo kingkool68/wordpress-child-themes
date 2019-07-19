@@ -686,6 +686,14 @@ class Daddio_Instagram {
 			&& ! empty( $node->edge_sidecar_to_children->edges )
 		) {
 			$children = $node->edge_sidecar_to_children->edges;
+
+			// Check if the first child is a video
+			$first_child = $this->normalize_instagram_data( $children[0]->node );
+			if ( ! empty( $first_child->video_src ) ) {
+				$output['is_video'] = $first_child->is_video;
+				$output['video_src'] = $first_child->video_src;
+			}
+
 			// Remove the first child since it is the same as the parent node
 			array_shift( $children );
 			foreach ( $children as $child_node ) {
