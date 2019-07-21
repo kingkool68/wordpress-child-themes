@@ -50,25 +50,10 @@ class Daddio_Instagram {
 	 * Setup post type
 	 */
 	public function action_init() {
-		$labels = array(
-			'name'               => 'Instagram',
-			'singular_name'      => 'Instagram',
-			'menu_name'          => 'Instagram',
-			'parent_item_colon'  => 'Parent Instagram:',
-			'all_items'          => 'All Instagram Posts',
-			'view_item'          => 'View Instagram',
-			'add_new_item'       => 'Add New Instagram',
-			'add_new'            => 'Add New',
-			'edit_item'          => 'Edit Instagram',
-			'update_item'        => 'Update Instagram',
-			'search_items'       => 'Search Instagram',
-			'not_found'          => 'Not found',
-			'not_found_in_trash' => 'Not found in Trash',
-		);
-		$args   = array(
+		$args = array(
 			'label'               => 'instagram',
 			'description'         => 'Instagram posts',
-			'labels'              => $labels,
+			'labels'              => Daddio_Helpers::generate_post_type_labels( 'instagram post', 'instagram posts' ),
 			'supports'            => array( 'title', 'editor', 'thumbnail', 'comments' ),
 			'taxonomies'          => array( 'category', 'post_tag' ),
 			'hierarchical'        => false,
