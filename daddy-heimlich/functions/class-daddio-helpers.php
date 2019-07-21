@@ -110,7 +110,7 @@ class Daddio_Helpers {
 			'update_item'           => 'Update ' . $uc_singular,
 			'view_item'             => 'View ' . $uc_singular,
 			'view_items'            => 'View ' . $uc_plural,
-			'search_items'          => 'Search ' . $uc_singular,
+			'search_items'          => 'Search ' . $uc_plural,
 			'not_found'             => 'Not found',
 			'not_found_in_trash'    => 'Not found in Trash',
 			'featured_image'        => 'Featured Image',
