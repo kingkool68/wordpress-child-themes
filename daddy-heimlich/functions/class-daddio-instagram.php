@@ -5,11 +5,11 @@ use \ForceUTF8\Encoding;
 class Daddio_Instagram {
 
 	/**
-	 * The nonce name for the private sync submenu
+	 * The submenu slug
 	 *
 	 * @var string
 	 */
-	private static $private_sync_nonce = 'instagram-private-sync';
+	private static $private_sync_slug = 'instagram-private-sync';
 
 	/**
 	 * Get an instance of this class
@@ -97,7 +97,7 @@ class Daddio_Instagram {
 			'Private Sync',
 			'Private Sync',
 			'manage_options',
-			'zah-instagram-private-sync',
+			static::$private_sync_slug,
 			array( __CLASS__, 'handle_private_sync_submenu' )
 		);
 
@@ -247,7 +247,7 @@ class Daddio_Instagram {
 		$result = '';
 		if (
 			! empty( $_POST['instagram-source'] )
-			&& check_admin_referer( static::$private_sync_nonce )
+			&& check_admin_referer( static::$private_sync_slug )
 		) {
 			$instagram_source = wp_unslash( $_POST['instagram-source'] );
 			$json             = static::get_instagram_json_from_html( $instagram_source );
@@ -302,10 +302,10 @@ class Daddio_Instagram {
 		}
 		$context = array(
 			'result'          => $result,
-			'form_action_url' => admin_url( 'edit.php?post_type=instagram&page=zah-instagram-private-sync' ),
+			'form_action_url' => admin_url( 'edit.php?post_type=instagram&page=' . static::$private_sync_slug ),
 			'submit_button'   => get_submit_button( 'Sync' ),
 			'nonce_field'     => wp_nonce_field(
-				static::$private_sync_nonce,
+				static::$private_sync_slug,
 				$name = '_wpnonce',
 				$referer = true,
 				$echo = false
@@ -513,7 +513,7 @@ class Daddio_Instagram {
 	 */
 	public static function handle_private_sync_dashboard_widget() {
 		?>
-		<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=zah-instagram-private-sync' ) ); ?>" method="post">
+		<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=' . static::$private_sync_slug ) ); ?>" method="post">
 			<input type="submit" class="button button-primary" value="Private Sync">
 		</form>
 		<?php
