@@ -5,6 +5,13 @@ use \ForceUTF8\Encoding;
 class Daddio_Instagram {
 
 	/**
+	 * The nonce name for the private sync submenu
+	 *
+	 * @var string
+	 */
+	private static $private_sync_nonce = 'instagram-private-sync';
+
+	/**
 	 * Get an instance of this class
 	 */
 	public static function get_instance() {
@@ -91,7 +98,7 @@ class Daddio_Instagram {
 			'Private Sync',
 			'manage_options',
 			'zah-instagram-private-sync',
-			array( $this, 'handle_private_sync_submenu' )
+			array( __CLASS__, 'handle_private_sync_submenu' )
 		);
 
 		add_submenu_page(
@@ -100,7 +107,7 @@ class Daddio_Instagram {
 			'Modify Synced Instagram Post',
 			'manage_options',
 			'zah-instagram-modify-post',
-			array( $this, 'handle_modify_instagram_post_submenu' )
+			array( __CLASS__, 'handle_modify_instagram_post_submenu' )
 		);
 	}
 
@@ -130,7 +137,7 @@ class Daddio_Instagram {
 	}
 
 	/**
-	 * Include Instagram posts in the main query under certian conditions
+	 * Include Instagram posts in the main query under certain conditions
 	 *
 	 * @param  WP_Query $query The WP_Query object we're modifying
 	 */
@@ -161,7 +168,7 @@ class Daddio_Instagram {
 			return;
 		}
 
-		if ( ! isset( $_GET['tag-filter'] ) || 'no-tags' !== $_GET['tag-filter'] ) {
+		if ( empty( $_GET['tag-filter'] ) || 'no-tags' !== $_GET['tag-filter'] ) {
 			return;
 		}
 
@@ -201,12 +208,14 @@ class Daddio_Instagram {
 				}
 
 				$img = wp_get_attachment_image_src( $featured_id, 'thumbnail' );
-				echo '<a href="' . esc_url( get_permalink( $post->ID ) ) . '"><img src="' . esc_url( $img[0] ) . '" width="' . esc_attr( $img[1] ) . '" height="' . esc_attr( $img[2] ) . '" style="height: auto; max-width: 100%;"></a>';
+				echo '<a href="' . esc_url( get_permalink( $post->ID ) ) . '">';
+				echo '<img src="' . esc_url( $img[0] ) . '" width="' . esc_attr( $img[1] ) . '" height="' . esc_attr( $img[2] ) . '" style="height: auto; max-width: 100%;">';
+				echo '</a>';
 
 				break;
 
 			case 'instagram_permalink':
-				echo '<a href="' . esc_url( $post->guid ) . '" target="_blank">@' . self::get_instagram_username() . '</a>';
+				echo '<a href="' . esc_url( $post->guid ) . '" target="_blank">@' . static::get_instagram_username() . '</a>';
 				break;
 		}
 
@@ -233,89 +242,80 @@ class Daddio_Instagram {
 	/**
 	 * Render the screen for the private sync submenu page
 	 */
-	public function handle_private_sync_submenu() {
+	public static function handle_private_sync_submenu() {
 
 		$result = '';
 		if (
-			isset( $_POST['instagram-source'] )
-			&& ! empty( $_POST['instagram-source'] )
-			&& check_admin_referer( 'zah-instagram-private-sync' )
+			! empty( $_POST['instagram-source'] )
+			&& check_admin_referer( static::$private_sync_nonce )
 		) {
 			$instagram_source = wp_unslash( $_POST['instagram-source'] );
-			$json             = $this->get_instagram_json_from_html( $instagram_source );
+			$json             = static::get_instagram_json_from_html( $instagram_source );
 
 			// It's a Tag page
-			if ( isset( $json->entry_data->TagPage[0] ) ) {
+			if ( ! empty( $json->entry_data->TagPage[0] ) ) {
+				$tag_page  = $json->entry_data->TagPage[0];
 				$top_posts = array();
 				$other     = array();
 
-				if ( isset( $json->entry_data->TagPage[0]->tag ) ) {
-					$top_posts = $json->entry_data->TagPage[0]->tag->top_posts->nodes;
-					$other     = $json->entry_data->TagPage[0]->tag->media->nodes;
+				if ( isset( $tag_page->tag ) ) {
+					$top_posts = $tag_page->tag->top_posts->nodes;
+					$other     = $tag_page->tag->media->nodes;
 				}
 
 				// New format I detected on 01/02/2018
-				if ( isset( $json->entry_data->TagPage[0]->graphql->hashtag ) ) {
-					$top_posts = $json->entry_data->TagPage[0]->graphql->hashtag->edge_hashtag_to_top_posts->edges;
-					$other     = $json->entry_data->TagPage[0]->graphql->hashtag->edge_hashtag_to_media->edges;
+				if ( isset( $tag_page->graphql->hashtag ) ) {
+					$top_posts = $tag_page->graphql->hashtag->edge_hashtag_to_top_posts->edges;
+					$other     = $tag_page->graphql->hashtag->edge_hashtag_to_media->edges;
 				}
 				$nodes = array_merge( $top_posts, $other );
+				$deuped_nodes = array();
+				foreach ( $nodes as $node ) {
+					$key = $node->node->id;
+					$deuped_nodes[ $key ] = $node;
+				}
+				$nodes = array_values( $deuped_nodes );
 			}
 
 			// It's a single Post page
 			if ( isset( $json->entry_data->PostPage[0] ) ) {
 				$nodes = array( $json->entry_data->PostPage[0]->graphql->shortcode_media );
 			}
-			foreach ( $nodes as $node ) :
-				$node           = $this->normalize_instagram_data( $node );
-				$instagram_link = 'https://www.instagram.com/p/' . $node->code . '/';
 
-				$found = $this->does_instagram_permalink_exist( $instagram_link );
-				if ( $found ) {
-					continue;
-				}
+			if ( ! empty( $nodes ) ) :
+				foreach ( $nodes as $node ) :
+					$node           = static::normalize_instagram_data( $node );
+					$instagram_link = 'https://www.instagram.com/p/' . $node->code . '/';
 
-				$inserted = $this->insert_instagram_post( $node, $post_args = array() );
-				$data     = $this->handle_instagram_inserted_result( $inserted, $node );
-				$result  .= $this->render_instagram_inserted_result( $data );
-			endforeach;
+					$found = static::does_instagram_permalink_exist( $instagram_link );
+					if ( $found ) {
+						continue;
+					}
+
+					$inserted = static::insert_instagram_post( $node, $post_args = array() );
+					$data     = static::handle_instagram_inserted_result( $inserted, $node );
+					$result  .= static::render_instagram_inserted_result( $data );
+				endforeach;
+			endif;
 		}
-		?>
-		<style>
-			#instagram-source {
-				display: block;
-				max-width: 800px;
-				width: 95%;
-			}
-			.children {
-				padding-left: 25px;
-			}
-			.delete-link {
-				color: red;
-			}
-		</style>
-		<div class="wrap">
-			<?php
-			if ( $result ) {
-				echo $result; }
-			?>
-
-			<h1>Private Sync</h1>
-			<p>Paste the HTML source of the private Instagram post to scrape and sync it with this site.</p>
-			<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=zah-instagram-private-sync' ) ); ?>" method="post">
-				<?php wp_nonce_field( 'zah-instagram-private-sync' ); ?>
-				<label for="instagram-source">HTML Source</label>
-				<textarea name="instagram-source" id="instagram-source" rows="5"></textarea>
-				<?php submit_button( 'Sync', 'primary' ); ?>
-			</form>
-		</div>
-		<?php
+		$context = array(
+			'result'          => $result,
+			'form_action_url' => admin_url( 'edit.php?post_type=instagram&page=zah-instagram-private-sync' ),
+			'submit_button'   => get_submit_button( 'Sync' ),
+			'nonce_field'     => wp_nonce_field(
+				static::$private_sync_nonce,
+				$name = '_wpnonce',
+				$referer = true,
+				$echo = false
+			),
+		);
+		Sprig::out( 'admin/instagram-private-sync-submenu.twig', $context );
 	}
 
 	/**
 	 * Handle requests to modify instagram posts (delete or set to draft)
 	 */
-	public function handle_modify_instagram_post_submenu() {
+	public static function handle_modify_instagram_post_submenu() {
 		if ( empty( $_GET['post_id'] ) ) {
 			wp_die( 'Missing Post ID parameter' );
 		}
@@ -356,8 +356,8 @@ class Daddio_Instagram {
 	 * @param  object $node   Normaized node data for reference
 	 * @return array          Options depending on if the post was inserted or not
 	 */
-	public function handle_instagram_inserted_result( $result, $node ) {
-		$node = $this->normalize_instagram_data( $node );
+	public static function handle_instagram_inserted_result( $result, $node ) {
+		$node = static::normalize_instagram_data( $node );
 
 		$output = array(
 			'status_message'   => '',
@@ -392,7 +392,7 @@ class Daddio_Instagram {
 			);
 			if ( ! empty( $result->children ) ) {
 				foreach ( $result->children as $child_post_id ) {
-					$output['children'][] = $this->handle_instagram_inserted_result(
+					$output['children'][] = static::handle_instagram_inserted_result(
 						(object) array(
 							'post_id'  => $child_post_id,
 							'children' => array(),
@@ -411,7 +411,7 @@ class Daddio_Instagram {
 	 * @param  array $data Insert data
 	 * @return string      HTML output
 	 */
-	public function render_instagram_inserted_result( $data ) {
+	public static function render_instagram_inserted_result( $data ) {
 		$defaults = array(
 			'status_message'   => '',
 			'permalink'        => '',
@@ -445,7 +445,7 @@ class Daddio_Instagram {
 		if ( $children ) {
 			$output .= '<div class="children">';
 			foreach ( $children as $child_data ) {
-				$output .= $this->render_instagram_inserted_result( $child_data );
+				$output .= static::render_instagram_inserted_result( $child_data );
 			}
 			$output .= '</div>';
 		}
@@ -462,6 +462,7 @@ class Daddio_Instagram {
 	public function filter_the_content( $content = '' ) {
 		$post = get_post();
 		if ( 'instagram' === get_post_type( $post ) ) {
+			// TODO: Use Twitter's hashtag parser thing to autolink hashtags. This should work better. See https://github.com/nojimage/twitter-text-php
 			$content = preg_replace( '/\s(#(\w+))/im', ' <a href="https://instagram.com/explore/tags/$2/">$1</a>', $content );
 			// $content = preg_replace('/^(#(\w+))/im', '<a href="https://instagram.com/explore/tags/$2/">$1</a>', $content);
 			$content = preg_replace( '/\s(@(\w+))/im', ' <a href="http://instagram.com/$2">$1</a>', $content );
@@ -498,13 +499,17 @@ class Daddio_Instagram {
 	 * Setup the Private Sync dahboard widget
 	 */
 	public function action_wp_dashboard_setup() {
-		wp_add_dashboard_widget( 'instagram-private-sync', 'Instagram Private Sync', array( $this, 'handle_private_sync_dashboard_widget' ) );
+		wp_add_dashboard_widget(
+			'instagram-private-sync',
+			'Instagram Private Sync',
+			array( __CLASS__, 'handle_private_sync_dashboard_widget' )
+		);
 	}
 
 	/**
 	 * Render the Private Sync dashboard widget
 	 */
-	public function handle_private_sync_dashboard_widget() {
+	public static function handle_private_sync_dashboard_widget() {
 		?>
 		<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=zah-instagram-private-sync' ) ); ?>" method="post">
 			<input type="submit" class="button button-primary" value="Private Sync">
@@ -520,12 +525,14 @@ class Daddio_Instagram {
 	 * @param  string $html HTML from an Instagram URL
 	 * @return json         Instagram data embedded in the page
 	 */
-	public function get_instagram_json_from_html( $html = '' ) {
+	public static function get_instagram_json_from_html( $html = '' ) {
 		// Parse the page response and extract the JSON string
-		$arr  = explode( 'window._sharedData = ', $html );
-		$json = explode( ';</script>', $arr[1] );
-		$json = $json[0];
-		return json_decode( $json );
+		$arr = explode( 'window._sharedData = ', $html );
+		if ( ! empty( $arr[1] ) ) {
+			$json = explode( ';</script>', $arr[1] );
+			$json = $json[0];
+			return json_decode( $json );
+		}
 	}
 
 	/**
@@ -535,7 +542,7 @@ class Daddio_Instagram {
 	 * @param  null|string $max_id Instagram ID to act like pagination
 	 * @return JSON        JSON data from the tag page
 	 */
-	public function fetch_instagram_tag( $tag = '', $max_id = null ) {
+	public static function fetch_instagram_tag( $tag = '', $max_id = null ) {
 		$args = array();
 		if ( $max_id ) {
 			$args['max_id'] = $max_id;
@@ -544,7 +551,7 @@ class Daddio_Instagram {
 		$request  = add_query_arg( $args, 'https://www.instagram.com/explore/tags/' . $tag . '/' );
 		$response = wp_remote_get( $request );
 
-		return $this->get_instagram_json_from_html( $response['body'] );
+		return static::get_instagram_json_from_html( $response['body'] );
 	}
 
 	/**
@@ -553,7 +560,7 @@ class Daddio_Instagram {
 	 * @param  string $code Instagram short URL code to fetch
 	 * @return JSON        JSON data from the tag page
 	 */
-	public function fetch_single_instagram( $code = '' ) {
+	public static function fetch_single_instagram( $code = '' ) {
 		if ( ! $code ) {
 			return array();
 		}
@@ -562,11 +569,11 @@ class Daddio_Instagram {
 		$request  = add_query_arg( $args, 'https://www.instagram.com/p/' . $code . '/' );
 		$response = wp_remote_get( $request );
 		if ( is_wp_error( $response ) ) {
-			echo '<p>' . $response->get_error_message . '</p>';
+			echo '<p>' . $response->get_error_message() . '</p>';
 			return false;
 		}
 
-		return $this->get_instagram_json_from_html( $response['body'] );
+		return static::get_instagram_json_from_html( $response['body'] );
 	}
 
 	/**
@@ -575,7 +582,7 @@ class Daddio_Instagram {
 	 * @param  Object|false  $node Node object from the Instagram API
 	 * @return Object|false  Normalized data
 	 */
-	public function normalize_instagram_data( $node = false ) {
+	public static function normalize_instagram_data( $node = false ) {
 		if ( ! $node ) {
 			return false;
 		}
@@ -688,16 +695,16 @@ class Daddio_Instagram {
 			$children = $node->edge_sidecar_to_children->edges;
 
 			// Check if the first child is a video
-			$first_child = $this->normalize_instagram_data( $children[0]->node );
+			$first_child = static::normalize_instagram_data( $children[0]->node );
 			if ( ! empty( $first_child->video_src ) ) {
-				$output['is_video'] = $first_child->is_video;
+				$output['is_video']  = $first_child->is_video;
 				$output['video_src'] = $first_child->video_src;
 			}
 
 			// Remove the first child since it is the same as the parent node
 			array_shift( $children );
 			foreach ( $children as $child_node ) {
-				$output['children'][] = $this->normalize_instagram_data( $child_node->node );
+				$output['children'][] = static::normalize_instagram_data( $child_node->node );
 			}
 		}
 
@@ -710,20 +717,20 @@ class Daddio_Instagram {
 	 * @param  object $node Instagram node data
 	 * @return object       Instagram node data
 	 */
-	public function get_instagram_data_from_node( $node ) {
-		$node = $this->normalize_instagram_data( $node );
+	public static function get_instagram_data_from_node( $node ) {
+		$node = static::normalize_instagram_data( $node );
 		// Check to see if $node is already a PostPage object. If not, try and fetch a single instagram post.
 		if ( ! $node->typename ) {
-			$json = $this->fetch_single_instagram( $node->code );
+			$json = static::fetch_single_instagram( $node->code );
 			if ( empty( $json ) || ! $json ) {
 				return;
 			}
 
 			// It's a single Post page
-			if ( isset( $json->entry_data->PostPage[0] ) ) {
+			if ( ! empty( $json->entry_data->PostPage[0] ) ) {
 				$node = $json->entry_data->PostPage[0]->graphql->shortcode_media;
 			}
-			$node = $this->normalize_instagram_data( $node );
+			$node = static::normalize_instagram_data( $node );
 		}
 		return $node;
 	}
@@ -735,14 +742,14 @@ class Daddio_Instagram {
 	 * @param  boolean $force_publish_status  Force the post to be published
 	 * @return boolean                        Whether the post was inserted successfully or not
 	 */
-	public function insert_instagram_post( $node, $post_args = array(), $force_publish_status = true ) {
+	public static function insert_instagram_post( $node, $post_args = array(), $force_publish_status = true ) {
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/admin.php';
 		}
-		$node      = $this->get_instagram_data_from_node( $node );
+		$node      = static::get_instagram_data_from_node( $node );
 		$src       = $node->full_src;
 		$permalink = 'https://www.instagram.com/p/' . $node->code . '/';
-		$found     = $this->does_instagram_permalink_exist( $permalink );
+		$found     = static::does_instagram_permalink_exist( $permalink );
 		if ( $found ) {
 			return false;
 		}
@@ -797,7 +804,7 @@ class Daddio_Instagram {
 				$child_post_args    = array(
 					'post_parent' => $inserted,
 				);
-				$inserted_child_obj = $this->insert_instagram_post( $child_node, $child_post_args );
+				$inserted_child_obj = static::insert_instagram_post( $child_node, $child_post_args );
 				if ( is_object( $inserted_child_obj ) && isset( $inserted_child_obj->post_id ) ) {
 					$inserted_child_ids[] = $inserted_child_obj->post_id;
 				}
@@ -850,7 +857,7 @@ class Daddio_Instagram {
 			'post_name'    => $node->code,
 			'file_name'    => $node->code . '.jpg',
 		);
-		$attachment_id   = $this->media_sideload_image_return_id( $node->full_src, $inserted, $caption, $attachment_data );
+		$attachment_id   = static::media_sideload_image_return_id( $node->full_src, $inserted, $caption, $attachment_data );
 		update_post_meta( $inserted, 'instagram_username', $node->owner_username );
 
 		// Set the featured image
@@ -891,7 +898,7 @@ class Daddio_Instagram {
 	 * @param  string $permalink Instagram permalink
 	 * @return boolean           Whether the Instagram post has been imported or not
 	 */
-	public function does_instagram_permalink_exist( $permalink = '' ) {
+	public static function does_instagram_permalink_exist( $permalink = '' ) {
 		global $wpdb;
 
 		$parts = wp_parse_url( $permalink );
@@ -916,7 +923,7 @@ class Daddio_Instagram {
 	 * @param  array    $post_data $_POST data to fake the request with
 	 * @return integer             Post ID of the inserted attachment
 	 */
-	public function media_sideload_image_return_id( $file = '', $post_id, $desc = null, $post_data = array() ) {
+	public static function media_sideload_image_return_id( $file = '', $post_id, $desc = null, $post_data = array() ) {
 		if ( ! empty( $file ) ) {
 
 			$file_array = array();
