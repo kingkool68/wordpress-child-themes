@@ -691,7 +691,24 @@ class Daddio_Instagram {
 			// Remove the first child since it is the same as the parent node
 			array_shift( $children );
 			foreach ( $children as $child_node ) {
-				$output['children'][] = static::normalize_instagram_data( $child_node->node );
+				$new_node = static::normalize_instagram_data( $child_node->node );
+				if ( empty( $new_node->location_id ) && ! empty( $output['location_id'] ) ) {
+					$new_node->location_id = $output['location_id'];
+				}
+
+				if ( empty( $new_node->location_name ) && ! empty( $output['location_name'] ) ) {
+					$new_node->location_name = $output['location_name'];
+				}
+
+				if ( empty( $new_node->location_slug ) && ! empty( $output['location_slug'] ) ) {
+					$new_node->location_slug = $output['location_slug'];
+				}
+
+				if ( empty( $new_node->location_has_public_page ) && ! empty( $output['location_has_public_page'] ) ) {
+					$new_node->location_has_public_page = $output['location_has_public_page'];
+				}
+
+				$output['children'][] = $new_node;
 			}
 		}
 
