@@ -1,6 +1,10 @@
 <?php
 class Daddio_Instagram_Locations {
 
+	private static $term_id_from_location_id_cache = array();
+
+	private static $normalized_data_cache = array();
+
 	/**
 	 * Get an instance of this class
 	 */
@@ -396,8 +400,13 @@ class Daddio_Instagram_Locations {
 			return false;
 		}
 
+		// Check if the data has already been normalized and is cached
+		if ( ! empty( $node->location->id ) && ! empty( static::$normalized_data_cache[ $node->location->id ] ) ) {
+			echo 'Cache hit!';
+			return static::$normalized_data_cache[ $node->location->id ];
+		}
+
 		// Check if $node is already normalized
-		// If so just return the $node back
 		if ( isset( $node->_normalized ) && $node->_normalized ) {
 			return $node;
 		}
@@ -411,6 +420,8 @@ class Daddio_Instagram_Locations {
 
 			'latitude'              => '',
 			'longitude'             => '',
+
+			'street_address'        => '',
 			'city'                  => '',
 			'county'                => '',
 			'state'                 => '',
@@ -418,13 +429,18 @@ class Daddio_Instagram_Locations {
 			'country'               => '',
 			'country_code'          => '',
 
+			'blurb'                 => '',
+			'website'               => '',
+			'phone'                 => '',
+
 			'term_id'               => 0,
+			'term_last_updated'     => false,
 		);
 		if ( ! empty( $node->location ) ) {
-			var_dump( $node->location );
 
 			if ( ! empty( $node->location->id ) ) {
 				$output['instagram_location_id'] = $node->location->id;
+
 			}
 
 			if ( ! empty( $node->location->has_public_page ) ) {
@@ -441,13 +457,77 @@ class Daddio_Instagram_Locations {
 
 			if ( ! empty( $node->location->address_json ) ) {
 				$address_json = json_decode( $node->location->address_json );
-				var_dump( $address_json );
+
+				if ( ! empty( $address_json->street_address ) ) {
+					$output['street_address'] = $address_json->street_address;
+				}
+
+				if ( ! empty( $address_json->zip_code ) ) {
+					$output['postcode'] = $address_json->zip_code;
+				}
+
+				if ( ! empty( $address_json->country_code ) ) {
+					$output['country_code'] = $address_json->country_code;
+				}
 			}
 		}
 
 		if ( ! empty( $output['instagram_location_id'] ) ) {
+			$term_id = static::get_term_id_from_location_id( $output['instagram_location_id'] );
+			if ( absint( $term_id ) > 0 ) {
+				$output['term_id']           = $term_id;
+				$output['term_last_updated'] = get_term_meta( $term_id, 'instagram-last-updated', true );
+			}
+
 			$location_data = static::fetch_instagram_location( $output['instagram_location_id'] );
-			var_dump( $location_data );
+			if ( ! empty( $location_data->lat ) ) {
+				$output['latitude'] = $location_data->lat;
+			}
+
+			if ( ! empty( $location_data->lng ) ) {
+				$output['longitude'] = $location_data->lng;
+			}
+
+			if ( ! empty( $location_data->blurb ) ) {
+				$output['blurb'] = $location_data->blurb;
+			}
+
+			if ( ! empty( $location_data->website ) ) {
+				$output['website'] = $location_data->website;
+			}
+
+			if ( ! empty( $location_data->phone ) ) {
+				$output['phone'] = $location_data->phone;
+			}
+		}
+
+		if ( ! empty( $output['latitude'] ) && ! empty( $output['longitude'] ) ) {
+			$data = static::reverse_geocode( $output['latitude'], $output['longitude'] );
+			var_dump( $data );
+
+			if ( ! empty( $data->city ) ) {
+				$output['city'] = $data->city;
+			}
+
+			if ( ! empty( $data->county ) ) {
+				$output['county'] = $data->county;
+			}
+
+			if ( ! empty( $data->state ) ) {
+				$output['state'] = $data->state;
+			}
+
+			if ( ! empty( $data->country ) ) {
+				$output['country'] = $data->country;
+			}
+
+			if ( ! empty( $data->postcode ) ) {
+				$output['postcode'] = $data->postcode;
+			}
+		}
+
+		if ( ! empty( $output['instagram_location_id'] ) ) {
+			static::$normalized_data_cache[ $output['instagram_location_id'] ] = $output;
 		}
 
 		return $output;
@@ -461,6 +541,10 @@ class Daddio_Instagram_Locations {
 	 */
 	public static function get_term_id_from_location_id( $location_id = 0 ) {
 		global $wpdb;
+
+		if ( ! empty( static::$term_id_from_location_id_cache[ $location_id ] ) ) {
+			return static::$term_id_from_location_id_cache[ $location_id ];
+		}
 
 		$meta_key   = 'instagram-location-id';
 		$meta_value = $location_id;
@@ -480,6 +564,7 @@ class Daddio_Instagram_Locations {
 		);
 		$term_id = intval( $term_id );
 		if ( $term_id ) {
+			static::$term_id_from_location_id_cache[ $location_id ] = $term_id;
 			return $term_id;
 		}
 		return 0;
@@ -497,7 +582,7 @@ class Daddio_Instagram_Locations {
 		}
 		$request  = 'https://www.instagram.com/explore/locations/' . $location_id . '/';
 		$response = wp_remote_get( $request );
-		$json = Daddio_Instagram::get_instagram_json_from_html( $response['body'] );
+		$json     = Daddio_Instagram::get_instagram_json_from_html( $response['body'] );
 		if ( ! empty( $json->entry_data->LocationsPage[0]->graphql->location ) ) {
 			return $json->entry_data->LocationsPage[0]->graphql->location;
 		}
@@ -543,7 +628,7 @@ class Daddio_Instagram_Locations {
 			'country_code' => '',
 		);
 		if ( empty( $lat ) || empty( $long ) ) {
-			return $output;
+			return (object) $output;
 		}
 		$query_args = array(
 			'format'         => 'json',
@@ -556,7 +641,7 @@ class Daddio_Instagram_Locations {
 		$response   = wp_remote_get( $request );
 		$body       = $response['body'];
 		if ( ! is_string( $body ) || empty( $body ) ) {
-			return $output;
+			return (object) $output;
 		}
 		$json = json_decode( $response['body'] );
 		if ( isset( $json->address ) ) {
@@ -577,7 +662,7 @@ class Daddio_Instagram_Locations {
 				}
 			}
 		}
-		return $output;
+		return (object) $output;
 	}
 
 	/**
