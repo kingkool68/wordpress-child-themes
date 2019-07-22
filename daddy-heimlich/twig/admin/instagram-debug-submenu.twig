@@ -14,7 +14,7 @@
 	<form action="{{ form_action_url|esc_url }}" method="post">
 		{{ nonce_field }}
 		<label for="instagram-source">HTML Source</label>
-		<textarea name="instagram-source" id="instagram-source" rows="5"></textarea>
+		<textarea name="instagram-source" id="instagram-source" rows="5">{{ text_area_value }}</textarea>
 		{{ submit_button }}
 	</form>
 </div>

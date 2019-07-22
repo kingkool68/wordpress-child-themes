@@ -78,12 +78,12 @@ class Daddio_Instagram_Debug {
 			if ( isset( $json->entry_data->PostPage[0] ) ) {
 				$nodes = array( $json->entry_data->PostPage[0]->graphql->shortcode_media );
 			}
-			foreach ( $nodes as $node ) :
-				$node           = $this->instagram_class->normalize_instagram_data( $node );
+			foreach ( $nodes as $raw_node ) :
+				$node           = $this->instagram_class->normalize_instagram_data( $raw_node );
 				$instagram_link = 'https://www.instagram.com/p/' . $node->code . '/';
-				$result[]      = '<xmp>' . wp_json_encode( $node, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . '</xmp>';
-				$location_data = $this->instagram_location_class->get_location_data_from_node( $node );
-				wp_dump( $location_data );
+				$result[]       = '<xmp>' . wp_json_encode( $node, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . '</xmp>';
+				$location_data  = $this->instagram_location_class->get_location_data_from_node( $raw_node );
+				var_dump( $location_data );
 			endforeach;
 		}
 
@@ -101,6 +101,7 @@ class Daddio_Instagram_Debug {
 				$echo
 			),
 			'form_action_url' => admin_url( 'edit.php?post_type=instagram&page=instagram-debug' ),
+			'text_area_value' => wp_unslash( $_POST['instagram-source'] ),
 			'submit_button'   => get_submit_button( 'Debug', 'primary' ),
 		);
 		Sprig::out( 'admin/instagram-debug-submenu.twig', $context );
