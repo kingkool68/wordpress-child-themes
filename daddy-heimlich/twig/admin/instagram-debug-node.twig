@@ -1,0 +1,56 @@
+<div class="debug-node level-{{ level }}">
+
+	{% if location %}
+		<h3>Location</h3>
+		<table class="location-data">
+			<tbody>
+				{% for key, value in location %}
+					<tr>
+						<td>{{ key }}</td>
+						{% if 'http' in value %}
+							<td>
+								<a href="{{ value|esc_url }}" target="_blank">
+									{{ value }}
+								</a>
+							</td>
+						{% else %}
+							<td>{{ value }}</td>
+						{% endif %}
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endif %}
+
+	<h3>Media</h3>
+	{% if node.video_src %}
+		<video controls class="video-preview">
+			<source src="{{ node.video_src|esc_url }}" type="video/mp4">
+		</video>
+	{% elseif node.full_src %}
+		<a href="{{ node.full_src|esc_url }}" target="_blank">
+			<img src="{{ node.full_src|esc_url }}" class="image-preview">
+		</a>
+	{% endif %}
+
+	<table class="media-data">
+		<tbody>
+			{% for key, value in node %}
+				<tr>
+					<td>{{ key }}</td>
+					{% if 'http' in value %}
+						<td>
+							<a href="{{ value|esc_url }}" target="_blank">
+								{{ value }}
+							</a>
+						</td>
+					{% else %}
+						<td>{{ value }}</td>
+					{% endif %}
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	{{ child_nodes }}
+</div>

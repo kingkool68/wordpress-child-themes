@@ -4,9 +4,34 @@
 		max-width: 800px;
 		width: 95%;
 	}
+
+	.debug-node.level-1 {
+		border-bottom: 2px solid #ccc;
+		margin-bottom: 64px;
+	}
+
+	.debug-node .video-preview,
+	.debug-node .image-preview {
+		margin: 0 0 8px;
+		max-width: 250px;
+		height: auto;
+	}
+
+	.debug-node table {
+		margin-bottom: 32px;
+	}
+
+	.debug-node .debug-node {
+		padding-left: 64px;
+	}
 </style>
 
 <div class="wrap">
+	{% if instagram_permalink %}
+		<h1>
+			Debugging <a href="{{ instagram_permalink|esc_url }}" target="_blank">{{ instagram_permalink }}</a>
+		</h1>
+	{% endif %}
 	{{ result }}
 
 	<h1>Instagram Debug</h1>

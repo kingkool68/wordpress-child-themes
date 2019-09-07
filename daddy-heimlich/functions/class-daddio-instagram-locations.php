@@ -39,7 +39,7 @@ class Daddio_Instagram_Locations {
 			'show_in_nav_menus' => true,
 			'show_tagcloud'     => true,
 		);
-		register_taxonomy( 'location', array( 'instagram' ), $args );
+		register_taxonomy( 'location', array( Daddio_Instagram::$post_type ), $args );
 
 		$args = array(
 			'labels'            => Daddio_Helpers::generate_taxonomy_labels( 'zip code', 'zip codes' ),
@@ -50,7 +50,7 @@ class Daddio_Instagram_Locations {
 			'show_in_nav_menus' => true,
 			'show_tagcloud'     => true,
 		);
-		register_taxonomy( 'zip-code', array( 'instagram' ), $args );
+		register_taxonomy( 'zip-code', array( Daddio_Instagram::$post_type ), $args );
 
 		$args = array(
 			'labels'            => Daddio_Helpers::generate_taxonomy_labels( 'state', 'states' ),
@@ -61,7 +61,7 @@ class Daddio_Instagram_Locations {
 			'show_in_nav_menus' => true,
 			'show_tagcloud'     => true,
 		);
-		register_taxonomy( 'state', array( 'instagram' ), $args );
+		register_taxonomy( 'state', array( Daddio_Instagram::$post_type ), $args );
 
 		$args = array(
 			'labels'            => Daddio_Helpers::generate_taxonomy_labels( 'county', 'counties' ),
@@ -72,7 +72,7 @@ class Daddio_Instagram_Locations {
 			'show_in_nav_menus' => true,
 			'show_tagcloud'     => true,
 		);
-		register_taxonomy( 'county', array( 'instagram' ), $args );
+		register_taxonomy( 'county', array( Daddio_Instagram::$post_type ), $args );
 
 		$args = array(
 			'labels'            => Daddio_Helpers::generate_taxonomy_labels( 'country', 'countries' ),
@@ -83,7 +83,7 @@ class Daddio_Instagram_Locations {
 			'show_in_nav_menus' => true,
 			'show_tagcloud'     => true,
 		);
-		register_taxonomy( 'country', array( 'instagram' ), $args );
+		register_taxonomy( 'country', array( Daddio_Instagram::$post_type ), $args );
 	}
 
 	/**
@@ -93,17 +93,17 @@ class Daddio_Instagram_Locations {
 	 * @param  object  $node    Normalized Instagram data
 	 */
 	public static function action_daddio_after_instagram_inserted( $post_id = 0, $node ) {
-		$post = get_post( $post_id );
-		if ( $post->post_type !== 'instagram' ) {
+		$post    = get_post( $post_id );
+		$post_id = $post->ID;
+		if ( $post->post_type !== Daddio_Instagram::$post_type ) {
 			return;
 		}
 
-		$location_data = static::get_location_data_from_node( $node );
-		if ( empty( $location_data ) ) {
-			$description = 'No location set';
-			$args        = array(
+		$location_data = static::normalize_node_data( $node );
+		if ( empty( $location_data ) || empty( $location_data['instagram_location_id'] ) ) {
+			$args = array(
 				'term_name'        => 'None',
-				'term_description' => $description,
+				'term_description' => 'No location set',
 				'taxonomy'         => 'location',
 				'post_id'          => $post_id,
 			);
@@ -111,26 +111,23 @@ class Daddio_Instagram_Locations {
 			update_post_meta( $post_id, 'instagram_location_id', 0 );
 			return;
 		}
-
-		if ( ! empty( $location_data['id'] ) ) {
-			// Get the term id for the location
-			$term_id = static::get_term_id_from_location_id( $location_data['id'] );
-			if ( $term_id ) {
-				wp_set_object_terms(
-					$post_id,
-					$term_id,
-					'location',
-					$append = true
-				);
-			}
-			update_post_meta( $post_id, 'instagram_location_id', $location_data['id'] );
+		// If there is no term ID, insert it
+		// If the term data is stale, update it
+		if ( ! empty( $location_data['term_id'] ) ) {
+			wp_set_object_terms(
+				$post_id,
+				$location_data['term_id'],
+				'location',
+				$append = true
+			);
+			update_post_meta( $post_id, 'instagram_location_id', $location_data['instagram_location_id'] );
 		}
 
-		if ( ! empty( $location_data['lat'] ) ) {
-			update_post_meta( $post_id, 'latitude', $location_data['lat'] );
+		if ( ! empty( $location_data['latitude'] ) ) {
+			update_post_meta( $post_id, 'latitude', $location_data['latitude'] );
 		}
-		if ( ! empty( $location_data['lng'] ) ) {
-			update_post_meta( $post_id, 'longitude', $location_data['lng'] );
+		if ( ! empty( $location_data['longitude'] ) ) {
+			update_post_meta( $post_id, 'longitude', $location_data['longitude'] );
 		}
 
 		if ( ! empty( $location_data['postcode'] ) ) {
@@ -254,31 +251,6 @@ class Daddio_Instagram_Locations {
 	}
 
 	/**
-	 * Get location data for a given Instagram node
-	 *
-	 * @param  object  $node Instagram node data
-	 * @return array         Location data
-	 */
-	public static function get_location_data_from_node( $node ) {
-		return static::normalize_data( $node );
-		/*
-		// This stuff is weird...
-		$location_term_id = false;
-		if ( ! empty( $node->location_id ) ) {
-			$location_args    = array(
-				'id'              => $node->location_id,
-				'name'            => $node->location_name,
-				'slug'            => $node->location_slug,
-				'has_public_page' => $node->location_has_public_page,
-			);
-			$location_term_id = static::maybe_add_location( $location_args );
-			return static::get_location_data( $location_term_id );
-		}
-		return array();
-		*/
-	}
-
-	/**
 	 * Add a term if it doesn't exist and associate with a post ID
 	 *
 	 * @param array $args Arguments of the term to maybe create
@@ -395,7 +367,7 @@ class Daddio_Instagram_Locations {
 		return $term_id;
 	}
 
-	public static function normalize_data( $node = false ) {
+	public static function normalize_node_data( $node = false ) {
 		if ( ! $node ) {
 			return false;
 		}
@@ -412,29 +384,30 @@ class Daddio_Instagram_Locations {
 		}
 
 		$output = array(
-			'_normalized'           => true,
-			'instagram_location_id' => '',
-			'name'                  => '',
-			'slug'                  => '',
-			'has_public_page'       => '',
+			'_normalized'                  => true,
+			'instagram_location_id'        => '',
+			'name'                         => '',
+			'slug'                         => '',
+			'has_public_page'              => '',
+			'instagram_location_url' => '',
 
-			'latitude'              => '',
-			'longitude'             => '',
+			'latitude'                     => '',
+			'longitude'                    => '',
 
-			'street_address'        => '',
-			'city'                  => '',
-			'county'                => '',
-			'state'                 => '',
-			'postcode'              => '',
-			'country'               => '',
-			'country_code'          => '',
+			'street_address'               => '',
+			'city'                         => '',
+			'county'                       => '',
+			'state'                        => '',
+			'postcode'                     => '',
+			'country'                      => '',
+			'country_code'                 => '',
 
-			'blurb'                 => '',
-			'website'               => '',
-			'phone'                 => '',
+			'blurb'                        => '',
+			'website'                      => '',
+			'phone'                        => '',
 
-			'term_id'               => 0,
-			'term_last_updated'     => false,
+			'term_id'                      => 0,
+			'term_last_updated'            => false,
 		);
 		if ( ! empty( $node->location ) ) {
 
@@ -478,6 +451,8 @@ class Daddio_Instagram_Locations {
 				$output['term_id']           = $term_id;
 				$output['term_last_updated'] = get_term_meta( $term_id, 'instagram-last-updated', true );
 			}
+
+			$output['instagram_location_url'] = 'https://www.instagram.com/explore/locations/' . $output['instagram_location_id'] . '/';
 
 			$location_data = static::fetch_instagram_location( $output['instagram_location_id'] );
 			if ( ! empty( $location_data->lat ) ) {
@@ -533,12 +508,35 @@ class Daddio_Instagram_Locations {
 		return $output;
 	}
 
-	/**
-	 * Get the term ID for a given Instagram location ID
-	 *
-	 * @param  integer $location_id ID of Instagram location
-	 * @return integer              WordPress term ID
-	 */
+	public static function update_terms_from_node_data( $node ) {
+		// Make sure $node is already normalized
+		if ( ! isset( $node->_normalized ) || ! $node->_normalized ) {
+			throw new Exception( '$node is not a normalized location data object!' );
+		}
+
+		$custom_slug = $node['slug'] . '-' . $node['instagram_location_id'];
+		$term_args   = array(
+			'slug' => $custom_slug,
+		);
+		$term        = wp_insert_term( $args['name'], $taxonomy = 'location', $term_args );
+		if ( ! is_array( $term ) || empty( $term['term_id'] ) || is_wp_error( $term ) ) {
+			return 0;
+		}
+		$term_id = intval( $term['term_id'] );
+		add_term_meta( $term_id, 'instagram-location-id', $location_data['id'] );
+		add_term_meta( $term_id, 'latitude', $location_data['lat'] );
+		add_term_meta( $term_id, 'longitude', $location_data['lng'] );
+		add_term_meta( $term_id, 'instagram-last-updated', time() );
+		add_term_meta( $term_id, 'location-data', $location_data );
+		return $term_id;
+	}
+
+		/**
+		 * Get the term ID for a given Instagram location ID
+		 *
+		 * @param  integer $location_id ID of Instagram location
+		 * @return integer              WordPress term ID
+		 */
 	public static function get_term_id_from_location_id( $location_id = 0 ) {
 		global $wpdb;
 
@@ -570,12 +568,12 @@ class Daddio_Instagram_Locations {
 		return 0;
 	}
 
-	/**
-	 * Fetch HTML for a given Instagram location ID
-	 *
-	 * @param  string $location_id Instagram Location ID to fetch data for
-	 * @return object              JSON data found from scraping the Instagram Location page
-	 */
+		/**
+		 * Fetch HTML for a given Instagram location ID
+		 *
+		 * @param  string $location_id Instagram Location ID to fetch data for
+		 * @return object              JSON data found from scraping the Instagram Location page
+		 */
 	public static function fetch_instagram_location( $location_id = '' ) {
 		if ( ! $location_id ) {
 			return false;
@@ -588,12 +586,12 @@ class Daddio_Instagram_Locations {
 		}
 	}
 
-	/**
-	 * Get meta data for given location term
-	 *
-	 * @param  string $term WordPress Term or term ID
-	 * @return array        Term meta data
-	 */
+		/**
+		 * Get meta data for given location term
+		 *
+		 * @param  string $term WordPress Term or term ID
+		 * @return array        Term meta data
+		 */
 	public static function get_location_data( $term = '' ) {
 		$term_id = false;
 		if ( is_numeric( $term ) ) {
@@ -610,13 +608,13 @@ class Daddio_Instagram_Locations {
 		return get_term_meta( $term_id, 'location-data', true );
 	}
 
-	/**
-	 * Reverse geocode a pair of lat/long coordinates
-	 *
-	 * @param  string $lat  Latitude coordinates
-	 * @param  string $long Longitude coordinates
-	 * @return array        Geocode data
-	 */
+		/**
+		 * Reverse geocode a pair of lat/long coordinates
+		 *
+		 * @param  string $lat  Latitude coordinates
+		 * @param  string $long Longitude coordinates
+		 * @return array        Geocode data
+		 */
 	public static function reverse_geocode( $lat = '', $long = '' ) {
 		$output = array(
 			'locality'     => '',
@@ -648,7 +646,7 @@ class Daddio_Instagram_Locations {
 			$output = wp_parse_args( $json->address, $output );
 		}
 		if ( isset( $output['postcode'] ) ) {
-			// Get city/state data via zipcode
+			// Get city/state data via zip code
 			$request  = 'https://api.zippopotam.us/us/' . $output['postcode'];
 			$response = wp_remote_get( $request );
 			$body     = $response['body'];
@@ -665,12 +663,12 @@ class Daddio_Instagram_Locations {
 		return (object) $output;
 	}
 
-	/**
-	 * Given a state return the state abbreviation
-	 *
-	 * @param  string $state Full state name
-	 * @return string|False  State abbreviation or false if not found
-	 */
+		/**
+		 * Given a state return the state abbreviation
+		 *
+		 * @param  string $state Full state name
+		 * @return string|False  State abbreviation or false if not found
+		 */
 	public static function get_state_abbreviation( $state = '' ) {
 		$key = ucwords( strtolower( $state ) );
 		// via https://gist.github.com/maxrice/2776900#gistcomment-1172963

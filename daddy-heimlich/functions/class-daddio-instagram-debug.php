@@ -15,15 +15,9 @@ class Daddio_Instagram_Debug {
 		static $instance = null;
 		if ( null === $instance ) {
 			$instance = new static();
-			$instance->setup();
 			$instance->setup_actions();
 		}
 		return $instance;
-	}
-
-	public function setup() {
-		$this->instagram_class          = Daddio_Instagram::get_instance();
-		$this->instagram_location_class = Daddio_Instagram_Locations::get_instance();
 	}
 
 	/**
@@ -54,7 +48,8 @@ class Daddio_Instagram_Debug {
 			&& check_admin_referer( static::$nonce_field_action )
 		) {
 			$instagram_source = wp_unslash( $_POST['instagram-source'] );
-			$json             = $this->instagram_class->get_instagram_json_from_html( $instagram_source );
+			$json             = Daddio_Instagram::get_instagram_json_from_html( $instagram_source );
+			$page_type        = '';
 
 			// It's a Tag page
 			if ( isset( $json->entry_data->TagPage[0] ) ) {
@@ -62,28 +57,36 @@ class Daddio_Instagram_Debug {
 				$other     = array();
 
 				if ( isset( $json->entry_data->TagPage[0]->tag ) ) {
-					$top_posts = $json->entry_data->TagPage[0]->tag->top_posts->nodes;
-					$other     = $json->entry_data->TagPage[0]->tag->media->nodes;
+					$tag       = $json->entry_data->TagPage[0]->tag;
+					$top_posts = $tag->top_posts->nodes;
+					$other     = $tag->media->nodes;
 				}
 
 				// New format I detected on 01/02/2018
 				if ( isset( $json->entry_data->TagPage[0]->graphql->hashtag ) ) {
-					$top_posts = $json->entry_data->TagPage[0]->graphql->hashtag->edge_hashtag_to_top_posts->edges;
-					$other     = $json->entry_data->TagPage[0]->graphql->hashtag->edge_hashtag_to_media->edges;
+					$tag       = $json->entry_data->TagPage[0]->graphql->hashtag;
+					$top_posts = $tag->edge_hashtag_to_top_posts->edges;
+					$other     = $tag->edge_hashtag_to_media->edges;
+					if ( ! empty( $tag->name ) ) {
+						$instagram_permalink = 'https://www.instagram.com/explore/tags/' . $tag->name . '/';
+					}
 				}
-				$nodes = array_merge( $top_posts, $other );
+				$nodes     = array_merge( $top_posts, $other );
+				$page_type = 'tag';
+
 			}
 
 			// It's a single Post page
-			if ( isset( $json->entry_data->PostPage[0] ) ) {
-				$nodes = array( $json->entry_data->PostPage[0]->graphql->shortcode_media );
+			if ( ! empty( $json->entry_data->PostPage[0]->graphql->shortcode_media ) ) {
+				$post_page_node = $json->entry_data->PostPage[0]->graphql->shortcode_media;
+				$nodes          = array( $post_page_node );
+				$page_type      = 'post';
+				if ( ! empty( $post_page_node->shortcode ) ) {
+					$instagram_permalink = 'https://www.instagram.com/p/' . $post_page_node->shortcode . '/';
+				}
 			}
 			foreach ( $nodes as $raw_node ) :
-				$node           = $this->instagram_class->normalize_instagram_data( $raw_node );
-				$instagram_link = 'https://www.instagram.com/p/' . $node->code . '/';
-				$result[]       = '<xmp>' . wp_json_encode( $node, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . '</xmp>';
-				$location_data  = $this->instagram_location_class->get_location_data_from_node( $raw_node );
-				var_dump( $location_data );
+				$result[] = static::render_raw_node_debug( $raw_node );
 			endforeach;
 		}
 
@@ -93,18 +96,60 @@ class Daddio_Instagram_Debug {
 		$echo    = false;
 
 		$context = array(
-			'result'          => implode( "\n", $result ),
-			'nonce_field'     => wp_nonce_field(
+			'instagram_permalink' => $instagram_permalink,
+			'result'              => implode( "\n", $result ),
+			'nonce_field'         => wp_nonce_field(
 				$action,
 				$name,
 				$referer,
 				$echo
 			),
-			'form_action_url' => admin_url( 'edit.php?post_type=instagram&page=instagram-debug' ),
-			'text_area_value' => wp_unslash( $_POST['instagram-source'] ),
-			'submit_button'   => get_submit_button( 'Debug', 'primary' ),
+			'form_action_url'     => admin_url( 'edit.php?post_type=instagram&page=instagram-debug' ),
+			'text_area_value'     => wp_unslash( $_POST['instagram-source'] ),
+			'submit_button'       => get_submit_button( 'Debug', 'primary' ),
 		);
 		Sprig::out( 'admin/instagram-debug-submenu.twig', $context );
+	}
+
+	public static function render_raw_node_debug( $raw_node, $level = 1 ) {
+		$node        = Daddio_Instagram::normalize_instagram_data( $raw_node );
+		$child_nodes = array();
+		if ( ! empty( $node->children ) ) {
+			$child_level = $level + 1;
+			foreach ( $node->children as $child_node ) {
+				$child_nodes[] = static::render_raw_node_debug( $child_node, $child_level );
+			}
+		}
+
+		$node_arr = (array) $node;
+		unset( $node_arr['children'] );
+		unset( $node_arr['_normalized'] );
+		$node_arr['children_count'] = count( $node->children );
+		foreach ( $node_arr as $key => $val ) {
+			if ( is_bool( $val ) ) {
+				$node_arr[ $key ] = ( $val ) ? 'true' : 'false';
+			}
+		}
+
+		$location_data = Daddio_Instagram_Locations::normalize_node_data( $raw_node );
+		$location_arr  = (array) $location_data;
+		unset( $location_arr['_normalized'] );
+		foreach ( $location_arr as $key => $val ) {
+			if ( is_bool( $val ) ) {
+				$location_arr[ $key ] = ( $val ) ? 'true' : 'false';
+			}
+		}
+		if ( $level > 1 ) {
+			$location_arr = array();
+		}
+
+		$context = array(
+			'level'       => $level,
+			'node'        => $node_arr,
+			'child_nodes' => implode( "\n", $child_nodes ),
+			'location'    => $location_arr,
+		);
+		return Sprig::render( 'admin/instagram-debug-node.twig', $context );
 	}
 }
 Daddio_Instagram_Debug::get_instance();

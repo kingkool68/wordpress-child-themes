@@ -11,6 +11,8 @@ class Daddio_Instagram {
 	 */
 	private static $private_sync_slug = 'instagram-private-sync';
 
+	public static $post_type = 'instagram';
+
 	/**
 	 * Get an instance of this class
 	 */
@@ -51,7 +53,7 @@ class Daddio_Instagram {
 	 */
 	public function action_init() {
 		$args = array(
-			'label'               => 'instagram',
+			'label'               => static::$post_type,
 			'description'         => 'Instagram posts',
 			'labels'              => Daddio_Helpers::generate_post_type_labels( 'instagram post', 'instagram posts' ),
 			'supports'            => array( 'title', 'editor', 'thumbnail', 'comments' ),
@@ -70,7 +72,7 @@ class Daddio_Instagram {
 			'publicly_queryable'  => true,
 			'capability_type'     => 'page',
 		);
-		register_post_type( 'instagram', $args );
+		register_post_type( static::$post_type, $args );
 	}
 
 	/**
@@ -103,7 +105,7 @@ class Daddio_Instagram {
 	 */
 	public function action_before_delete_post( $post_id = 0 ) {
 		$post = get_post( $post_id );
-		if ( 'instagram' !== $post->post_type ) {
+		if ( static::$post_type !== $post->post_type ) {
 			return;
 		}
 		$args  = array(
@@ -210,7 +212,7 @@ class Daddio_Instagram {
 	 * Add a select menu for showing posts that aren't tagged in the post list screen
 	 */
 	public function action_restrict_manage_posts() {
-		$whitelisted_post_types = array( 'post', 'instagram' );
+		$whitelisted_post_types = array( 'post', static::$post_type );
 		if ( ! in_array( get_current_screen()->post_type, $whitelisted_post_types, true ) ) {
 			return;
 		}
@@ -313,7 +315,7 @@ class Daddio_Instagram {
 		$post_id = absint( $_GET['post_id'] );
 		check_admin_referer( 'modify_' . $post_id );
 
-		if ( get_post_type( $post_id ) !== 'instagram' ) {
+		if ( get_post_type( $post_id ) !== static::$post_type ) {
 			wp_die( 'Not an Instagram post' );
 		}
 		$action = strtolower( $_GET['action'] );
@@ -448,7 +450,7 @@ class Daddio_Instagram {
 	 */
 	public function filter_the_content( $content = '' ) {
 		$post = get_post();
-		if ( 'instagram' === get_post_type( $post ) ) {
+		if ( static::$post_type === get_post_type( $post ) ) {
 			// TODO: Use Twitter's hashtag parser thing to autolink hashtags. This should work better. See https://github.com/nojimage/twitter-text-php
 			$content = preg_replace( '/\s(#(\w+))/im', ' <a href="https://instagram.com/explore/tags/$2/">$1</a>', $content );
 			// $content = preg_replace('/^(#(\w+))/im', '<a href="https://instagram.com/explore/tags/$2/">$1</a>', $content);
@@ -585,6 +587,7 @@ class Daddio_Instagram {
 			'typename'                 => false,
 			'id'                       => '',
 			'code'                     => '',
+			'instagram_url'            => '',
 			'full_src'                 => '',
 			'thumbnail_src'            => '',
 			'video_src'                => '',
@@ -672,6 +675,10 @@ class Daddio_Instagram {
 		}
 		if ( isset( $node->caption ) ) {
 			$output['caption'] = $node->caption;
+		}
+
+		if ( ! empty( $output['code'] ) ) {
+			$output['instagram_url'] = 'https://instagram.com/p/' . $output['code'] . '/';
 		}
 
 		// Check if this node has children
@@ -772,7 +779,7 @@ class Daddio_Instagram {
 			'post_title'    => $title,
 			'post_content'  => $caption,
 			'post_status'   => 'publish',
-			'post_type'     => 'instagram',
+			'post_type'     => static::$post_type,
 			'post_date'     => get_date_from_gmt( $posted ),
 			'post_date_gmt' => $posted,
 			'guid'          => $permalink,
