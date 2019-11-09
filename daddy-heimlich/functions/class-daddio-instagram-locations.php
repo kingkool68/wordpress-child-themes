@@ -22,7 +22,7 @@ class Daddio_Instagram_Locations {
 	 */
 	public function setup_actions() {
 		add_action( 'init', array( $this, 'action_init' ) );
-		add_action( 'daddio_after_instagram_inserted', array( __CLASS__, 'action_daddio_after_instagram_inserted' ), 10, 2 );
+		add_action( 'daddio_after_instagram_inserted', array( __CLASS__, 'action_daddio_after_instagram_inserted' ), 10, 3 );
 		add_action( 'location_edit_form_fields', array( __CLASS__, 'action_location_edit_form_fields' ), 11 );
 	}
 
@@ -99,8 +99,12 @@ class Daddio_Instagram_Locations {
 			return;
 		}
 
+		/**
+		 * Looks like $node is usually a normalized instagram post node not a location page node. We need to add some logic to the normalize_node_data method to check what kind of node it is and then normalize the data as needed
+		 */
 		$location_data = static::normalize_node_data( $node );
-		if ( empty( $location_data ) || empty( $location_data['instagram_location_id'] ) ) {
+
+		if ( empty( $location_data->instagram_location_id ) ) {
 			$args = array(
 				'term_name'        => 'None',
 				'term_description' => 'No location set',
@@ -317,7 +321,7 @@ class Daddio_Instagram_Locations {
 		if ( $term_id ) {
 			return $term_id;
 		}
-		$raw_location_data = static::fetch_instagram_location( $args['id'] );
+		$raw_location_data = static::fetch_instagram_location_by_id( $args['id'] );
 		$location_data     = array(
 			'id'              => '',
 			'name'            => '',
@@ -333,7 +337,6 @@ class Daddio_Instagram_Locations {
 		if ( isset( $raw_location_data->entry_data->LocationsPage[0]->graphql->location ) ) {
 			$location_obj = $raw_location_data->entry_data->LocationsPage[0]->graphql->location;
 			$address      = json_decode( $location_obj->address_json );
-			var_dump( $address );
 		}
 
 		if ( ! empty( $location_obj ) ) {
@@ -374,46 +377,48 @@ class Daddio_Instagram_Locations {
 
 		// Check if the data has already been normalized and is cached
 		if ( ! empty( $node->location->id ) && ! empty( static::$normalized_data_cache[ $node->location->id ] ) ) {
-			echo 'Cache hit!';
 			return static::$normalized_data_cache[ $node->location->id ];
 		}
 
 		// Check if $node is already normalized
-		if ( isset( $node->_normalized ) && $node->_normalized ) {
+		if ( isset( $node->instagram_location_id ) && isset( $node->_normalized ) && $node->_normalized ) {
 			return $node;
 		}
 
+		if ( ! empty( $node->location_id ) ) {
+			// $node = static::fetch_instagram_location_by_id( $node->location_id );
+		}
+
 		$output = array(
-			'_normalized'                  => true,
-			'instagram_location_id'        => '',
-			'name'                         => '',
-			'slug'                         => '',
-			'has_public_page'              => '',
+			'_normalized'            => true,
+			'instagram_location_id'  => '',
+			'name'                   => '',
+			'slug'                   => '',
+			'has_public_page'        => '',
 			'instagram_location_url' => '',
 
-			'latitude'                     => '',
-			'longitude'                    => '',
+			'latitude'               => '',
+			'longitude'              => '',
 
-			'street_address'               => '',
-			'city'                         => '',
-			'county'                       => '',
-			'state'                        => '',
-			'postcode'                     => '',
-			'country'                      => '',
-			'country_code'                 => '',
+			'street_address'         => '',
+			'city'                   => '',
+			'county'                 => '',
+			'state'                  => '',
+			'postcode'               => '',
+			'country'                => '',
+			'country_code'           => '',
 
-			'blurb'                        => '',
-			'website'                      => '',
-			'phone'                        => '',
+			'blurb'                  => '',
+			'website'                => '',
+			'phone'                  => '',
 
-			'term_id'                      => 0,
-			'term_last_updated'            => false,
+			'term_id'                => 0,
+			'term_last_updated'      => false,
 		);
 		if ( ! empty( $node->location ) ) {
 
 			if ( ! empty( $node->location->id ) ) {
 				$output['instagram_location_id'] = $node->location->id;
-
 			}
 
 			if ( ! empty( $node->location->has_public_page ) ) {
@@ -454,50 +459,11 @@ class Daddio_Instagram_Locations {
 
 			$output['instagram_location_url'] = 'https://www.instagram.com/explore/locations/' . $output['instagram_location_id'] . '/';
 
-			$location_data = static::fetch_instagram_location( $output['instagram_location_id'] );
-			if ( ! empty( $location_data->lat ) ) {
-				$output['latitude'] = $location_data->lat;
-			}
-
-			if ( ! empty( $location_data->lng ) ) {
-				$output['longitude'] = $location_data->lng;
-			}
-
-			if ( ! empty( $location_data->blurb ) ) {
-				$output['blurb'] = $location_data->blurb;
-			}
-
-			if ( ! empty( $location_data->website ) ) {
-				$output['website'] = $location_data->website;
-			}
-
-			if ( ! empty( $location_data->phone ) ) {
-				$output['phone'] = $location_data->phone;
-			}
-		}
-
-		if ( ! empty( $output['latitude'] ) && ! empty( $output['longitude'] ) ) {
-			$data = static::reverse_geocode( $output['latitude'], $output['longitude'] );
-			var_dump( $data );
-
-			if ( ! empty( $data->city ) ) {
-				$output['city'] = $data->city;
-			}
-
-			if ( ! empty( $data->county ) ) {
-				$output['county'] = $data->county;
-			}
-
-			if ( ! empty( $data->state ) ) {
-				$output['state'] = $data->state;
-			}
-
-			if ( ! empty( $data->country ) ) {
-				$output['country'] = $data->country;
-			}
-
-			if ( ! empty( $data->postcode ) ) {
-				$output['postcode'] = $data->postcode;
+			$location_data = static::fetch_instagram_location_by_id( $output['instagram_location_id'] );
+			if ( ! empty( $location_data ) ) {
+				foreach ( $location_data as $key => $val ) {
+					$output[ $key ] = $val;
+				}
 			}
 		}
 
@@ -574,16 +540,87 @@ class Daddio_Instagram_Locations {
 		 * @param  string $location_id Instagram Location ID to fetch data for
 		 * @return object              JSON data found from scraping the Instagram Location page
 		 */
-	public static function fetch_instagram_location( $location_id = '' ) {
+	public static function fetch_instagram_location_by_id( $location_id = '' ) {
+		$output = array(
+			'latitude'       => '',
+			'longitude'      => '',
+
+			'street_address' => '',
+			'city'           => '',
+			'county'         => '',
+			'state'          => '',
+			'postcode'       => '',
+			'country'        => '',
+			'country_code'   => '',
+
+			'blurb'          => '',
+			'website'        => '',
+			'phone'          => '',
+		);
+
 		if ( ! $location_id ) {
-			return false;
+			return (object) $output;
 		}
-		$request  = 'https://www.instagram.com/explore/locations/' . $location_id . '/';
-		$response = wp_remote_get( $request );
-		$json     = Daddio_Instagram::get_instagram_json_from_html( $response['body'] );
-		if ( ! empty( $json->entry_data->LocationsPage[0]->graphql->location ) ) {
-			return $json->entry_data->LocationsPage[0]->graphql->location;
+
+		$scraper             = Daddio_Instagram::get_instagram_scraper();
+		$location            = $scraper->getLocationById( $location_id );
+		$output['latitude']  = $location->getLat();
+		$output['longitude'] = $location->getLng();
+
+		$location_data = Daddio_Helpers::get_protected_object_property( $location, 'data' );
+
+		$mapping = array(
+			'blurb',
+			'website',
+			'phone',
+		);
+		foreach ( $mapping as $key ) {
+			if ( ! empty( $location_data[ $key ] ) ) {
+				$output[ $key ] = $location_data[ $key ];
+			}
 		}
+
+		if ( ! empty( $location_data['address_json'] ) ) {
+			$address_json = json_decode( $location_data['address_json'] );
+
+			if ( ! empty( $address_json->street_address ) ) {
+				$output['street_address'] = $address_json->street_address;
+			}
+
+			if ( ! empty( $address_json->zip_code ) ) {
+				$output['postcode'] = $address_json->zip_code;
+			}
+
+			if ( ! empty( $address_json->country_code ) ) {
+				$output['country_code'] = $address_json->country_code;
+			}
+		}
+
+		if ( ! empty( $output['latitude'] ) && ! empty( $output['longitude'] ) ) {
+			$data = static::reverse_geocode( $output['latitude'], $output['longitude'] );
+			var_dump( $data );
+
+			if ( ! empty( $data->city ) && empty( $output['city'] ) ) {
+				$output['city'] = $data->city;
+			}
+
+			if ( ! empty( $data->county ) && empty( $output['county'] ) ) {
+				$output['county'] = $data->county;
+			}
+
+			if ( ! empty( $data->state ) && empty( $output['state'] ) ) {
+				$output['state'] = $data->state;
+			}
+
+			if ( ! empty( $data->country ) && empty( $output['country'] ) ) {
+				$output['country'] = $data->country;
+			}
+
+			if ( ! empty( $data->postcode ) && empty( $output['postcode'] ) ) {
+				$output['postcode'] = $data->postcode;
+			}
+		}
+		return (object) $output;
 	}
 
 		/**

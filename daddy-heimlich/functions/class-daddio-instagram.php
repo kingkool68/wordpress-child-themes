@@ -506,6 +506,22 @@ class Daddio_Instagram {
 		<?php
 	}
 
+	public static function get_instagram_scraper() {
+		if ( ! defined( 'DADDIO_INSTAGRAM_USERNAME' ) || empty( DADDIO_INSTAGRAM_USERNAME ) ) {
+
+		}
+		if ( ! defined( 'DADDIO_INSTAGRAM_PASSWORD' ) || empty( DADDIO_INSTAGRAM_PASSWORD ) ) {
+
+		}
+		$instagram = \InstagramScraper\Instagram::withCredentials(
+			DADDIO_INSTAGRAM_USERNAME,
+			DADDIO_INSTAGRAM_PASSWORD,
+			ABSPATH . '../instagram-scraper-cache/'
+		);
+		$instagram->login();
+		return $instagram;
+	}
+
 	/**
 	 * Given an HTML page from Instagram, return a JSON of the data from that page
 	 *
@@ -516,6 +532,15 @@ class Daddio_Instagram {
 	 */
 	public static function get_instagram_json_from_html( $html = '' ) {
 		// Parse the page response and extract the JSON string
+		$arr = explode( 'window.__additionalDataLoaded(', $html );
+		if ( ! empty( $arr[1] ) ) {
+			$parts    = explode( "/',{", $arr[1] );
+			$json_str = '{' . $parts[1];
+			$json_str = explode( ');</script>', $json_str );
+			$json_str = $json_str[0];
+			return json_decode( $json_str );
+		}
+
 		$arr = explode( 'window._sharedData = ', $html );
 		if ( ! empty( $arr[1] ) ) {
 			$json = explode( ';</script>', $arr[1] );
