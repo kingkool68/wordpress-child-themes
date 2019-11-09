@@ -551,25 +551,6 @@ class Daddio_Instagram {
 	}
 
 	/**
-	 * Fetch data for a given Instagram tag
-	 *
-	 * @param  string      $tag    Instagram tag to fetch data for
-	 * @param  null|string $max_id Instagram ID to act like pagination
-	 * @return JSON        JSON data from the tag page
-	 */
-	public static function fetch_instagram_tag( $tag = '', $max_id = null ) {
-		$args = array();
-		if ( $max_id ) {
-			$args['max_id'] = $max_id;
-		}
-
-		$request  = add_query_arg( $args, 'https://www.instagram.com/explore/tags/' . $tag . '/' );
-		$response = wp_remote_get( $request );
-
-		return static::get_instagram_json_from_html( $response['body'] );
-	}
-
-	/**
 	 * Fetch a single Instagram page/data from a given code
 	 *
 	 * @param  string $code Instagram short URL code to fetch
@@ -925,7 +906,6 @@ class Daddio_Instagram {
 		if ( ! $output ) {
 			$output = '';
 		}
-
 		return $output;
 	}
 
