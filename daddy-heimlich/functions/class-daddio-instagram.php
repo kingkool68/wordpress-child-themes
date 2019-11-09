@@ -11,6 +11,11 @@ class Daddio_Instagram {
 	 */
 	private static $private_sync_slug = 'instagram-private-sync';
 
+	/**
+	 * The post type key
+	 *
+	 * @var string
+	 */
 	public static $post_type = 'instagram';
 
 	/**
@@ -483,8 +488,6 @@ class Daddio_Instagram {
 		return array_merge( $new_columns, $columns );
 	}
 
-	// Quick Sync Dashboard Widget
-
 	/**
 	 * Setup the Private Sync dahboard widget
 	 */
@@ -507,6 +510,9 @@ class Daddio_Instagram {
 		<?php
 	}
 
+	/**
+	 * Get an Instagram scraper object for fetching authenticated data
+	 */
 	public static function get_instagram_scraper() {
 		if ( ! defined( 'DADDIO_INSTAGRAM_USERNAME' ) || empty( DADDIO_INSTAGRAM_USERNAME ) ) {
 
