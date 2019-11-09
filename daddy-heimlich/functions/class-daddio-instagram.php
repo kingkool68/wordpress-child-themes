@@ -267,8 +267,9 @@ class Daddio_Instagram {
 			}
 
 			// It's a single Post page
-			if ( isset( $json->entry_data->PostPage[0] ) ) {
-				$nodes = array( $json->entry_data->PostPage[0]->graphql->shortcode_media );
+			if ( ! empty( $json->graphql->shortcode_media ) ) {
+				$post_page_node = $json->graphql->shortcode_media;
+				$nodes          = array( $post_page_node );
 			}
 
 			if ( ! empty( $nodes ) ) :
