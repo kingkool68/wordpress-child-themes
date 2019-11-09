@@ -1,7 +1,7 @@
 <?php
 
 // Include external libraries
-include 'vendor/ForceUTF8/Encoding.php';
+require get_template_directory() . '/vendor/autoload.php';
 
 // Include our own libraries
 $files_to_require = array(
