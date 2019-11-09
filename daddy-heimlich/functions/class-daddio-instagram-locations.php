@@ -598,7 +598,6 @@ class Daddio_Instagram_Locations {
 
 		if ( ! empty( $output['latitude'] ) && ! empty( $output['longitude'] ) ) {
 			$data = static::reverse_geocode( $output['latitude'], $output['longitude'] );
-			var_dump( $data );
 
 			if ( ! empty( $data->city ) && empty( $output['city'] ) ) {
 				$output['city'] = $data->city;
