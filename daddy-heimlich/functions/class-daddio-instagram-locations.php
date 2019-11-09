@@ -1,8 +1,18 @@
 <?php
 class Daddio_Instagram_Locations {
 
+	/**
+	 * Store a mapping of term ids keyed by Instagram location id
+	 *
+	 * @var array
+	 */
 	private static $term_id_from_location_id_cache = array();
 
+	/**
+	 * Holds a cache of normalized data
+	 *
+	 * @var array
+	 */
 	private static $normalized_data_cache = array();
 
 	/**
@@ -297,79 +307,6 @@ class Daddio_Instagram_Locations {
 		}
 	}
 
-	/**
-	 * Maybe add Location term if it doesn't already exist
-	 *
-	 * @param array $args     Arguments about the term to possibly add
-	 * @return integer|False  Term ID or false if Location ID not provided
-	 */
-	public static function maybe_add_location( $args = array() ) {
-		global $wpdb;
-
-		$default_args = array(
-			'id'              => '',
-			'name'            => '',
-			'slug'            => '',
-			'has_public_page' => '',
-		);
-		$args         = wp_parse_args( $args, $default_args );
-		if ( empty( $args['id'] ) ) {
-			return false;
-		}
-
-		$term_id = static::get_term_id_from_location_id( $args['id'] );
-		if ( $term_id ) {
-			return $term_id;
-		}
-		$raw_location_data = static::fetch_instagram_location_by_id( $args['id'] );
-		$location_data     = array(
-			'id'              => '',
-			'name'            => '',
-			'has_public_page' => '',
-			'lat'             => '',
-			'lng'             => '',
-			'slug'            => '',
-			'blurb'           => '',
-		);
-		if ( isset( $raw_location_data->entry_data->LocationsPage[0]->location ) ) {
-			$location_obj = $raw_location_data->entry_data->LocationsPage[0]->location;
-		}
-		if ( isset( $raw_location_data->entry_data->LocationsPage[0]->graphql->location ) ) {
-			$location_obj = $raw_location_data->entry_data->LocationsPage[0]->graphql->location;
-			$address      = json_decode( $location_obj->address_json );
-		}
-
-		if ( ! empty( $location_obj ) ) {
-			foreach ( $location_data as $key => $val ) {
-				if ( isset( $location_obj->{ $key } ) ) {
-					$location_data[ $key ] = $location_obj->{ $key };
-				}
-			}
-		}
-
-		$address_data = array();
-		if ( ! empty( $location_data['lat'] ) && ! empty( $location_data['lng'] ) ) {
-			$address_data = static::reverse_geocode( $location_data['lat'], $location_data['lng'] );
-		}
-
-		$location_data = array_merge( $location_data, $address_data );
-		$custom_slug   = $args['slug'] . '-' . $args['id'];
-		$term_args     = array(
-			'slug' => $custom_slug,
-		);
-		$term          = wp_insert_term( $args['name'], $taxonomy = 'location', $term_args );
-		if ( ! is_array( $term ) || empty( $term['term_id'] ) || is_wp_error( $term ) ) {
-			return 0;
-		}
-		$term_id = intval( $term['term_id'] );
-		add_term_meta( $term_id, 'instagram-location-id', $location_data['id'] );
-		add_term_meta( $term_id, 'latitude', $location_data['lat'] );
-		add_term_meta( $term_id, 'longitude', $location_data['lng'] );
-		add_term_meta( $term_id, 'instagram-last-updated', time() );
-		add_term_meta( $term_id, 'location-data', $location_data );
-		return $term_id;
-	}
-
 	public static function normalize_node_data( $node = false ) {
 		if ( ! $node ) {
 			return false;
@@ -470,39 +407,15 @@ class Daddio_Instagram_Locations {
 		if ( ! empty( $output['instagram_location_id'] ) ) {
 			static::$normalized_data_cache[ $output['instagram_location_id'] ] = $output;
 		}
-
 		return $output;
 	}
 
-	public static function update_terms_from_node_data( $node ) {
-		// Make sure $node is already normalized
-		if ( ! isset( $node->_normalized ) || ! $node->_normalized ) {
-			throw new Exception( '$node is not a normalized location data object!' );
-		}
-
-		$custom_slug = $node['slug'] . '-' . $node['instagram_location_id'];
-		$term_args   = array(
-			'slug' => $custom_slug,
-		);
-		$term        = wp_insert_term( $args['name'], $taxonomy = 'location', $term_args );
-		if ( ! is_array( $term ) || empty( $term['term_id'] ) || is_wp_error( $term ) ) {
-			return 0;
-		}
-		$term_id = intval( $term['term_id'] );
-		add_term_meta( $term_id, 'instagram-location-id', $location_data['id'] );
-		add_term_meta( $term_id, 'latitude', $location_data['lat'] );
-		add_term_meta( $term_id, 'longitude', $location_data['lng'] );
-		add_term_meta( $term_id, 'instagram-last-updated', time() );
-		add_term_meta( $term_id, 'location-data', $location_data );
-		return $term_id;
-	}
-
-		/**
-		 * Get the term ID for a given Instagram location ID
-		 *
-		 * @param  integer $location_id ID of Instagram location
-		 * @return integer              WordPress term ID
-		 */
+	/**
+	 * Get the term ID for a given Instagram location ID
+	 *
+	 * @param  integer $location_id ID of Instagram location
+	 * @return integer              WordPress term ID
+	 */
 	public static function get_term_id_from_location_id( $location_id = 0 ) {
 		global $wpdb;
 
@@ -534,12 +447,12 @@ class Daddio_Instagram_Locations {
 		return 0;
 	}
 
-		/**
-		 * Fetch HTML for a given Instagram location ID
-		 *
-		 * @param  string $location_id Instagram Location ID to fetch data for
-		 * @return object              JSON data found from scraping the Instagram Location page
-		 */
+	/**
+	 * Fetch HTML for a given Instagram location ID
+	 *
+	 * @param  string $location_id Instagram Location ID to fetch data for
+	 * @return object              JSON data found from scraping the Instagram Location page
+	 */
 	public static function fetch_instagram_location_by_id( $location_id = '' ) {
 		$output = array(
 			'latitude'       => '',
@@ -622,12 +535,12 @@ class Daddio_Instagram_Locations {
 		return (object) $output;
 	}
 
-		/**
-		 * Get meta data for given location term
-		 *
-		 * @param  string $term WordPress Term or term ID
-		 * @return array        Term meta data
-		 */
+	/**
+	 * Get meta data for given location term
+	 *
+	 * @param  string $term WordPress Term or term ID
+	 * @return array        Term meta data
+	 */
 	public static function get_location_data( $term = '' ) {
 		$term_id = false;
 		if ( is_numeric( $term ) ) {
@@ -699,12 +612,12 @@ class Daddio_Instagram_Locations {
 		return (object) $output;
 	}
 
-		/**
-		 * Given a state return the state abbreviation
-		 *
-		 * @param  string $state Full state name
-		 * @return string|False  State abbreviation or false if not found
-		 */
+	/**
+	 * Given a state return the state abbreviation
+	 *
+	 * @param  string $state Full state name
+	 * @return string|False  State abbreviation or false if not found
+	 */
 	public static function get_state_abbreviation( $state = '' ) {
 		$key = ucwords( strtolower( $state ) );
 		// via https://gist.github.com/maxrice/2776900#gistcomment-1172963
