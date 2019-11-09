@@ -322,10 +322,6 @@ class Daddio_Instagram_Locations {
 			return $node;
 		}
 
-		if ( ! empty( $node->location_id ) ) {
-			// $node = static::fetch_instagram_location_by_id( $node->location_id );
-		}
-
 		$output = array(
 			'_normalized'            => true,
 			'instagram_location_id'  => '',
