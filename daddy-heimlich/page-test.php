@@ -1,29 +1,18 @@
 <?php
 get_header();
 
-$obj = Daddio_Weather::get_instance();
+$scraper  = Daddio_Instagram::get_instagram_scraper();
+$location = $scraper->getLocationById( 115578671850891 );
 
-echo 'LEGOLAND!';
-$args = array(
-	'latitude'  => '40.966222735791',
-	'longitude' => '-73.856948992804',
-	'time'      => '2017-12-16 04:41:56',
-);
-$weather = $obj->fetch_weather( $args );
-var_dump( $weather['currently'] );
-var_dump( $weather['hourly']['data'] );
-var_dump( date( 'Y-m-d H:i a Z', $weather['currently']['time'] ) );
+// https://stackoverflow.com/a/27754169/1119655
+function getProtectedValue( $obj, $name ) {
+	$array  = (array) $obj;
+	$prefix = chr( 0 ) . '*' . chr( 0 );
+	return $array[ $prefix . $name ];
+}
 
-
-echo 'Manassas Park Community Center Manassas Park Community Center';
-$args = array(
-	'latitude'  => '38.782925131421',
-	'longitude' => '-77.461950045337',
-	'time'      => '2017-12-09 23:29:57',
-);
-$weather = $obj->fetch_weather( $args );
-var_dump( $weather['currently'] );
-var_dump( $weather['hourly']['data'] );
-var_dump( date( 'Y-m-d H:i a Z', $weather['currently']['time'] ) );
+var_dump( getProtectedValue( $location, 'data' ) );
+var_dump( $location->getLat() );
+var_dump( $location->getLng() );
 
 get_footer();

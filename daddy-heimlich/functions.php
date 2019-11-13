@@ -1,7 +1,7 @@
 <?php
 
 // Include external libraries
-include 'vendor/ForceUTF8/Encoding.php';
+require get_template_directory() . '/vendor/autoload.php';
 
 // Include our own libraries
 $files_to_require = array(
@@ -18,6 +18,7 @@ $files_to_require = array(
 	'class-daddio-post-galleries.php',
 	'class-daddio-instagram.php',
 	'class-daddio-instagram-locations.php',
+	'class-daddio-instagram-debug.php',
 	'class-daddio-infinite-scroll.php',
 	'class-daddio-on-this-day.php',
 	'rsvp.php',
