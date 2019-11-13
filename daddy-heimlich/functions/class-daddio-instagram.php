@@ -1,7 +1,6 @@
 <?php
 
 use \ForceUTF8\Encoding;
-use Phpfastcache\Helper\Psr16Adapter;
 
 class Daddio_Instagram {
 
@@ -521,10 +520,10 @@ class Daddio_Instagram {
 		if ( ! defined( 'DADDIO_INSTAGRAM_PASSWORD' ) || empty( DADDIO_INSTAGRAM_PASSWORD ) ) {
 
 		}
-		$instagram  = \InstagramScraper\Instagram::withCredentials(
+		$instagram = \InstagramScraper\Instagram::withCredentials(
 			DADDIO_INSTAGRAM_USERNAME,
 			DADDIO_INSTAGRAM_PASSWORD,
-			new Psr16Adapter( 'Files' )
+			ABSPATH . '../instagram-scraper-cache/'
 		);
 		$instagram->login();
 		return $instagram;
