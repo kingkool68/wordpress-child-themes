@@ -1,0 +1,20 @@
+name: Deploy
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: rlespinasse/github-slug-action@master
+      - name: SSH into host and update repo
+        if: github.ref == 'refs/heads/master'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/test.russellheimlich.com/htdocs
+            git checkout ${{ env.GITHUB_REF_SLUG }}
+            git fetch
+            git reset --hard origin/${{ env.GITHUB_REF_SLUG }}

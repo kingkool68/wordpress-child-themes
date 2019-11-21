@@ -14,6 +14,7 @@
 # Ignore everything in the root except the "wp-content" directory.
 /*
 !.gitignore
+!.github/
 !daddy-heimlich/
 daddy-heimlich/node_modules/
 daddy-heimlich/vendor/
