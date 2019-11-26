@@ -52,6 +52,9 @@ class Daddio_Scripts_Styles {
 			add_filter( 'script_loader_tag', array( $this, 'dont_load_bundled_scripts' ), 10, 3 );
 			wp_enqueue_script( 'daddio-global-scripts' );
 		}
+
+		// Don't load the frontend Block Editor styles
+		wp_dequeue_style( 'wp-block-library' );
 	}
 
 	/**
