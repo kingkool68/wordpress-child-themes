@@ -132,16 +132,18 @@ class Daddio_Instagram_Debug {
 			}
 		}
 
-		$location_data = Daddio_Instagram_Locations::normalize_node_data( $raw_node );
-		$location_arr  = (array) $location_data;
-		unset( $location_arr['_normalized'] );
-		foreach ( $location_arr as $key => $val ) {
-			if ( is_bool( $val ) ) {
-				$location_arr[ $key ] = ( $val ) ? 'true' : 'false';
+		$location_arr = array();
+		if ( ! empty( $node->location_id ) ) {
+			$location_data = Daddio_Instagram_Locations::get_location_data_by_location_id( $node->location_id );
+			foreach ( $location_data as $key => $val ) {
+				$location_arr[ $key ] = $val;
+				if ( is_bool( $val ) ) {
+					$location_arr[ $key ] = ( $val ) ? 'true' : 'false';
+				}
 			}
-		}
-		if ( $level > 1 ) {
-			$location_arr = array();
+			if ( $level > 1 ) {
+				$location_arr = array();
+			}
 		}
 
 		$context = array(

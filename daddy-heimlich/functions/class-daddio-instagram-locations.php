@@ -128,6 +128,8 @@ class Daddio_Instagram_Locations {
 			return;
 		}
 
+		update_post_meta( $post_id, 'instagram_location_id', $location_data->location_id );
+
 		if ( ! empty( $location_data->term_id ) ) {
 			wp_set_object_terms(
 				$post_id,
@@ -135,7 +137,6 @@ class Daddio_Instagram_Locations {
 				'location',
 				$append = true
 			);
-			update_post_meta( $post_id, 'instagram_location_id', $location_data->location_id );
 		}
 
 		if ( ! empty( $location_data->latitude ) ) {
@@ -559,9 +560,6 @@ class Daddio_Instagram_Locations {
 			return (object) $output;
 		}
 
-		$scraper  = Daddio_Instagram::get_instagram_scraper();
-		$location = $scraper->getLocationById( $location_id );
-
 		$output['latitude']  = $location->getLat();
 		$output['longitude'] = $location->getLng();
 		$output['name']      = $location->getName();
@@ -665,13 +663,14 @@ class Daddio_Instagram_Locations {
 			$output['term_last_updated'] = intval( $output['term_last_updated'] );
 
 			if ( $output['term_last_updated'] < time() - $args['term_staleness'] ) {
-				$is_term_stale = true;
+				update_term_meta( $term_id, 'location_needs_updating', true );
 			}
-			if ( ! $is_term_stale ) {
-				return static::get_location_data_by_term_id( $term_id );
-			}
+			$output = static::get_location_data_by_term_id( $term_id );
+			static::$data_cache[ $location_id ] = (object) $output;
+			return (object) $output;
 		}
 
+		// Pretty sure the rest of this code will be pointless since we can't fetch location data from Instagram
 		$location_data = static::fetch_location_data_by_location_id( $location_id );
 		if ( ! empty( $location_data ) ) {
 			foreach ( $location_data as $key => $val ) {
