@@ -459,10 +459,7 @@ class Daddio_Instagram {
 		if ( static::$post_type === get_post_type( $post ) ) {
 			// TODO: Use Twitter's hashtag parser thing to autolink hashtags. This should work better. See https://github.com/nojimage/twitter-text-php
 			$content = preg_replace( '/\s(#(\w+))/im', ' <a href="https://instagram.com/explore/tags/$2/">$1</a>', $content );
-			// $content = preg_replace('/^(#(\w+))/im', '<a href="https://instagram.com/explore/tags/$2/">$1</a>', $content);
 			$content = preg_replace( '/\s(@(\w+))/im', ' <a href="http://instagram.com/$2">$1</a>', $content );
-			// $content = preg_replace('/^(@(\w+))/im', '<a href="http://instagram.com/$2">$1</a>', $content);
-			// $via = ' via <a href="' . $permalink . '" target="_blank">' . $username . '</a>';
 		}
 		return $content;
 	}
@@ -520,10 +517,12 @@ class Daddio_Instagram {
 		if ( ! defined( 'DADDIO_INSTAGRAM_PASSWORD' ) || empty( DADDIO_INSTAGRAM_PASSWORD ) ) {
 
 		}
+
+		$cache     = new \Phpfastcache\Helper\Psr16Adapter( 'Files' );
 		$instagram = \InstagramScraper\Instagram::withCredentials(
 			DADDIO_INSTAGRAM_USERNAME,
 			DADDIO_INSTAGRAM_PASSWORD,
-			ABSPATH . '../instagram-scraper-cache/'
+			$cache
 		);
 		$instagram->login();
 		return $instagram;
