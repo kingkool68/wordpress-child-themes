@@ -508,27 +508,6 @@ class Daddio_Instagram {
 	}
 
 	/**
-	 * Get an Instagram scraper object for fetching authenticated data
-	 */
-	public static function get_instagram_scraper() {
-		if ( ! defined( 'DADDIO_INSTAGRAM_USERNAME' ) || empty( DADDIO_INSTAGRAM_USERNAME ) ) {
-
-		}
-		if ( ! defined( 'DADDIO_INSTAGRAM_PASSWORD' ) || empty( DADDIO_INSTAGRAM_PASSWORD ) ) {
-
-		}
-
-		$cache     = new \Phpfastcache\Helper\Psr16Adapter( 'Files' );
-		$instagram = \InstagramScraper\Instagram::withCredentials(
-			DADDIO_INSTAGRAM_USERNAME,
-			DADDIO_INSTAGRAM_PASSWORD,
-			$cache
-		);
-		$instagram->login();
-		return $instagram;
-	}
-
-	/**
 	 * Given an HTML page from Instagram, return a JSON of the data from that page
 	 *
 	 * @link https://github.com/raiym/instagram-php-scraper/blob/849f464bf53f84a93f86d1ecc6c806cc61c27fdc/src/InstagramScraper/Instagram.php#L32
