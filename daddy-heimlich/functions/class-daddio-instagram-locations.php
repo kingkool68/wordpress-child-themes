@@ -663,55 +663,20 @@ class Daddio_Instagram_Locations {
 			$output['term_last_updated'] = intval( $output['term_last_updated'] );
 
 			if ( $output['term_last_updated'] < time() - $args['term_staleness'] ) {
-				update_term_meta( $term_id, 'location_needs_updating', true );
+				update_term_meta( $term_id, 'location-needs-updating', true );
 			}
-			$output = static::get_location_data_by_term_id( $term_id );
+			$output                             = static::get_location_data_by_term_id( $term_id );
 			static::$data_cache[ $location_id ] = (object) $output;
 			return (object) $output;
 		}
 
-		// Pretty sure the rest of this code will be pointless since we can't fetch location data from Instagram
-		$location_data = static::fetch_location_data_by_location_id( $location_id );
-		if ( ! empty( $location_data ) ) {
-			foreach ( $location_data as $key => $val ) {
-				$output[ $key ] = $val;
-			}
-		}
-
+		// Note that we need to create a location term via a separate process
 		if ( $output['term_id'] === 0 && $args['update_term'] ) {
-			$custom_slug = $output['slug'] . '-' . $output['location_id'];
-			$term_args   = array(
-				'description' => $output['blurb'],
-				'slug'        => $custom_slug,
-			);
-			$term        = wp_insert_term( $output['name'], $taxonomy = 'location', $term_args );
-			if ( is_array( $term ) && ! empty( $term['term_id'] ) ) {
-				$output['term_id'] = $term['term_id'];
-				$is_term_stale     = true;
-			}
-		}
-
-		if (
-			! empty( $output['term_id'] )
-			&& $is_term_stale
-			&& $args['update_term']
-		) {
-			$blacklisted_meta_keys = array(
-				'name',
-				'location_id',
-				'term_id',
-				'term_last_updated',
-			);
-			foreach ( $output as $meta_key => $meta_value ) {
-				if ( in_array( $meta_key, $blacklisted_meta_keys, true ) ) {
-					continue;
-				}
-				update_term_meta( $output['term_id'], $meta_key, $meta_value );
-			}
-			update_term_meta( $output['term_id'], 'instagram-location-id', $output['location_id'] );
-			$term_last_updated = time();
-			update_term_meta( $output['term_id'], 'instagram-last-updated', $term_last_updated );
-			$output['term_last_updated'] = $term_last_updated;
+			$option_key               = 'instagram-location-ids-needing-terms';
+			$instagram_location_ids   = get_option( '', array() );
+			$instagram_location_ids[] = $location_id;
+			$instagram_location_ids   = array_unique( $instagram_location_ids );
+			update_option( $option_key, $instagram_location_ids, $autoload = false );
 		}
 
 		static::$data_cache[ $location_id ] = (object) $output;
