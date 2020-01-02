@@ -530,14 +530,14 @@ class Daddio_Instagram_Locations {
 	}
 
 	/**
-	 * Fetch HTML for a given Instagram location ID
+	 * Normalize location data from a given Location object node
 	 *
-	 * @param  string $location_id Instagram Location ID to fetch data for
+	 * @param  Object|false  $node Node object from the Instagram API
 	 * @return object              JSON data found from scraping the Instagram Location page
 	 */
-	public static function fetch_location_data_by_location_id( $location_id = '' ) {
+	public static function normalize_location_data( $node = false ) {
 		$output = array(
-			'location_id'    => $location_id,
+			'location_id'    => '',
 			'name'           => '',
 			'slug'           => '',
 			'blurb'          => '',
@@ -556,33 +556,37 @@ class Daddio_Instagram_Locations {
 			'country_code'   => '',
 		);
 
-		if ( ! $location_id ) {
+		if ( ! $node ) {
 			return (object) $output;
 		}
 
-		$output['latitude']  = $location->getLat();
-		$output['longitude'] = $location->getLng();
-		$output['name']      = $location->getName();
-		$output['slug']      = $location->getSlug();
-
-		$location_data = Daddio_Helpers::get_protected_object_property( $location, 'data' );
-
+		// Map our node object properties to our output object properties
 		$mapping = array(
-			'blurb',
-			'website',
-			'phone',
+			'id'      => 'location_id',
+			'name'    => 'name',
+			'slug'    => 'slug',
+			'blurb'   => 'blurb',
+			'website' => 'website',
+			'phone'   => 'phone',
+			'lat'     => 'latitude',
+			'lng'     => 'longitude',
 		);
-		foreach ( $mapping as $key ) {
-			if ( ! empty( $location_data[ $key ] ) ) {
-				$output[ $key ] = $location_data[ $key ];
+		foreach ( $mapping as $node_key => $output_key ) {
+			if ( ! empty( $node->{$node_key} ) ) {
+				$output[ $output_key ] = $node->{$node_key};
 			}
 		}
 
-		if ( ! empty( $location_data['address_json'] ) ) {
-			$address_json = json_decode( $location_data['address_json'] );
+		if ( ! empty( $node->address_json ) ) {
+			$address_json = json_decode( $node->address_json );
 
 			if ( ! empty( $address_json->street_address ) ) {
 				$output['street_address'] = $address_json->street_address;
+			}
+
+			if ( ! empty( $address_json->city_name ) ) {
+				$city = explode( ',', $address_json->city_name );
+				$output['city'] = $city[0];
 			}
 
 			if ( ! empty( $address_json->zip_code ) ) {

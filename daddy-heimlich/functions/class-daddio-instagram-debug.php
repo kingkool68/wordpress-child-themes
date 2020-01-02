@@ -89,6 +89,19 @@ class Daddio_Instagram_Debug {
 			foreach ( $nodes as $raw_node ) :
 				$result[] = static::render_raw_node_debug( $raw_node );
 			endforeach;
+
+			// It's a location page
+			if ( ! empty( $json->entry_data->LocationsPage[0]->graphql->location ) ) {
+				$location  = $json->entry_data->LocationsPage[0]->graphql->location;
+				$page_type = 'location';
+				if ( ! empty( $location->id ) ) {
+					$instagram_permalink = 'https://www.instagram.com/explore/locations/' . $location->id . '/';
+				}
+				$context  = array(
+					'location' => (array) Daddio_Instagram_Locations::normalize_location_data( $location ),
+				);
+				$result[] = Sprig::render( 'admin/instagram-debug-node.twig', $context );
+			}
 		}
 
 		$action  = static::$nonce_field_action;
@@ -134,7 +147,7 @@ class Daddio_Instagram_Debug {
 
 		$location_arr = array();
 		if ( ! empty( $node->location_id ) ) {
-			$args = array(
+			$args          = array(
 				'update_term' => false, // Don't add or update term info when we're just debugging instagram data
 			);
 			$location_data = Daddio_Instagram_Locations::get_location_data_by_location_id( $node->location_id, $args );
