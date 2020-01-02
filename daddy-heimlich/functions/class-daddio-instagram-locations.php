@@ -284,9 +284,10 @@ class Daddio_Instagram_Locations {
 	}
 
 	/**
-	 * Add Private Sync submenu
+	 * Add Location Sync submenu
 	 */
 	public function action_admin_menu() {
+		// Delete the next one eventually
 		add_submenu_page(
 			'edit.php?post_type=instagram',
 			'Private Location Sync',
@@ -295,7 +296,20 @@ class Daddio_Instagram_Locations {
 			'instagram-private-location-sync',
 			array( $this, 'handle_private_location_sync_submenu' )
 		);
+
+		add_submenu_page(
+			'edit.php?post_type=instagram',
+			'Location Sync',
+			'Location Sync',
+			'manage_options',
+			'instagram-location-sync',
+			array( $this, 'handle_location_sync_submenu' )
+		);
 	}
+
+	/**
+	 * Delete this eventually
+	 */
 	public function handle_private_location_sync_submenu() {
 		// Get all published instagram posts that have a needs-location-data meta key set...
 		$args    = array(
@@ -342,6 +356,7 @@ class Daddio_Instagram_Locations {
 		);
 		echo $this->render_private_location_sync_submenu( $context );
 	}
+
 	public function render_private_location_sync_submenu( $data = array() ) {
 		$defaults = array(
 			'found_posts' => 0,
@@ -428,6 +443,15 @@ class Daddio_Instagram_Locations {
 		}
 		wp_send_json_success( array( 'message' => 'Success!' ) );
 		die();
+	}
+
+	public function handle_location_sync_submenu() {
+		// Get all of the location IDs that need terms
+		$location_ids = get_option( 'instagram-location-ids-needing-terms' );
+		$context      = array(
+			'location_ids' => $location_ids,
+		);
+		Sprig::out( 'admin/instagram-location-sync-submenu.twig', $context );
 	}
 
 	/**
