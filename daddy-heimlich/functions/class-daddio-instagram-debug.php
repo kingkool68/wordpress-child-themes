@@ -134,7 +134,10 @@ class Daddio_Instagram_Debug {
 
 		$location_arr = array();
 		if ( ! empty( $node->location_id ) ) {
-			$location_data = Daddio_Instagram_Locations::get_location_data_by_location_id( $node->location_id );
+			$args = array(
+				'update_term' => false, // Don't add or update term info when we're just debugging instagram data
+			);
+			$location_data = Daddio_Instagram_Locations::get_location_data_by_location_id( $node->location_id, $args );
 			foreach ( $location_data as $key => $val ) {
 				$location_arr[ $key ] = $val;
 				if ( is_bool( $val ) ) {
