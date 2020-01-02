@@ -86,9 +86,11 @@ class Daddio_Instagram_Debug {
 				}
 			}
 
-			foreach ( $nodes as $raw_node ) :
-				$result[] = static::render_raw_node_debug( $raw_node );
-			endforeach;
+			if ( ! empty( $nodes ) ) {
+				foreach ( $nodes as $raw_node ) :
+					$result[] = static::render_raw_node_debug( $raw_node );
+				endforeach;
+			}
 
 			// It's a location page
 			if ( ! empty( $json->entry_data->LocationsPage[0]->graphql->location ) ) {
