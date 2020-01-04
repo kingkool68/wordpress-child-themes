@@ -268,19 +268,11 @@ class Daddio_Instagram_Locations {
 	 * @param  string $value Value of form field
 	 */
 	public static function edit_form_field( $label = '', $value = '' ) {
-		// TODO Use Sprig for this
-		ob_start();
-		?>
-		<tr class="form-field form-required term-name-wrap">
-			<th scope="row">
-				<label><?php echo $label; ?></label>
-			</th>
-			<td>
-				<?php echo $value; ?>
-			</td>
-		</tr>
-		<?php
-		return ob_get_clean();
+		$context = array(
+			'label' => $label,
+			'value' => $value,
+		);
+		return Sprig::render( 'admin/location-term-form-field.twig', $context );
 	}
 
 	/**
