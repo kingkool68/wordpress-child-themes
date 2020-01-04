@@ -36,6 +36,7 @@ class Daddio_Instagram_Locations {
 		add_action( 'location_edit_form_fields', array( __CLASS__, 'action_location_edit_form_fields' ), 11 );
 		add_action( 'admin_menu', array( $this, 'action_admin_menu' ) );
 		add_action( 'wp_ajax_daddio_private_location_sync', array( $this, 'action_ajax_daddio_private_location_sync' ) );
+		add_action( 'wp_ajax_daddio_location_sync', array( $this, 'action_ajax_daddio_location_sync' ) );
 	}
 
 	/**
@@ -99,7 +100,7 @@ class Daddio_Instagram_Locations {
 	}
 
 	/**
-	 * Handle associating terms and post meta for location data for a given Instagram node
+	 * Handle associating terms and post meta for location data for a newly inserted Instagram post
 	 *
 	 * @param  integer $post_id WordPress Post ID location data is to be associated with
 	 * @param  object  $node    Normalized Instagram data
@@ -111,12 +112,8 @@ class Daddio_Instagram_Locations {
 			return;
 		}
 
-		$location_data = false;
-		if ( ! empty( $node->location_id ) ) {
-			$location_data = static::get_location_data_by_location_id( $node->location_id );
-		}
-
-		if ( empty( $location_data->location_id ) ) {
+		// If there is no location ID set then we can associate the Instagram post with the None location
+		if ( empty( $node->location_id ) || $node->location_id === 0 ) {
 			$args = array(
 				'term_name'        => 'None',
 				'term_description' => 'No location set',
@@ -128,69 +125,13 @@ class Daddio_Instagram_Locations {
 			return;
 		}
 
+		$location_data = false;
+		if ( ! empty( $node->location_id ) ) {
+			$location_data = static::get_location_data_by_location_id( $node->location_id );
+		}
+
 		update_post_meta( $post_id, 'instagram_location_id', $location_data->location_id );
-
-		if ( ! empty( $location_data->term_id ) ) {
-			wp_set_object_terms(
-				$post_id,
-				$location_data->term_id,
-				'location',
-				$append = true
-			);
-		}
-
-		if ( ! empty( $location_data->latitude ) ) {
-			update_post_meta( $post_id, 'latitude', $location_data->latitude );
-		}
-		if ( ! empty( $location_data->longitude ) ) {
-			update_post_meta( $post_id, 'longitude', $location_data->longitude );
-		}
-
-		if ( ! empty( $location_data->postcode ) ) {
-			$description = $location_data->city . ', ' . static::get_state_abbreviation( $location_data->state );
-			$args        = array(
-				'term_name'        => $location_data->postcode,
-				'term_description' => $description,
-				'taxonomy'         => 'zip-code',
-				'post_id'          => $post_id,
-			);
-			static::maybe_add_term_and_associate_with_post( $args );
-		}
-
-		if ( ! empty( $location_data->state ) ) {
-			$args = array(
-				'term_name'        => $location_data->state,
-				'term_description' => '',
-				'taxonomy'         => 'state',
-				'post_id'          => $post_id,
-			);
-			static::maybe_add_term_and_associate_with_post( $args );
-		}
-
-		if ( ! empty( $location_data->county ) ) {
-			$term_name          = str_replace( 'County', '', $location_data->county );
-			$state_abbreviation = static::get_state_abbreviation( $location_data->state );
-			$term_slug          = $term_name . ' ' . $state_abbreviation;
-			$description        = $location_data->county . ', ' . $state_abbreviation;
-			$args               = array(
-				'term_name'        => $term_name,
-				'slug'             => $term_slug,
-				'term_description' => $description,
-				'taxonomy'         => 'county',
-				'post_id'          => $post_id,
-			);
-			static::maybe_add_term_and_associate_with_post( $args );
-		}
-
-		if ( ! empty( $location_data->country ) ) {
-			$args = array(
-				'term_name'        => $location_data->country,
-				'term_description' => '',
-				'taxonomy'         => 'country',
-				'post_id'          => $post_id,
-			);
-			static::maybe_add_term_and_associate_with_post( $args );
-		}
+		static::associate_location_with_post( $node->location_id, $post_id );
 	}
 
 	/**
@@ -227,6 +168,7 @@ class Daddio_Instagram_Locations {
 			$request_link
 		);
 
+		// Object properties of the $location_data object mapped to a human-readable label
 		$mapping = array(
 			'website'           => 'Web Site',
 			'phone'             => 'Phone',
@@ -437,11 +379,71 @@ class Daddio_Instagram_Locations {
 		die();
 	}
 
+	/**
+	 * Handle AAJX requests from the Location Sync sub menu
+	 *
+	 * @todo Add a nonce check to this
+	 */
+	public function action_ajax_daddio_location_sync() {
+		if ( empty( $_POST['instagram-source'] ) ) {
+			wp_send_json_fail( array( 'message' => 'No Instagram HTML provided' ) );
+			die();
+		}
+		$html          = wp_unslash( $_POST['instagram-source'] );
+		$json          = Daddio_Instagram::get_instagram_json_from_html( $html );
+		$location_data = static::normalize_location_data( $json );
+		if ( empty( $location_data->location_id ) ) {
+			wp_send_json_fail( array( 'message' => 'Location ID not found!' ) );
+			die();
+		}
+
+		wp_log( $location_data );
+
+		// Get all posts with the same location ID and update them
+		$args            = array(
+			'post_type'      => Daddio_Instagram::$post_type,
+			'post_status'    => 'any',
+			'posts_per_page' => -1,
+			'meta_key'       => 'instagram_location_id',
+			'meta_value'     => $location_data->location_id,
+			'fields'         => 'ids',
+		);
+		$instagram_posts = new WP_Query( $args );
+		if ( ! empty( $instagram_posts->posts ) ) {
+			foreach ( $instagram_posts->posts as $post_id ) {
+				static::associate_location_with_post( $location_data->location_id, $post_id );
+			}
+		}
+		$found_posts = number_format( $instagram_posts->found_posts );
+		wp_send_json_success( array( 'message' => 'Success! Updated ' . $found_posts . ' Instagram posts.' ) );
+		die();
+	}
+
+	/**
+	 * Render the Location Sync submenu
+	 */
 	public function handle_location_sync_submenu() {
+		global $wpdb;
 		// Get all of the location IDs that need terms
-		$location_ids = get_option( 'instagram-location-ids-needing-terms' );
-		$context      = array(
-			'location_ids' => $location_ids,
+		$location_ids = get_option( 'instagram-location-ids-needing-terms', array() );
+
+		// Get all of the stale location IDs
+		$stale_location_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT `meta_value` FROM {$wpdb->termmeta} WHERE `meta_key` = %s",
+				'location-needs-updating'
+			)
+		);
+
+		wp_enqueue_script(
+			'daddio-location-sync-submenu',
+			get_template_directory_uri() . '/js/admin-location-sync-submenu.js',
+			array( 'jquery' )
+		);
+
+		$context = array(
+			'location_ids'       => $location_ids,
+			'stale_location_ids' => $stale_location_ids,
 		);
 		Sprig::out( 'admin/instagram-location-sync-submenu.twig', $context );
 	}
@@ -459,6 +461,7 @@ class Daddio_Instagram_Locations {
 			'slug'             => '',
 			'taxonomy'         => '',
 			'post_id'          => 0,
+			'append'           => false,
 		);
 		$args         = wp_parse_args( $args, $default_args );
 		$term         = get_term_by(
@@ -484,7 +487,7 @@ class Daddio_Instagram_Locations {
 				$args['post_id'],
 				$term->term_id,
 				$args['taxonomy'],
-				$append = true
+				$args['append']
 			);
 		}
 	}
@@ -548,6 +551,8 @@ class Daddio_Instagram_Locations {
 	/**
 	 * Normalize location data from a given Location object node
 	 *
+	 * @todo This would be a good place to maybe add location terms and meta data if the term doesn't exist
+	 *
 	 * @param  Object|false  $node Node object from the Instagram API
 	 * @return object              JSON data found from scraping the Instagram Location page
 	 */
@@ -576,6 +581,11 @@ class Daddio_Instagram_Locations {
 			return (object) $output;
 		}
 
+		// Check to make sure a raw Instagram JSON response isn't being passed in
+		if ( ! empty( $node->entry_data->LocationsPage[0]->graphql->location ) ) {
+			$node = $node->entry_data->LocationsPage[0]->graphql->location;
+		}
+
 		// Map our node object properties to our output object properties
 		$mapping = array(
 			'id'      => 'location_id',
@@ -601,7 +611,7 @@ class Daddio_Instagram_Locations {
 			}
 
 			if ( ! empty( $address_json->city_name ) ) {
-				$city = explode( ',', $address_json->city_name );
+				$city           = explode( ',', $address_json->city_name );
 				$output['city'] = $city[0];
 			}
 
@@ -640,6 +650,14 @@ class Daddio_Instagram_Locations {
 		return (object) $output;
 	}
 
+	/**
+	 * Get location data for a given location ID
+	 *
+	 * @todo Hmmm this seems an awful lot like the normalize data method
+	 *
+	 * @param string $location_id The Instagram location ID to get data for
+	 * @param array $args         Arguments for modifying what is returned
+	 */
 	public static function get_location_data_by_location_id( $location_id = '', $args = array() ) {
 		$defaults = array(
 			'term_staleness' => 3 * DAY_IN_SECONDS,
@@ -683,7 +701,7 @@ class Daddio_Instagram_Locations {
 			$output['term_last_updated'] = intval( $output['term_last_updated'] );
 
 			if ( $output['term_last_updated'] < time() - $args['term_staleness'] ) {
-				update_term_meta( $term_id, 'location-needs-updating', true );
+				update_term_meta( $term_id, 'location-needs-updating', $location_id );
 			}
 			$output                             = static::get_location_data_by_term_id( $term_id );
 			static::$data_cache[ $location_id ] = (object) $output;
@@ -693,7 +711,7 @@ class Daddio_Instagram_Locations {
 		// Note that we need to create a location term via a separate process
 		if ( $output['term_id'] === 0 && $args['update_term'] ) {
 			$option_key               = 'instagram-location-ids-needing-terms';
-			$instagram_location_ids   = get_option( '', array() );
+			$instagram_location_ids   = get_option( $option_key, array() );
 			$instagram_location_ids[] = $location_id;
 			$instagram_location_ids   = array_unique( $instagram_location_ids );
 			update_option( $option_key, $instagram_location_ids, $autoload = false );
@@ -759,13 +777,98 @@ class Daddio_Instagram_Locations {
 		return (object) $output;
 	}
 
-		/**
-		 * Reverse geocode a pair of lat/long coordinates
-		 *
-		 * @param  string $lat  Latitude coordinates
-		 * @param  string $long Longitude coordinates
-		 * @return array        Geocode data
-		 */
+	/**
+	 * Associate location data terms with a given post ID
+	 *
+	 * @param integer $location_id The location ID to get data for
+	 * @param integer $post_id     The WordPress Post ID to associate location terms with
+	 */
+	public static function associate_location_with_post( $location_id = 0, $post_id = 0 ) {
+		$post    = get_post( $post_id );
+		$post_id = $post->ID;
+		if ( ! $post_id || $post_id === 0 ) {
+			return;
+		}
+
+		$location_data = false;
+		if ( ! empty( $location_id ) ) {
+			$location_data = static::get_location_data_by_location_id( $location_id );
+		}
+
+		if ( ! empty( $location_data->latitude ) ) {
+			update_post_meta( $post_id, 'latitude', $location_data->latitude );
+		}
+		if ( ! empty( $location_data->longitude ) ) {
+			update_post_meta( $post_id, 'longitude', $location_data->longitude );
+		}
+
+		// Not sure I want to add the location term here if it doesn't exit. Maybe that makes sense? Maybe it should be a standalone method?
+		if ( ! empty( $location_data->name ) ) {
+			$custom_slug = $location_data->slug . '-' . $location_data->location_id;
+			$args        = array(
+				'term_name'        => $location_data->name,
+				'term_description' => $location_data->blurb,
+				'slug'             => $custom_slug,
+				'taxonomy'         => 'location',
+				'post_id'          => $post_id,
+			);
+			static::maybe_add_term_and_associate_with_post( $args );
+		}
+
+		if ( ! empty( $location_data->postcode ) ) {
+			$description = $location_data->city . ', ' . static::get_state_abbreviation( $location_data->state );
+			$args        = array(
+				'term_name'        => $location_data->postcode,
+				'term_description' => $description,
+				'taxonomy'         => 'zip-code',
+				'post_id'          => $post_id,
+			);
+			static::maybe_add_term_and_associate_with_post( $args );
+		}
+
+		if ( ! empty( $location_data->state ) ) {
+			$args = array(
+				'term_name'        => $location_data->state,
+				'term_description' => '',
+				'taxonomy'         => 'state',
+				'post_id'          => $post_id,
+			);
+			static::maybe_add_term_and_associate_with_post( $args );
+		}
+
+		if ( ! empty( $location_data->county ) ) {
+			$term_name          = str_replace( 'County', '', $location_data->county );
+			$state_abbreviation = static::get_state_abbreviation( $location_data->state );
+			$term_slug          = $term_name . ' ' . $state_abbreviation;
+			$description        = $location_data->county . ', ' . $state_abbreviation;
+			$args               = array(
+				'term_name'        => $term_name,
+				'slug'             => $term_slug,
+				'term_description' => $description,
+				'taxonomy'         => 'county',
+				'post_id'          => $post_id,
+			);
+			static::maybe_add_term_and_associate_with_post( $args );
+		}
+
+		if ( ! empty( $location_data->country ) ) {
+			$args = array(
+				'term_name'        => $location_data->country,
+				'term_description' => '',
+				'taxonomy'         => 'country',
+				'post_id'          => $post_id,
+			);
+			static::maybe_add_term_and_associate_with_post( $args );
+		}
+	}
+
+	/**
+	 * Reverse geocode a pair of lat/long coordinates
+	 *
+	 * @param  string $lat  Latitude coordinates
+	 * @param  string $long Longitude coordinates
+	 * @return array        Geocode data
+	 */
 	public static function reverse_geocode( $lat = '', $long = '' ) {
 		$output = array(
 			'locality'     => '',
