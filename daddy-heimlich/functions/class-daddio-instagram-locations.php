@@ -556,25 +556,33 @@ class Daddio_Instagram_Locations {
 	 * @param  Object|false  $node Node object from the Instagram API
 	 * @return object              JSON data found from scraping the Instagram Location page
 	 */
-	public static function normalize_location_data( $node = false ) {
+	public static function normalize_location_data( $node = false, $args = array() ) {
+		$defaults = array(
+			'add_term_if_doesnt_exist' => false,
+		);
+		$args     = wp_parse_args( $args, $defaults );
+
 		$output = array(
-			'location_id'    => '',
-			'name'           => '',
-			'slug'           => '',
-			'blurb'          => '',
-			'website'        => '',
-			'phone'          => '',
+			'location_id'       => '',
+			'name'              => '',
+			'slug'              => '',
+			'blurb'             => '',
+			'website'           => '',
+			'phone'             => '',
 
-			'latitude'       => '',
-			'longitude'      => '',
+			'latitude'          => '',
+			'longitude'         => '',
 
-			'street_address' => '',
-			'city'           => '',
-			'county'         => '',
-			'state'          => '',
-			'postcode'       => '',
-			'country'        => '',
-			'country_code'   => '',
+			'street_address'    => '',
+			'city'              => '',
+			'county'            => '',
+			'state'             => '',
+			'postcode'          => '',
+			'country'           => '',
+			'country_code'      => '',
+
+			'term_id'           => 0,
+			'term_last_updated' => false,
 		);
 
 		if ( ! $node ) {
@@ -647,6 +655,15 @@ class Daddio_Instagram_Locations {
 				$output['postcode'] = $data->postcode;
 			}
 		}
+
+		if ( ! empty( $output['location_id'] ) ) {
+			$term_id = static::get_term_id_from_location_id( $output['location_id'] );
+			if ( absint( $term_id ) > 0 ) {
+				$output['term_id']           = $term_id;
+				$output['term_last_updated'] = get_term_meta( $term_id, 'instagram-last-updated', true );
+				$output['term_last_updated'] = intval( $output['term_last_updated'] );
+			}
+		}
 		return (object) $output;
 	}
 
@@ -697,7 +714,7 @@ class Daddio_Instagram_Locations {
 		$is_term_stale = false;
 		if ( absint( $term_id ) > 0 ) {
 			$output['term_id']           = $term_id;
-			$output['term_last_updated'] = get_term_meta( $term_id, 'term_last_updated', true );
+			$output['term_last_updated'] = get_term_meta( $term_id, 'instagram-last-updated', true );
 			$output['term_last_updated'] = intval( $output['term_last_updated'] );
 
 			if ( $output['term_last_updated'] < time() - $args['term_staleness'] ) {
@@ -794,6 +811,9 @@ class Daddio_Instagram_Locations {
 		if ( ! empty( $location_id ) ) {
 			$location_data = static::get_location_data_by_location_id( $location_id );
 		}
+
+		var_dump( $location_data );
+		die();
 
 		if ( ! empty( $location_data->latitude ) ) {
 			update_post_meta( $post_id, 'latitude', $location_data->latitude );
