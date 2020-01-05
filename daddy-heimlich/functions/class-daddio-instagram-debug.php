@@ -99,8 +99,26 @@ class Daddio_Instagram_Debug {
 				if ( ! empty( $location->id ) ) {
 					$instagram_permalink = 'https://www.instagram.com/explore/locations/' . $location->id . '/';
 				}
+				$location_data = (array) Daddio_Instagram_Locations::normalize_location_data( $location );
+				foreach ( $location_data as $key => $val ) {
+					switch ( $key ) {
+
+						case 'website':
+							$val = make_clickable( $val );
+							break;
+
+						case 'term_last_updated':
+							$val = date( 'F j, Y g:i a', intval( $val ) );
+							break;
+
+					}
+					$location_data[ $key ] = $val;
+					if ( is_bool( $val ) ) {
+						$location_data[ $key ] = ( $val ) ? 'true' : 'false';
+					}
+				}
 				$context  = array(
-					'location' => (array) Daddio_Instagram_Locations::normalize_location_data( $location ),
+					'location' => $location_data,
 				);
 				$result[] = Sprig::render( 'admin/instagram-debug-node.twig', $context );
 			}
@@ -154,6 +172,17 @@ class Daddio_Instagram_Debug {
 			);
 			$location_data = Daddio_Instagram_Locations::get_location_data_by_location_id( $node->location_id, $args );
 			foreach ( $location_data as $key => $val ) {
+				switch ( $key ) {
+
+					case 'website':
+						$val = make_clickable( $val );
+						break;
+
+					case 'term_last_updated':
+						$val = date( 'F j, Y g:i a', intval( $val ) );
+						break;
+
+				}
 				$location_arr[ $key ] = $val;
 				if ( is_bool( $val ) ) {
 					$location_arr[ $key ] = ( $val ) ? 'true' : 'false';
