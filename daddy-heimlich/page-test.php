@@ -1,6 +1,8 @@
 <?php
 get_header();
 
-var_dump( 'hello world!' );
+$fake_post_id = 0;
+$result = update_post_meta( $fake_post_id, 'latitude', 'foo' );
+var_dump( $result );
 
 get_footer();
