@@ -284,6 +284,8 @@ class Daddio_Instagram_Locations {
 				'location-needs-updating'
 			)
 		);
+		$stale_location_ids = array_map( 'absint', $stale_location_ids );
+		$location_ids       = array_merge( $location_ids, $stale_location_ids );
 
 		wp_enqueue_script(
 			'daddio-location-sync-submenu',
@@ -292,8 +294,7 @@ class Daddio_Instagram_Locations {
 		);
 
 		$context = array(
-			'location_ids'       => $location_ids,
-			'stale_location_ids' => $stale_location_ids,
+			'location_ids' => $location_ids,
 		);
 		Sprig::out( 'admin/instagram-location-sync-submenu.twig', $context );
 	}
@@ -580,15 +581,6 @@ class Daddio_Instagram_Locations {
 			return (object) $output;
 		}
 
-		// Note that we need to create a location term via a separate process
-		if ( $output['term_id'] === 0 && $args['update_term'] ) {
-			$option_key               = 'instagram-location-ids-needing-terms';
-			$instagram_location_ids   = get_option( $option_key, array() );
-			$instagram_location_ids[] = $location_id;
-			$instagram_location_ids   = array_unique( $instagram_location_ids );
-			update_option( $option_key, $instagram_location_ids, $autoload = false );
-		}
-
 		static::$data_cache[ $location_id ] = (object) $output;
 		return (object) $output;
 	}
@@ -665,12 +657,11 @@ class Daddio_Instagram_Locations {
 			return;
 		}
 
+		$stale_location = false;
 		if ( empty( $location_data ) ) {
 			$location_data = static::get_location_data_by_location_id( $location_id );
+			$stale_location = true;
 		}
-
-		// var_dump( $location_data );
-		// die();
 
 		if ( ! empty( $location_data->latitude ) ) {
 			update_post_meta( $post_id, 'latitude', $location_data->latitude );
@@ -709,6 +700,9 @@ class Daddio_Instagram_Locations {
 				$term_last_updated = time();
 				update_term_meta( $location_term_id, 'instagram-last-updated', $term_last_updated );
 				delete_term_meta( $location_term_id, 'location-needs-updating' );
+				if ( $stale_location || empty( $location_data->location_id ) ) {
+					update_term_meta( $location_term_id, 'location-needs-updating', $location_data->location_id );
+				}
 
 				// Remove location ID from the list of location IDs needing terms
 				$option_key                 = 'instagram-location-ids-needing-terms';
@@ -719,6 +713,15 @@ class Daddio_Instagram_Locations {
 				);
 				update_option( $option_key, $location_ids_needing_terms, $autoload = false );
 			}
+		}
+
+		// Note that we need to create a location term via a separate process
+		if ( $location_data->term_id === 0 && ! empty( $location_data->location_id ) ) {
+			$option_key               = 'instagram-location-ids-needing-terms';
+			$instagram_location_ids   = get_option( $option_key, array() );
+			$instagram_location_ids[] = $location_data->location_id;
+			$instagram_location_ids   = array_unique( $instagram_location_ids );
+			update_option( $option_key, $instagram_location_ids, $autoload = false );
 		}
 
 		if ( ! empty( $location_data->postcode ) ) {

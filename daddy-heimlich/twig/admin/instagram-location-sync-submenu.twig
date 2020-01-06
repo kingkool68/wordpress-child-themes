@@ -15,7 +15,6 @@
 <div class="wrap">
 	<h1>Instagram Location Sync</h1>
 	{% if location_ids %}
-		<h2>Location IDs that need terms</h2>
 		{% for location_id in location_ids %}
 			<div class="text-fields">
 				<input type="text" class="view-source-url" value="view-source:https://www.instagram.com/explore/locations/{{location_id}}/" onfocus="this.select();" readonly>
@@ -25,14 +24,8 @@
 		{% endfor %}
 	{% endif %}
 
-	{% if stale_location_ids %}
-		<h2>Location IDs that need updating</h2>
-		{% for stale_location_id in stale_location_ids %}
-			<div class="text-fields">
-				<input type="text" class="view-source-url" value="view-source:https://www.instagram.com/explore/locations/{{stale_location_id}}/" onfocus="this.select();" readonly>
-				<input type="hidden" class="location-id" name="stale-location-id" value="{{ stale_location_id|esc_attr }}">
-				<textarea rows="5" class="instagram-source"></textarea>
-			</div>
-		{% endfor %}
-	{% endif %}
+	<h2>Freeform</h2>
+	<div class="text-fields">
+		<textarea rows="5" class="instagram-source"></textarea>
+	</div>
 </div>
