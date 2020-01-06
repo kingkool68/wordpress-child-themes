@@ -112,8 +112,14 @@ class Daddio_Instagram_Locations {
 			return;
 		}
 
+		$location_id = 0;
+		if ( ! empty( $node->location_id ) ) {
+			$location_id = absint( $node->location_id );
+		}
+		update_post_meta( $post_id, 'instagram_location_id', $location_id );
+
 		// If there is no location ID set then we can associate the Instagram post with the None location
-		if ( empty( $node->location_id ) || $node->location_id === 0 ) {
+		if ( $location_id === 0 ) {
 			$args = array(
 				'term_name'        => 'None',
 				'term_description' => 'No location set',
@@ -121,17 +127,12 @@ class Daddio_Instagram_Locations {
 				'post_id'          => $post_id,
 			);
 			static::maybe_add_term_and_associate_with_post( $args );
-			update_post_meta( $post_id, 'instagram_location_id', 0 );
 			return;
 		}
 
-		$location_data = false;
-		if ( ! empty( $node->location_id ) ) {
-			$location_data = static::get_location_data_by_location_id( $node->location_id );
-		}
-
-		update_post_meta( $post_id, 'instagram_location_id', $location_data->location_id );
-		static::associate_location_with_post( $node->location_id, $post_id );
+		// If the location id has a term_id, associate this Instagram post
+		// Otherwise we need to note that this location ID needs its data synced
+		static::associate_location_with_post( $location_id, $post_id );
 	}
 
 	/**
@@ -397,8 +398,6 @@ class Daddio_Instagram_Locations {
 			die();
 		}
 
-		wp_log( $location_data );
-
 		// Get all posts with the same location ID and update them
 		$args            = array(
 			'post_type'      => Daddio_Instagram::$post_type,
@@ -411,7 +410,7 @@ class Daddio_Instagram_Locations {
 		$instagram_posts = new WP_Query( $args );
 		if ( ! empty( $instagram_posts->posts ) ) {
 			foreach ( $instagram_posts->posts as $post_id ) {
-				static::associate_location_with_post( $location_data->location_id, $post_id );
+				static::associate_location_with_post( $location_data->location_id, $post_id, $location_data );
 			}
 		}
 		$found_posts = number_format( $instagram_posts->found_posts );
@@ -453,6 +452,7 @@ class Daddio_Instagram_Locations {
 	 *
 	 * @param array $args Arguments of the term to maybe create
 	 *                    and the post ID to associate the term with
+	 * @return integer Return the term ID if found or inserted, 0 if something went wrong
 	 */
 	public static function maybe_add_term_and_associate_with_post( $args = array() ) {
 		$default_args = array(
@@ -464,8 +464,12 @@ class Daddio_Instagram_Locations {
 			'append'           => false,
 		);
 		$args         = wp_parse_args( $args, $default_args );
-		$term         = get_term_by(
-			$field    = 'name',
+		if ( ! is_numeric( $args['post_id'] ) ) {
+			$args['post_id'] = 0;
+		}
+
+		$term      = get_term_by(
+			$field = 'name',
 			$args['term_name'],
 			$args['taxonomy']
 		);
@@ -478,18 +482,22 @@ class Daddio_Instagram_Locations {
 					'slug'        => $args['slug'],
 				)
 			);
-			if ( ! is_wp_error( $term ) ) {
-				$term = (object) $term;
+			if ( is_wp_error( $term ) ) {
+				wp_die( $term );
 			}
+			$term = (object) $term;
 		}
-		if ( isset( $term->term_id ) ) {
+		if ( isset( $term->term_id ) && $args['post_id'] > 0 ) {
 			wp_set_object_terms(
 				$args['post_id'],
 				$term->term_id,
 				$args['taxonomy'],
 				$args['append']
 			);
+			return $term->term_id;
 		}
+
+		return 0;
 	}
 
 	/**
@@ -550,8 +558,6 @@ class Daddio_Instagram_Locations {
 
 	/**
 	 * Normalize location data from a given Location object node
-	 *
-	 * @todo This would be a good place to maybe add location terms and meta data if the term doesn't exist
 	 *
 	 * @param  Object|false  $node Node object from the Instagram API
 	 * @return object              JSON data found from scraping the Instagram Location page
@@ -669,8 +675,6 @@ class Daddio_Instagram_Locations {
 
 	/**
 	 * Get location data for a given location ID
-	 *
-	 * @todo Hmmm this seems an awful lot like the normalize data method
 	 *
 	 * @param string $location_id The Instagram location ID to get data for
 	 * @param array $args         Arguments for modifying what is returned
@@ -800,20 +804,22 @@ class Daddio_Instagram_Locations {
 	 * @param integer $location_id The location ID to get data for
 	 * @param integer $post_id     The WordPress Post ID to associate location terms with
 	 */
-	public static function associate_location_with_post( $location_id = 0, $post_id = 0 ) {
-		$post    = get_post( $post_id );
-		$post_id = $post->ID;
-		if ( ! $post_id || $post_id === 0 ) {
+	public static function associate_location_with_post( $location_id = 0, $post_id = 0, $location_data = false ) {
+		// Verify $post_id is a valid WordPress post or -1 if we want to add all of the terms and not associate with a post
+		if ( $post_id !== -1 ) {
+			$post    = get_post( $post_id );
+			$post_id = $post->ID;
+		}
+		if ( ! $post_id ) {
 			return;
 		}
 
-		$location_data = false;
-		if ( ! empty( $location_id ) ) {
+		if ( empty( $location_data ) ) {
 			$location_data = static::get_location_data_by_location_id( $location_id );
 		}
 
-		var_dump( $location_data );
-		die();
+		// var_dump( $location_data );
+		// die();
 
 		if ( ! empty( $location_data->latitude ) ) {
 			update_post_meta( $post_id, 'latitude', $location_data->latitude );
@@ -822,17 +828,46 @@ class Daddio_Instagram_Locations {
 			update_post_meta( $post_id, 'longitude', $location_data->longitude );
 		}
 
-		// Not sure I want to add the location term here if it doesn't exit. Maybe that makes sense? Maybe it should be a standalone method?
 		if ( ! empty( $location_data->name ) ) {
-			$custom_slug = $location_data->slug . '-' . $location_data->location_id;
-			$args        = array(
+			$custom_slug      = $location_data->slug . '-' . $location_data->location_id;
+			$args             = array(
 				'term_name'        => $location_data->name,
 				'term_description' => $location_data->blurb,
 				'slug'             => $custom_slug,
 				'taxonomy'         => 'location',
 				'post_id'          => $post_id,
 			);
-			static::maybe_add_term_and_associate_with_post( $args );
+			$location_term_id = static::maybe_add_term_and_associate_with_post( $args );
+			if ( ! empty( $location_term_id ) ) {
+				$blacklisted_meta_keys = array(
+					'name',
+					'location_id',
+					'term_id',
+					'term_last_updated',
+				);
+				foreach ( $location_data as $meta_key => $meta_value ) {
+					if ( in_array( $meta_key, $blacklisted_meta_keys, true ) ) {
+						continue;
+					}
+					if ( empty( $meta_value ) ) {
+						continue;
+					}
+					update_term_meta( $location_term_id, $meta_key, $meta_value );
+				}
+				update_term_meta( $location_term_id, 'instagram-location-id', $location_data->location_id );
+				$term_last_updated = time();
+				update_term_meta( $location_term_id, 'instagram-last-updated', $term_last_updated );
+				delete_term_meta( $location_term_id, 'location-needs-updating' );
+
+				// Remove location ID from the list of location IDs needing terms
+				$option_key                 = 'instagram-location-ids-needing-terms';
+				$location_ids_needing_terms = get_option( $option_key, array() );
+				$location_ids_needing_terms = array_diff(
+					$location_ids_needing_terms,
+					array( $location_data->location_id )
+				);
+				update_option( $option_key, $location_ids_needing_terms, $autoload = false );
+			}
 		}
 
 		if ( ! empty( $location_data->postcode ) ) {
