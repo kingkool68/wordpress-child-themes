@@ -86,9 +86,42 @@ class Daddio_Instagram_Debug {
 				}
 			}
 
-			foreach ( $nodes as $raw_node ) :
-				$result[] = static::render_raw_node_debug( $raw_node );
-			endforeach;
+			if ( ! empty( $nodes ) ) {
+				foreach ( $nodes as $raw_node ) :
+					$result[] = static::render_raw_node_debug( $raw_node );
+				endforeach;
+			}
+
+			// It's a location page
+			if ( ! empty( $json->entry_data->LocationsPage[0]->graphql->location ) ) {
+				$location  = $json->entry_data->LocationsPage[0]->graphql->location;
+				$page_type = 'location';
+				if ( ! empty( $location->id ) ) {
+					$instagram_permalink = 'https://www.instagram.com/explore/locations/' . $location->id . '/';
+				}
+				$location_data = (array) Daddio_Instagram_Locations::normalize_location_data( $location );
+				foreach ( $location_data as $key => $val ) {
+					switch ( $key ) {
+
+						case 'website':
+							$val = make_clickable( $val );
+							break;
+
+						case 'term_last_updated':
+							$val = date( 'F j, Y g:i a', intval( $val ) );
+							break;
+
+					}
+					$location_data[ $key ] = $val;
+					if ( is_bool( $val ) ) {
+						$location_data[ $key ] = ( $val ) ? 'true' : 'false';
+					}
+				}
+				$context  = array(
+					'location' => $location_data,
+				);
+				$result[] = Sprig::render( 'admin/instagram-debug-node.twig', $context );
+			}
 		}
 
 		$action  = static::$nonce_field_action;
@@ -132,16 +165,32 @@ class Daddio_Instagram_Debug {
 			}
 		}
 
-		$location_data = Daddio_Instagram_Locations::normalize_node_data( $raw_node );
-		$location_arr  = (array) $location_data;
-		unset( $location_arr['_normalized'] );
-		foreach ( $location_arr as $key => $val ) {
-			if ( is_bool( $val ) ) {
-				$location_arr[ $key ] = ( $val ) ? 'true' : 'false';
+		$location_arr = array();
+		if ( ! empty( $node->location_id ) ) {
+			$args          = array(
+				'update_term' => false, // Don't add or update term info when we're just debugging instagram data
+			);
+			$location_data = Daddio_Instagram_Locations::get_location_data_by_location_id( $node->location_id, $args );
+			foreach ( $location_data as $key => $val ) {
+				switch ( $key ) {
+
+					case 'website':
+						$val = make_clickable( $val );
+						break;
+
+					case 'term_last_updated':
+						$val = date( 'F j, Y g:i a', intval( $val ) );
+						break;
+
+				}
+				$location_arr[ $key ] = $val;
+				if ( is_bool( $val ) ) {
+					$location_arr[ $key ] = ( $val ) ? 'true' : 'false';
+				}
 			}
-		}
-		if ( $level > 1 ) {
-			$location_arr = array();
+			if ( $level > 1 ) {
+				$location_arr = array();
+			}
 		}
 
 		$context = array(

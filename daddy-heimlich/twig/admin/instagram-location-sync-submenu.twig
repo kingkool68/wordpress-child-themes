@@ -1,0 +1,31 @@
+<style>
+	.text-fields {
+		padding: 16px;
+		margin-bottom: 32px;
+	}
+
+	.text-fields input,
+	.text-fields textarea {
+		display: block;
+		margin-bottom: 16px;
+		width: 100%;
+	}
+</style>
+
+<div class="wrap">
+	<h1>Instagram Location Sync</h1>
+	{% if location_ids %}
+		{% for location_id in location_ids %}
+			<div class="text-fields">
+				<input type="text" class="view-source-url" value="view-source:https://www.instagram.com/explore/locations/{{location_id}}/" onfocus="this.select();" readonly>
+				<input type="hidden" class="location-id" name="location-id" value="{{ location_id|esc_attr }}">
+				<textarea rows="5" class="instagram-source"></textarea>
+			</div>
+		{% endfor %}
+	{% endif %}
+
+	<h2>Freeform</h2>
+	<div class="text-fields">
+		<textarea rows="5" class="instagram-source"></textarea>
+	</div>
+</div>

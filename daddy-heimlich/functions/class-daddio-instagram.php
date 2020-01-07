@@ -9,7 +9,7 @@ class Daddio_Instagram {
 	 *
 	 * @var string
 	 */
-	private static $private_sync_slug = 'instagram-private-sync';
+	private static $sync_slug = 'instagram-sync';
 
 	/**
 	 * The post type key
@@ -81,16 +81,16 @@ class Daddio_Instagram {
 	}
 
 	/**
-	 * Add Private Sync submenu
+	 * Add sync submenu
 	 */
 	public function action_admin_menu() {
 		add_submenu_page(
 			'edit.php?post_type=instagram',
-			'Private Sync',
-			'Private Sync',
+			'Instagram Sync',
+			'Instagram Sync',
 			'manage_options',
-			static::$private_sync_slug,
-			array( __CLASS__, 'handle_private_sync_submenu' )
+			static::$sync_slug,
+			array( __CLASS__, 'handle_sync_submenu' )
 		);
 
 		add_submenu_page(
@@ -232,14 +232,14 @@ class Daddio_Instagram {
 	}
 
 	/**
-	 * Render the screen for the private sync submenu page
+	 * Render the screen for the sync submenu page
 	 */
-	public static function handle_private_sync_submenu() {
+	public static function handle_sync_submenu() {
 
 		$result = '';
 		if (
 			! empty( $_POST['instagram-source'] )
-			&& check_admin_referer( static::$private_sync_slug )
+			&& check_admin_referer( static::$sync_slug )
 		) {
 			$instagram_source = wp_unslash( $_POST['instagram-source'] );
 			$json             = static::get_instagram_json_from_html( $instagram_source );
@@ -295,16 +295,16 @@ class Daddio_Instagram {
 		}
 		$context = array(
 			'result'          => $result,
-			'form_action_url' => admin_url( 'edit.php?post_type=instagram&page=' . static::$private_sync_slug ),
+			'form_action_url' => admin_url( 'edit.php?post_type=instagram&page=' . static::$sync_slug ),
 			'submit_button'   => get_submit_button( 'Sync' ),
 			'nonce_field'     => wp_nonce_field(
-				static::$private_sync_slug,
+				static::$sync_slug,
 				$name = '_wpnonce',
 				$referer = true,
 				$echo = false
 			),
 		);
-		Sprig::out( 'admin/instagram-private-sync-submenu.twig', $context );
+		Sprig::out( 'admin/instagram-sync-submenu.twig', $context );
 	}
 
 	/**
@@ -459,10 +459,7 @@ class Daddio_Instagram {
 		if ( static::$post_type === get_post_type( $post ) ) {
 			// TODO: Use Twitter's hashtag parser thing to autolink hashtags. This should work better. See https://github.com/nojimage/twitter-text-php
 			$content = preg_replace( '/\s(#(\w+))/im', ' <a href="https://instagram.com/explore/tags/$2/">$1</a>', $content );
-			// $content = preg_replace('/^(#(\w+))/im', '<a href="https://instagram.com/explore/tags/$2/">$1</a>', $content);
 			$content = preg_replace( '/\s(@(\w+))/im', ' <a href="http://instagram.com/$2">$1</a>', $content );
-			// $content = preg_replace('/^(@(\w+))/im', '<a href="http://instagram.com/$2">$1</a>', $content);
-			// $via = ' via <a href="' . $permalink . '" target="_blank">' . $username . '</a>';
 		}
 		return $content;
 	}
@@ -489,44 +486,25 @@ class Daddio_Instagram {
 	}
 
 	/**
-	 * Setup the Private Sync dahboard widget
+	 * Setup the sync dahboard widget
 	 */
 	public function action_wp_dashboard_setup() {
 		wp_add_dashboard_widget(
-			'instagram-private-sync',
-			'Instagram Private Sync',
-			array( __CLASS__, 'handle_private_sync_dashboard_widget' )
+			'instagram-sync',
+			'Instagram Sync',
+			array( __CLASS__, 'handle_sync_dashboard_widget' )
 		);
 	}
 
 	/**
-	 * Render the Private Sync dashboard widget
+	 * Render the sync dashboard widget
 	 */
-	public static function handle_private_sync_dashboard_widget() {
+	public static function handle_sync_dashboard_widget() {
 		?>
-		<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=' . static::$private_sync_slug ) ); ?>" method="post">
-			<input type="submit" class="button button-primary" value="Private Sync">
+		<form action="<?php echo esc_url( admin_url( 'edit.php?post_type=instagram&page=' . static::$sync_slug ) ); ?>" method="post">
+			<input type="submit" class="button button-primary" value="Sync">
 		</form>
 		<?php
-	}
-
-	/**
-	 * Get an Instagram scraper object for fetching authenticated data
-	 */
-	public static function get_instagram_scraper() {
-		if ( ! defined( 'DADDIO_INSTAGRAM_USERNAME' ) || empty( DADDIO_INSTAGRAM_USERNAME ) ) {
-
-		}
-		if ( ! defined( 'DADDIO_INSTAGRAM_PASSWORD' ) || empty( DADDIO_INSTAGRAM_PASSWORD ) ) {
-
-		}
-		$instagram = \InstagramScraper\Instagram::withCredentials(
-			DADDIO_INSTAGRAM_USERNAME,
-			DADDIO_INSTAGRAM_PASSWORD,
-			ABSPATH . '../instagram-scraper-cache/'
-		);
-		$instagram->login();
-		return $instagram;
 	}
 
 	/**
