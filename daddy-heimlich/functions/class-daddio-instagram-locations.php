@@ -509,6 +509,11 @@ class Daddio_Instagram_Locations {
 				$output['country'] = $data->country;
 			}
 
+			// If the zip code has a , or a - in it then clear the zip code and use the one from the reverse geocode
+			if ( strpos( $output['postcode'], ',' ) !== false && strpos( $output['postcode'], '-' ) !== false ) {
+				$output['postcode'] = '';
+			}
+
 			if ( ! empty( $data->postcode ) && empty( $output['postcode'] ) ) {
 				$output['postcode'] = $data->postcode;
 			}
