@@ -1,6 +1,7 @@
 <?php
 
 use \ForceUTF8\Encoding;
+use \Twitter\Text\Extractor;
 
 class Daddio_Instagram {
 
@@ -456,10 +457,19 @@ class Daddio_Instagram {
 	 */
 	public function filter_the_content( $content = '' ) {
 		$post = get_post();
-		if ( static::$post_type === get_post_type( $post ) ) {
-			// TODO: Use Twitter's hashtag parser thing to autolink hashtags. This should work better. See https://github.com/nojimage/twitter-text-php
-			$content = preg_replace( '/\s(#(\w+))/im', ' <a href="https://instagram.com/explore/tags/$2/">$1</a>', $content );
-			$content = preg_replace( '/\s(@(\w+))/im', ' <a href="http://instagram.com/$2">$1</a>', $content );
+		if ( static::$post_type === get_post_type( $post ) && ! empty( $content ) ) {
+			// Extract and linkify any hashtags
+			$e        = Extractor::create();
+			$hashtags = $e->extractHashtags( $content );
+			if ( ! empty( $hashtags ) ) {
+				foreach ( $hashtags as $hashtag ) {
+					$link    = '<a href="https://instagram.com/explore/tags/' . strtolower( $hashtag ) . '/">#' . $hashtag . '</a>';
+					$content = str_replace( '#' . $hashtag, $link, $content );
+				}
+			}
+
+			// Linkify Instagram usernames
+			$content = preg_replace( '/(@([0-9a-zA-z.]+))/im', ' <a href="http://instagram.com/$2/">$1</a>', $content );
 		}
 		return $content;
 	}
