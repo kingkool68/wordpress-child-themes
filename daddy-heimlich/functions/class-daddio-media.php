@@ -196,8 +196,9 @@ class Daddio_Media {
 		}
 
 		$img_attrs = array(
-			'class' => 'aligncenter from-instagram',
-			'alt'   => '',
+			'class'   => 'aligncenter from-instagram',
+			'alt'     => '',
+			'loading' => 'lazy',
 		);
 		return wp_get_attachment_image( $featured_image_id, 'full', false, $img_attrs );
 	}
