@@ -18,3 +18,5 @@ jobs:
             git checkout ${{ env.GITHUB_REF_SLUG }}
             git fetch
             git reset --hard origin/${{ env.GITHUB_REF_SLUG }}
+            cd daddy-heimlich/
+            composer install -o --no-dev
