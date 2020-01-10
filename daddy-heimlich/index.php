@@ -1,10 +1,12 @@
 <?php
+global $wp_query;
 $the_content = array();
 if ( have_posts() ) :
 	while ( have_posts() ) :
 		the_post();
-		$context   = array();
-		$templates = array();
+		$current_iteration = $wp_query->current_post + 1;
+		$context           = array();
+		$templates         = array();
 		switch ( $post->post_type ) {
 			case 'instagram':
 				$context     = array(
@@ -13,7 +15,7 @@ if ( have_posts() ) :
 					'the_time'           => get_the_time( Daddio_Dates::get_child_time_format() ),
 					'machine_datetime'   => get_post_time( 'c', true ),
 					'child_age'          => Daddio_Dates::how_old_was_child(),
-					'instagram_media'    => Daddio_Media::get_the_instagram_media(),
+					'instagram_media'    => Daddio_Media::get_the_instagram_media( get_the_ID(), $current_iteration ),
 					'the_content'        => apply_filters( 'the_content', get_the_content() ),
 					'via_url'            => get_the_guid(),
 					'instagram_username' => Daddio_Instagram::get_instagram_username(),

@@ -151,7 +151,7 @@ class Daddio_Media {
 	 * @param  integer $post_id Post ID of Instagram post
 	 * @return string           HTML of media
 	 */
-	public static function get_the_instagram_media( $post_id = 0 ) {
+	public static function get_the_instagram_media( $post_id = 0, $position = 1 ) {
 		$post              = get_post( $post_id );
 		$featured_image_id = get_post_thumbnail_id( $post->ID );
 		$featured_video_id = get_post_meta( $post->ID, '_video_id', true );
@@ -195,10 +195,14 @@ class Daddio_Media {
 			}
 		}
 
+		$loading = 'lazy';
+		if ( $position < 2 ) {
+			$loading = 'eager';
+		}
 		$img_attrs = array(
 			'class'   => 'aligncenter from-instagram',
 			'alt'     => '',
-			'loading' => 'lazy',
+			'loading' => $loading,
 		);
 		return wp_get_attachment_image( $featured_image_id, 'full', false, $img_attrs );
 	}
