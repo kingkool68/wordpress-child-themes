@@ -15,6 +15,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.PATH_TO_REPO_ROOT }}
-            git checkout ${{ env.GITHUB_REF_SLUG }}
-            git fetch
-            git reset --hard origin/${{ env.GITHUB_REF_SLUG }}
+            sudo git checkout ${{ env.GITHUB_REF_SLUG }}
+            sudo git fetch
+            sudo git reset --hard origin/${{ env.GITHUB_REF_SLUG }}
+            sudo chown -R www-data: .
