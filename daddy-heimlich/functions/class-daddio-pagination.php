@@ -28,7 +28,7 @@ class Daddio_Pagination {
 		$defaults = array(
 			'next_url'      => $data->next_url,
 			'next_page_num' => $data->next_page_num,
-			'next_text'     => 'More',
+			'next_text'     => 'Page ' . $data->next_page_num,
 		);
 		$context  = wp_parse_args( $args, $defaults );
 		return Sprig::render( 'pagination.twig', $context );

@@ -1,7 +1,7 @@
 <nav id="more-menu" class="more-menu">
 	<section>
 		<h2 class="title">Main Menu</h2>
-		<a href="#close" class="close" data-ga-category="nav" data-ga-label="Close">
+		<a href="#close" class="close" data-ga-category="nav" data-ga-label="Close" aria-label="Close menu">
 			<span aria-hidden="true">&times;</span>
 			<span class="alt-text">Close</span>
 		</a>
@@ -15,6 +15,7 @@
 				title="The code that powers this site is on GitHub"
 				data-ga-category="nav"
 				data-ga-label="GitHub Icon"
+				aria-label="GitHub"
 			>
 				{{ github_icon }}
 			</a>
@@ -26,6 +27,7 @@
 				title="Follow {{ child_name|esc_attr }} on Instagram @{{ child_instagram_handle|esc_attr }}"
 				data-ga-category="nav"
 				data-ga-label="Instagram Icon"
+				aria-label="Instagram"
 			>
 				{{ instagram_icon }}
 			</a>
@@ -36,6 +38,7 @@
 				data-ga-category="nav"
 				data-ga-label="Facebook Icon"
 				class="u-url"
+				aria-label="Facebook"
 			>
 				{{ facebook_icon }}
 			</a>
