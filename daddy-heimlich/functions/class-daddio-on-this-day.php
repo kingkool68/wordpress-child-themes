@@ -133,6 +133,7 @@ class Daddio_On_This_Day {
 		}
 
 		$query->set( 'date_query', $date_query );
+		$query->set( 'post_status', 'publish' );
 		$query->set( 'name', '' );
 		$query->set( 'pagename', '' );
 		$query->is_page    = false;
