@@ -115,10 +115,10 @@ class Daddio_Scripts_Styles {
 			$new_script_element .= $script_element;
 			$new_script_element .= '<![endif]-->';
 
-			// jQuery 2.x gets served to everyone else...
-			$jquery2_src         = apply_filters( 'script_loader_src', get_template_directory_uri() . '/js/jquery-2.min.js' );
+			// jQuery 3.x gets served to everyone else...
+			$jquery3_src         = apply_filters( 'script_loader_src', get_template_directory_uri() . '/js/jquery-3.min.js' );
 			$new_script_element .= '<!--[if (gte IE 9) | (!IE)]><!-->';
-			$new_script_element .= "<script type='text/javascript' src='" . $jquery2_src . "'></script>";
+			$new_script_element .= "<script type='text/javascript' src='" . $jquery3_src . "'></script>";
 			$new_script_element .= '<!--<![endif]-->';
 
 			return $new_script_element;

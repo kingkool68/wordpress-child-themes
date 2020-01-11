@@ -210,7 +210,7 @@ gulp.task('clean', function (done) {
 gulp.task('clean:javascript', function () {
 	return del([
 		'js/*.min.js',
-		'!js/jquery-2.min.js'
+		'!js/jquery-3.min.js'
 	]);
 });
 
