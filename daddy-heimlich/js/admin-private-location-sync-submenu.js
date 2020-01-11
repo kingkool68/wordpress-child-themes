@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
 			'post-id': postID,
 			'instagram-source': instagramSource
 		};
-		$post.addClass('loading')
+		$post.addClass('loading');
 
 		$.post(ajaxurl, data )
 			.done(function(resp) {
