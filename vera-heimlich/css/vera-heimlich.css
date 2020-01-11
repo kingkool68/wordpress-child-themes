@@ -1445,18 +1445,16 @@ html {
 a {
   text-decoration: none;
   color: #c7fab2;
-  border-bottom: 0.15em dotted #c7fab2;
-  -webkit-transition: color 0.35s ease, border 0.35s ease, background-color 0.35s ease;
-  -o-transition: color 0.35s ease, border 0.35s ease, background-color 0.35s ease;
-  transition: color 0.35s ease, border 0.35s ease, background-color 0.35s ease; }
-
-a:hover,
-a:focus {
-  color: #FEF6C9;
-  border-bottom-color: #FEF6C9; }
-
-a:focus {
-  outline-color: #FEF6C9; }
+  border-bottom: 0.15em dotted #c7fab2; }
+  .has-js a {
+    -webkit-transition: all 0.35s ease;
+    -o-transition: all 0.35s ease;
+    transition: all 0.35s ease; }
+  a:hover, a:focus {
+    color: #FEF6C9;
+    border-bottom-color: #FEF6C9; }
+  a:focus {
+    outline-color: #FEF6C9; }
 
 p {
   font-size: 1.125em;
