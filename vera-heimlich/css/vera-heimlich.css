@@ -1446,9 +1446,9 @@ a {
   text-decoration: none;
   color: #c7fab2;
   border-bottom: 0.15em dotted #c7fab2;
-  -webkit-transition: all 0.35s ease;
-  -o-transition: all 0.35s ease;
-  transition: all 0.35s ease; }
+  -webkit-transition: color 0.35s ease, border 0.35s ease, background-color 0.35s ease;
+  -o-transition: color 0.35s ease, border 0.35s ease, background-color 0.35s ease;
+  transition: color 0.35s ease, border 0.35s ease, background-color 0.35s ease; }
 
 a:hover,
 a:focus {
