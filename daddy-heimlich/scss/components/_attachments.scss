@@ -1,30 +1,38 @@
 .attachment article {
-	padding-bottom: em(10px);
+    padding-bottom: em(10px);
 }
+
 .attachment .parent-post {
-	padding-bottom: em(8px);
+    padding-bottom: em(8px);
 }
+
 .attachment article .title {
-	text-align: center;
+    text-align: center;
 }
+
 .attachment article .container {
-	margin: 0 auto;
+    margin: 0 auto;
 }
+
 article.attachment-image p {
-	font-size: em(15px);
+    font-size: em(15px);
 }
+
 article.attachment-image img {
-	margin: em(25px) auto em(15px);
-	display: block;
-	border-width: em(6px);
+    margin: em(25px) auto em(15px);
+    display: block;
+    border-width: em(6px);
 }
+
 .attachment nav .next {
-	float: right;
+    float: right;
 }
+
 .attachment nav .prev {
-	float: left;
+    float: left;
 }
+
 .attachment .progress {
-	text-align: center;
-	padding-top: em(3px);
+    text-align: center;
+    padding-top: em(3px);
 }

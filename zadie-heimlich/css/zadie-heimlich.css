@@ -1063,7 +1063,7 @@ a.button:invalid,
 select:invalid,
 textarea:invalid {
   -webkit-box-shadow: none;
-  box-shadow: none; }
+          box-shadow: none; }
 
 input:focus,
 button:focus,
@@ -1071,7 +1071,7 @@ a.button:focus,
 select:focus,
 textarea:focus {
   -webkit-box-shadow: #0066ff 0 0 5px 0;
-  box-shadow: #0066ff 0 0 5px 0;
+          box-shadow: #0066ff 0 0 5px 0;
   z-index: 1; }
 
 input[type="file"]:focus,
@@ -1081,23 +1081,21 @@ input[type="radio"]:active,
 input[type="checkbox"]:focus,
 input[type="checkbox"]:active {
   -webkit-box-shadow: none;
-  box-shadow: none; }
+          box-shadow: none; }
 
 button,
 a.button,
 input[type="reset"],
 input[type="submit"],
 input[type="button"] {
-  -webkit-appearance: none;
   -webkit-border-radius: 4px;
-  border-radius: 4px;
-  -webkit-background-clip: padding;
-  background-clip: padding-box;
+          border-radius: 4px;
+  -webkit-background-clip: padding-box;
+          background-clip: padding-box;
   background: #dddddd url("../images/button.png?1298351022") repeat-x;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #dddddd));
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#dddddd));
   background-image: -webkit-linear-gradient(#ffffff, #dddddd);
   background-image: -o-linear-gradient(#ffffff, #dddddd);
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#dddddd));
   background-image: linear-gradient(#ffffff, #dddddd);
   border: 1px solid;
   border-color: #dddddd #bbbbbb #999999;
@@ -1121,7 +1119,6 @@ a.button:hover,
 input[type="reset"]:hover,
 input[type="submit"]:hover,
 input[type="button"]:hover {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(1px, #eeeeee), color-stop(100%, #cccccc));
   background-image: -webkit-linear-gradient(#ffffff, #eeeeee 1px, #cccccc);
   background-image: -o-linear-gradient(#ffffff, #eeeeee 1px, #cccccc);
   background-image: linear-gradient(#ffffff, #eeeeee 1px, #cccccc);
@@ -1132,10 +1129,9 @@ a.button:active,
 input[type="reset"]:active,
 input[type="submit"]:active,
 input[type="button"]:active {
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #dddddd), color-stop(100%, #eeeeee));
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#eeeeee));
   background-image: -webkit-linear-gradient(#dddddd, #eeeeee);
   background-image: -o-linear-gradient(#dddddd, #eeeeee);
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#eeeeee));
   background-image: linear-gradient(#dddddd, #eeeeee);
   -webkit-box-shadow: inset rgba(0, 0, 0, 0.25) 0 1px 2px 0;
   box-shadow: inset rgba(0, 0, 0, 0.25) 0 1px 2px 0;
@@ -1172,11 +1168,11 @@ input[type="time"],
 input[type="url"],
 input[type="week"] {
   -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  -webkit-background-clip: padding;
-  background-clip: padding-box;
+          box-sizing: border-box;
+  -webkit-background-clip: padding-box;
+          background-clip: padding-box;
   -webkit-border-radius: 0;
-  border-radius: 0;
+          border-radius: 0;
   -webkit-appearance: none;
   background-color: white;
   border: 1px solid;
@@ -1219,11 +1215,11 @@ select[disabled] optgroup,
 textarea[disabled],
 a.button_disabled {
   -webkit-box-shadow: none;
-  box-shadow: none;
-  -moz-user-select: -moz-none;
+          box-shadow: none;
   -webkit-user-select: none;
-  -ms-user-select: none;
-      user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   color: #888888;
   cursor: default; }
 
@@ -1277,7 +1273,7 @@ select[size="1"] {
   ::-webkit-validation-bubble-top-outer-arrow,
   ::-webkit-validation-bubble-top-inner-arrow {
     -webkit-box-shadow: none;
-    box-shadow: none;
+            box-shadow: none;
     background: #666666;
     border-color: #666666; } }
 
@@ -1364,8 +1360,7 @@ Use .hidden to visual hide an element but still making it accessible to screen r
   left: -999em;
   position: absolute;
   top: auto;
-  _top: -999em;
-  /* IE6 https://learntech.imsu.ox.ac.uk/blog/?p=494 */ }
+  _top: -999em; }
 
 /* If the skip link is focused using the keyboard then show it. */
 #top:focus {
@@ -2186,7 +2181,9 @@ article.attachment-image img {
           animation-delay: -0.8s; }
 
 @-webkit-keyframes stretchdelay {
-  0%, 40%, 100% {
+  0%,
+  40%,
+  100% {
     -webkit-transform: scaleY(0.4);
             transform: scaleY(0.4); }
   20% {
@@ -2194,7 +2191,9 @@ article.attachment-image img {
             transform: scaleY(1); } }
 
 @keyframes stretchdelay {
-  0%, 40%, 100% {
+  0%,
+  40%,
+  100% {
     -webkit-transform: scaleY(0.4);
             transform: scaleY(0.4); }
   20% {

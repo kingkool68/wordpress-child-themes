@@ -15,37 +15,41 @@ html {
 }
 
 a {
-    text-decoration: none;
-    color: $link-color;
-    border-bottom: 0.15em dotted $link-color;
-    transition: all 0.35s ease;
+  text-decoration: none;
+  color: $link-color;
+  border-bottom: 0.15em dotted $link-color;
+  transition: all 0.35s ease;
 }
 
 a:hover,
 a:focus {
-	color: $link-hover-color;
-	border-bottom-color: $link-hover-color;
+  color: $link-hover-color;
+  border-bottom-color: $link-hover-color;
 }
+
 a:focus {
-	outline-color: $link-hover-color;
+  outline-color: $link-hover-color;
 }
+
 p {
-	font-size: em(18px);
-	line-height: 1.5;
+  font-size: em(18px);
+  line-height: 1.5;
 }
+
 strong,
 b {
-	font-weight:700;
+  font-weight: 700;
 }
+
 em,
 i {
-	font-weight:500;
+  font-weight: 500;
 }
 
 ul li {
-    list-style-type: disc;
+  list-style-type: disc;
 }
 
 ol li {
-    list-style-type: decimal;
+  list-style-type: decimal;
 }

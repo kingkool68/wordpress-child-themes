@@ -1,45 +1,60 @@
 /* Loading Bars via http://tobiasahlin.com/spinkit/ */
 
 .loading-bars {
-	height: em(120px);
-	margin: auto;
-	text-align: center;
-	padding-bottom: em(10px);
+    height: em(120px);
+    margin: auto;
+    text-align: center;
+    padding-bottom: em(10px);
 }
+
 .loading-bars div {
-	background-color: #fff;
-	display: inline-block;
-	margin: 0 em(4px);
-	height: 100%;
-	width: em(12px);
-	border-radius: em(100px, 10px);
-	animation: stretchdelay 1.2s infinite ease-in-out;
+    background-color: #fff;
+    display: inline-block;
+    margin: 0 em(4px);
+    height: 100%;
+    width: em(12px);
+    border-radius: em(100px, 10px);
+    animation: stretchdelay 1.2s infinite ease-in-out;
 }
+
 .loading-bars .rect2 {
-	animation-delay: -1.1s;
+    animation-delay: -1.1s;
 }
+
 .loading-bars .rect3 {
-	animation-delay: -1.0s;
+    animation-delay: -1.0s;
 }
+
 .loading-bars .rect4 {
-	animation-delay: -0.9s;
+    animation-delay: -0.9s;
 }
+
 .loading-bars .rect5 {
-	animation-delay: -0.8s;
+    animation-delay: -0.8s;
 }
+
 @-webkit-keyframes stretchdelay {
-	0%, 40%, 100% {
-		transform: scaleY(0.4);
-	}
-	20% {
-		transform: scaleY(1.0);
-	}
+
+    0%,
+    40%,
+    100% {
+        transform: scaleY(0.4);
+    }
+
+    20% {
+        transform: scaleY(1.0);
+    }
 }
+
 @keyframes stretchdelay {
-	0%, 40%, 100% {
-		transform: scaleY(0.4);
-	}
-	20% {
-		transform: scaleY(1.0);
-	}
+
+    0%,
+    40%,
+    100% {
+        transform: scaleY(0.4);
+    }
+
+    20% {
+        transform: scaleY(1.0);
+    }
 }

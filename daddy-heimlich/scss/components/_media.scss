@@ -1,88 +1,104 @@
 img,
 .wp-video {
-	max-width: 100%;
-	height: auto;
+    max-width: 100%;
+    height: auto;
 }
+
 img {
-	border: em(3px) solid #fff;
-	border-radius: em(10px);
-	box-sizing: border-box;
+    border: em(3px) solid #fff;
+    border-radius: em(10px);
+    box-sizing: border-box;
 }
+
 img.alignleft,
 figure.alignleft img {
-	float: left;
-	margin-right: em(10px);
+    float: left;
+    margin-right: em(10px);
 }
+
 img.alignright,
 figure.alignright img {
-	float: right;
-	margin-left: em(10px);
+    float: right;
+    margin-left: em(10px);
 }
+
 article img.alignright {
-	margin: em(2.5px) -20% em(10px) em(20px);
+    margin: em(2.5px) -20% em(10px) em(20px);
 }
+
 img.aligncenter,
 figure.aligncenter img {
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
+
 img.from-instagram,
 article.instagram .wp-video {
-	margin-bottom: em(10px);
-	margin-top: em(10px) * -1;
+    margin-bottom: em(10px);
+    margin-top: em(10px) * -1;
 }
+
 .wp-caption {
-	font-size: em(20px);
-	margin-bottom: em(18px, 20px);
-	overflow: auto;
-	height: 100%;
+    font-size: em(20px);
+    margin-bottom: em(18px, 20px);
+    overflow: auto;
+    height: 100%;
 }
+
 .wp-caption-text {
-	font-size: em(7px);
-	padding: em(7.5px) em(7.5px) em(7.5px) 0;
-	text-align: right;
-	font-style: italic;
-	clear: both;
+    font-size: em(7px);
+    padding: em(7.5px) em(7.5px) em(7.5px) 0;
+    text-align: right;
+    font-style: italic;
+    clear: both;
 }
+
 .gallery {
-	overflow: auto;
-	height: 100%;
-	padding-left: em(25px);
-	margin-bottom: em(10px);
+    overflow: auto;
+    height: 100%;
+    padding-left: em(25px);
+    margin-bottom: em(10px);
 }
+
 .gallery-size-thumbnail {
-	max-width: em(680px);
-	margin-left: auto;
-	margin-right: auto;
+    max-width: em(680px);
+    margin-left: auto;
+    margin-right: auto;
 }
+
 .gallery a {
-	border-bottom: 0 none;
+    border-bottom: 0 none;
 }
+
 .gallery img {
-	float: left;
-	margin: em(10px);
-	transition : border-color .35s ease;
+    float: left;
+    margin: em(10px);
+    transition: border-color .35s ease;
 }
+
 .gallery a:hover img,
 .gallery a:focus img {
-	border-color: $link-hover-color;
+    border-color: $link-hover-color;
 }
-@media( max-width: em(760px) ) {
-	.gallery {
-		padding-left: 0;
-	}
+
+@media(max-width: em(760px)) {
+    .gallery {
+        padding-left: 0;
+    }
 }
-@media( max-width: em(400px) ) {
-	.gallery-size-thumbnail img {
-		float: none;
-		margin-left: auto;
-		margin-right: auto;
-		display: block;
-	}
+
+@media(max-width: em(400px)) {
+    .gallery-size-thumbnail img {
+        float: none;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
 }
-@media( max-width:em(560px) ) {
-	img {
-		border-width: em(2px);
-	}
+
+@media(max-width:em(560px)) {
+    img {
+        border-width: em(2px);
+    }
 }

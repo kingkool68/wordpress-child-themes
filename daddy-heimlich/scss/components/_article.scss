@@ -1,127 +1,130 @@
 .article {
-	border-top: em(5px) solid $divider-color;
-	border-top-color: $divider-color-rgba;
-	padding: em(30px) 0 em(50px);
+    border-top: em(5px) solid $divider-color;
+    border-top-color: $divider-color-rgba;
+    padding: em(30px) 0 em(50px);
 
-	&:first-of-type {
-		border-top: 0 none;
-	}
+    &:first-of-type {
+        border-top: 0 none;
+    }
 
-	.inner {
-		max-width: em(650px);
-		margin: 0 auto;
-		padding-bottom: em(25px);
-	}
+    .inner {
+        max-width: em(650px);
+        margin: 0 auto;
+        padding-bottom: em(25px);
+    }
 
-	.title {
-		text-align: center;
-	}
+    .title {
+        text-align: center;
+    }
 
-	.title a {
-		color: #fff;
-		border-bottom: 0 none;
-		border-radius: em(10px);
-		padding: em(2px) em(5px);
-		display: inline-block;
-	}
+    .title a {
+        color: #fff;
+        border-bottom: 0 none;
+        border-radius: em(10px);
+        padding: em(2px) em(5px);
+        display: inline-block;
+    }
 
-	.title a:hover,
-	.title a:focus {
-		background-color: $site-title-bg-color;
-		color: $link-hover-color;
-	}
+    .title a:hover,
+    .title a:focus {
+        background-color: $site-title-bg-color;
+        color: $link-hover-color;
+    }
 
-	.time-stamp {
-		font-size: em(20px);
-		margin-bottom: em(24px, 20px);
-		text-align: center;
-	}
+    .time-stamp {
+        font-size: em(20px);
+        margin-bottom: em(24px, 20px);
+        text-align: center;
+    }
 
-	.colon {
-		font-size: 75%;
-		display: inline-block;
-		padding: 0.1em;
-	}
+    .colon {
+        font-size: 75%;
+        display: inline-block;
+        padding: 0.1em;
+    }
 
-	.am-pm {
-		text-transform: uppercase;
-		font-size: 50%;
-		position: relative;
-		left: -0.15em;
-	}
+    .am-pm {
+        text-transform: uppercase;
+        font-size: 50%;
+        position: relative;
+        left: -0.15em;
+    }
 }
+
 .instagram p {
-	margin-bottom: em(5px);
+    margin-bottom: em(5px);
 }
 
 .post .title,
 .page .title {
-	line-height: 1.3333;
+    line-height: 1.3333;
 }
 
 .page .title {
-	margin-bottom: 0.937em;
+    margin-bottom: 0.937em;
 }
 
 .post .time-stamp {
-	line-height: 1.25;
-	margin-top: -0.3em;
+    line-height: 1.25;
+    margin-top: -0.3em;
 }
 
 .post .title a {
-	margin-left: -em(5px);
+    margin-left: -em(5px);
 }
 
-@media (max-width: em(100px) ) {
-	.article {
+@media (max-width: em(100px)) {
+    .article {
 
-		.title {
-			font-size: em(35px);
-		}
+        .title {
+            font-size: em(35px);
+        }
 
-		.birthday-rsvp-title {
-			font-size: em(22px);
-		}
+        .birthday-rsvp-title {
+            font-size: em(22px);
+        }
 
-		.addtocalendar {
-			font-size: em(10px);
-		}
-	}
+        .addtocalendar {
+            font-size: em(10px);
+        }
+    }
 }
 
-@media (max-width: em(760px) ) {
-	.post .inner p,
-	.page .inner p {
-		padding-left: 0;
-	}
+@media (max-width: em(760px)) {
+
+    .post .inner p,
+    .page .inner p {
+        padding-left: 0;
+    }
 }
 
-@media (max-width: em(560px) ) {
-	.article {
+@media (max-width: em(560px)) {
+    .article {
 
-		.time-stamp b {
-			display: none;
-		}
+        .time-stamp b {
+            display: none;
+        }
 
-		.birthday-rsvp-title {
-			padding-top: 1em;
-		}
-	}
+        .birthday-rsvp-title {
+            padding-top: 1em;
+        }
+    }
 
-	.post .title,
-	.page .title {
-		margin-bottom: 0.3em;
-	}
+    .post .title,
+    .page .title {
+        margin-bottom: 0.3em;
+    }
 
-	.post .how-old-was-zadie {
-		display: block;
-		margin-top: 0.3em;
-	}
+    .post .how-old-was-zadie {
+        display: block;
+        margin-top: 0.3em;
+    }
 }
-@media (max-width: em(480px) ) {
-	.instagram .time {
-		display: block;
-		font-size: 80%;
-		padding-bottom: em(5px);
-	}
+
+@media (max-width: em(480px)) {
+    .instagram .time {
+        display: block;
+        font-size: 80%;
+        padding-bottom: em(5px);
+    }
 }

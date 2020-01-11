@@ -1,111 +1,130 @@
 .has-js .holder,
 .has-js #magic-shield,
 .has-js .more-menu {
-	transition: all 0.35s ease;
-	transform: translate3d(0, 0, 0);
-	backface-visibility: hidden;
+    transition: all 0.35s ease;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
 }
+
 .more-menu {
-	max-width: em(1050px);
-	margin: 0 auto;
+    max-width: em(1050px);
+    margin: 0 auto;
 }
+
 .has-js .more-menu {
-	z-index: 100;
-	width: em(280px);
-	min-height: 100vw;
-	position: fixed;
-	top: 0;
-	bottom: 0;
-	right: em(400px) * -1;
-	padding: em(16px) em(20px) 0;
-	background-color: $primary-color;
-	background-image: url($main-bg-image);
-	background-repeat: repeat;
-	box-shadow: em(10px) 0 em(25px) em(13px) rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    width: em(280px);
+    min-height: 100vw;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: em(400px) * -1;
+    padding: em(16px) em(20px) 0;
+    background-color: $primary-color;
+    background-image: url($main-bg-image);
+    background-repeat: repeat;
+    box-shadow: em(10px) 0 em(25px) em(13px) rgba(0, 0, 0, 0.5);
 }
+
 .admin-bar.has-js .more-menu {
-	padding-top: em(48px);
+    padding-top: em(48px);
 }
+
 .nav-open .more-menu {
-	right: 0;
+    right: 0;
 }
+
 .more-menu .close {
-	display: none;
-	font-size: em(20px);
-	border-bottom: 0 none;
-	margin-bottom: em(10px, 20px);
+    display: none;
+    font-size: em(20px);
+    border-bottom: 0 none;
+    margin-bottom: em(10px, 20px);
 }
+
 .has-js .more-menu .close {
-	display: block;
+    display: block;
 }
+
 .has-js .more-menu .alt-text {
-	visibility: hidden;
+    visibility: hidden;
 }
+
 .more-menu .title {
-	font-size: em(38px);
-	font-weight: 700;
-	text-transform: uppercase;
-	color: #fff;
-	font-style: normal;
+    font-size: em(38px);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+    font-style: normal;
 }
+
 .has-js .more-menu .title {
-	display: none;
+    display: none;
 }
+
 .more-menu ul {
-	padding-left: 0;
+    padding-left: 0;
 }
+
 .more-menu li {
-	list-style: none;
-	line-height: 1.25;
-	font-size: em(12px);
+    list-style: none;
+    line-height: 1.25;
+    font-size: em(12px);
 }
+
 .more-menu li:first-child a {
-	border-top: 0;
+    border-top: 0;
 }
+
 .more-menu li a {
-	border: 0 none;
-	border-top: 0.25em solid $divider-color;
-	border-top-color: $divider-color-rgba;
-	color: #fff;
-	font-size: em(19.2px, 12px);
-	padding: em(9.6px, 19.2px) 0 em(9.6px, 19.2px) em(28.8px, 19.2px);
-	font-family: $headline-font;
-	text-align: left;
-	display: block;
+    border: 0 none;
+    border-top: 0.25em solid $divider-color;
+    border-top-color: $divider-color-rgba;
+    color: #fff;
+    font-size: em(19.2px, 12px);
+    padding: em(9.6px, 19.2px) 0 em(9.6px, 19.2px) em(28.8px, 19.2px);
+    font-family: $headline-font;
+    text-align: left;
+    display: block;
 }
+
 .more-menu li a:hover,
 .more-menu li a:focus {
-	background-color: $light-accent-color;
-	background-color: $site-title-bg-color;
+    background-color: $light-accent-color;
+    background-color: $site-title-bg-color;
 }
+
 .more-menu .social-links {
-	padding-top: em(7.5px);
-	overflow: auto;
-	height: 100%;
+    padding-top: em(7.5px);
+    overflow: auto;
+    height: 100%;
 }
+
 .more-menu .social-links a {
-	color: #fff;
-	float: left;
-	width: 33.333%;
-	text-align: center;
-	font-size: em(45px);
-	border-bottom: 0;
+    color: #fff;
+    float: left;
+    width: 33.333%;
+    text-align: center;
+    font-size: em(45px);
+    border-bottom: 0;
 }
+
 .more-menu .social-links a:hover,
 .more-menu .social-links a:focus {
-	color: $light-accent-color;
-	color: $site-title-bg-color;
+    color: $light-accent-color;
+    color: $site-title-bg-color;
 }
+
 #magic-shield {
-	background-color: rgba(255, 255, 255, 0);
-	position: fixed;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	z-index: -1;
+    background-color: rgba(255, 255, 255, 0);
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
 }
+
 .nav-open #magic-shield {
-	z-index: 99;
-	background-color: rgba( 255, 255, 255, 0.75);
+    z-index: 99;
+    background-color: rgba(255, 255, 255, 0.75);
 }

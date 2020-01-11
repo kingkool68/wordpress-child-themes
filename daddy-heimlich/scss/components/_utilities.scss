@@ -1,13 +1,17 @@
 /* Should only be used as a last resort if clearing floats with overflow:hidden|auto doesn't work. */
 .clearfix {
-	zoom: 1;
+    zoom: 1;
 }
+
 .clearfix:before,
 .clearfix:after {
-	content: ".";
-	display: block;
-	height: 0;
-	overflow: hidden;
-	zoom: 1;
+    content: ".";
+    display: block;
+    height: 0;
+    overflow: hidden;
+    zoom: 1;
 }
-.clearfix:after { clear: both; }
+
+.clearfix:after {
+    clear: both;
+}

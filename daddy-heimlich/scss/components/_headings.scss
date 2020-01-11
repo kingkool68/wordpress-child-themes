@@ -4,9 +4,10 @@ h3,
 h4,
 h5,
 h6 {
-	font-family: $headline-font;
+    font-family: $headline-font;
 }
+
 h2 {
-	font-size: em(20px);
-	margin-bottom: em(4px, 20px);
+    font-size: em(20px);
+    margin-bottom: em(4px, 20px);
 }

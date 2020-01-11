@@ -1,70 +1,70 @@
 .archive-section {
-	overflow: auto;
-	height: 100%;
-	padding: em(32px) em(38px) em(16px);
+    overflow: auto;
+    height: 100%;
+    padding: em(32px) em(38px) em(16px);
 
-	.heading {
-		font-size: em(32px);
-	}
+    .heading {
+        font-size: em(32px);
+    }
 }
 
 .date-archive {
 
-	.year-heading {
-		font-size: em(32px);
-		display: block;
-		clear: both;
-		margin: 0 0 em(24px, 32px);
-	}
+    .year-heading {
+        font-size: em(32px);
+        display: block;
+        clear: both;
+        margin: 0 0 em(24px, 32px);
+    }
 
-	.item {
-		float: left;
-		margin-right: em(16px);
-		margin-bottom: em(32px);
-		font-size: em(16px);
-	}
+    .item {
+        float: left;
+        margin-right: em(16px);
+        margin-bottom: em(32px);
+        font-size: em(16px);
+    }
 
-	span.rounded-button {
-		background-color: transparent;
-		border: 0 none;
-		padding-top: em(10px, 18px);
-		padding-bottom: em(10px, 18px);
-	}
+    span.rounded-button {
+        background-color: transparent;
+        border: 0 none;
+        padding-top: em(10px, 18px);
+        padding-bottom: em(10px, 18px);
+    }
 }
 
 .age-archive {
 
-	.age-group {
-		float: left;
-		width: 33.33%;
-		overflow: auto;
-		margin-bottom: em(24px);
+    .age-group {
+        float: left;
+        width: 33.33%;
+        overflow: auto;
+        margin-bottom: em(24px);
 
-		@media( max-width: em(660px) ) {
-			width: 50%;
-		}
+        @media(max-width: em(660px)) {
+            width: 50%;
+        }
 
-		@media( max-width: em(480px) ) {
-			float: none;
-			width: auto;
+        @media(max-width: em(480px)) {
+            float: none;
+            width: auto;
 
-		}
+        }
 
-	}
+    }
 
-	.year-heading {
-		font-size: em(32px);
-		padding: 0 0 em(24px, 32px);
-	}
+    .year-heading {
+        font-size: em(32px);
+        padding: 0 0 em(24px, 32px);
+    }
 
-	.age-item {
-		float: left;
-		clear: left;
-		margin-left: em(8px);
-		margin-bottom: em(8px);
-	}
+    .age-item {
+        float: left;
+        clear: left;
+        margin-left: em(8px);
+        margin-bottom: em(8px);
+    }
 }
 
 .tag-archive {
-	clear: both;
+    clear: both;
 }

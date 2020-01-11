@@ -1,26 +1,29 @@
 .on-this-day-date-switcher {
-	text-align: center;
-	margin-bottom: 0;
-	padding-top: em(30px);
+    text-align: center;
+    margin-bottom: 0;
+    padding-top: em(30px);
 }
+
 .on-this-day-date-switcher select,
 .on-this-day-date-switcher .submit {
-	font-size: em(15px);
+    font-size: em(15px);
 }
+
 .on-this-day-date-switcher .submit {
-	margin-left: em(8px, 15px);
+    margin-left: em(8px, 15px);
 }
+
 .days-in-month-29 option[value="30"],
 .days-in-month-29 option[value="31"],
 .days-in-month-30 option[value="31"] {
-	display: none;
+    display: none;
 }
 
-@media ( max-width: em(340px) ) {
-	.on-this-day-date-switcher .submit {
-		display: block;
-		margin-top: em(8px, 15px);
-		margin-left: 0;
-		width: 100%;
-	}
+@media (max-width: em(340px)) {
+    .on-this-day-date-switcher .submit {
+        display: block;
+        margin-top: em(8px, 15px);
+        margin-left: 0;
+        width: 100%;
+    }
 }
