@@ -429,7 +429,7 @@ class Daddio_Post_Galleries {
 		if ( is_feed() ) {
 			$output = "\n";
 			foreach ( $attachments as $att_id => $attachment ) {
-				$output .= $this->get_attachment_link( $att_id, $atts['size'], true ) . PHPEOL;
+				$output .= $this->get_attachment_link( $att_id, $atts['size'], true ) . PHP_EOL;
 			}
 			return $output;
 		}
