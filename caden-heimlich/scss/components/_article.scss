@@ -1,0 +1,32 @@
+.article {
+
+	.title {
+		font-weight: 700;
+		font-style: italic;
+
+		a:hover,
+		a:focus {
+			color: #fff;
+			background-color: rgba($link-color, 0.85 );
+		}
+	}
+
+	.time-stamp {
+		font-style: italic;
+	}
+
+	.colon {
+		position: relative;
+		top: -0.1em;
+	}
+}
+
+@media (max-width: em(820px) ) {
+	.article {
+
+		.title {
+			font-size: em(32px);
+		}
+
+	}
+}

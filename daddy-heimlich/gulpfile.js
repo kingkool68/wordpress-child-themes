@@ -43,6 +43,7 @@ var PATHS = {
 		'js/infinite-scroll.js'
 	],
 	scss: [
+		'../caden-heimlich/scss/*.scss',
 		'../vera-heimlich/scss/*.scss',
 		'../zadie-heimlich/scss/*.scss'
 	],
