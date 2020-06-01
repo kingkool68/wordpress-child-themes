@@ -120,7 +120,7 @@ class Daddio_Scripts_Styles {
 			$new_script_element .= '<!--[if (gte IE 9) | (!IE)]><!-->';
 			$new_script_element .= "<script type='text/javascript' src='" . $jquery3_src . "' defer></script>";
 			$new_script_element .= '<!--<![endif]-->';
-
+			return '';
 			return $new_script_element;
 		}
 
