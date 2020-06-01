@@ -72,7 +72,7 @@ class Daddio_Scripts_Styles {
 
 		add_action( 'wp_footer', 'wp_print_scripts', 11 );
 		add_action( 'wp_footer', 'wp_print_head_scripts', 11 );
-		add_action( 'wp_footer', 'print_emoji_detection_script', 7 );
+		// add_action( 'wp_footer', 'print_emoji_detection_script', 7 );
 	}
 
 	/**
