@@ -54,9 +54,9 @@
 .instagram p {
     margin-bottom: em(5px);
 
-    // Make link tap targets farther apart
-    a+a {
-        margin-left: em(8px, 18px);
+    a {
+        display: inline-block;
+        padding: em(4px, 18px) 0 em(2px, 18px);
     }
 }
 
