@@ -197,7 +197,7 @@ class Daddio_Media {
 
 		$loading = 'lazy';
 		if ( $position < 2 ) {
-			$loading = 'eager';
+			// $loading = 'eager';
 		}
 		$img_attrs = array(
 			'class'   => 'aligncenter from-instagram',
