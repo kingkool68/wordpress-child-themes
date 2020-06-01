@@ -50,7 +50,7 @@ class Daddio_Scripts_Styles {
 	public function action_wp_enqueue_scripts() {
 		if ( $this->maybe_use_global_script_file() ) {
 			add_filter( 'script_loader_tag', array( $this, 'dont_load_bundled_scripts' ), 10, 3 );
-			wp_enqueue_script( 'daddio-global-scripts' );
+			// wp_enqueue_script( 'daddio-global-scripts' );
 		}
 
 		// Don't load the frontend Block Editor styles
@@ -72,7 +72,7 @@ class Daddio_Scripts_Styles {
 
 		add_action( 'wp_footer', 'wp_print_scripts', 11 );
 		add_action( 'wp_footer', 'wp_print_head_scripts', 11 );
-		// add_action( 'wp_footer', 'print_emoji_detection_script', 7 );
+		add_action( 'wp_footer', 'print_emoji_detection_script', 7 );
 	}
 
 	/**
