@@ -157,7 +157,7 @@ class Daddio_Scripts_Styles {
 			return false;
 		}
 		if ( function_exists( 'rh_is_prod' ) && rh_is_prod() ) {
-			return true;
+			// return true;
 		}
 
 		return false;
