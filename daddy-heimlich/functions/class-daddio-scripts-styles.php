@@ -20,13 +20,13 @@ class Daddio_Scripts_Styles {
 		add_action( 'init', array( $this, 'action_init_register_scripts' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'action_wp_enqueue_scripts' ) );
 		add_action( 'after_setup_theme', array( $this, 'action_after_setup_theme' ) );
+		add_action( 'send_headers', array( $this, 'action_send_headers' ), 1 );
 	}
 
 	/**
 	 * Hook in to WordPress via filters
 	 */
 	public function setup_filters() {
-		add_filter( 'style_loader_tag', array( $this, 'filter_style_loader_tag' ), 10, 4 );
 		add_filter( 'script_loader_tag', array( $this, 'filter_script_loader_tag' ), 10, 3 );
 		add_filter( 'body_class', array( $this, 'filter_body_class' ), 10, 1 );
 	}
@@ -76,22 +76,14 @@ class Daddio_Scripts_Styles {
 	}
 
 	/**
-	 * Adds a pre-connect <link> element to start establishing a connection for Google Fonts to speed up page rendering
+	 * If the RH_CDN_URL constant is defined add a link HTTP header to preconnect to that URL so the page can start downloading resources as quickly as possible.
 	 *
-	 * @see https://www.igvita.com/2015/08/17/eliminating-roundtrips-with-preconnect/
-	 *
-	 * @param  [type] $html   HTML to be printed
-	 * @param  [type] $handle Handle of the style being filtered
-	 * @param  [type] $href   href attribute of the style being printed
-	 * @param  [type] $media  media attribute of the style being printed
-	 * @return [type]         HTML to be printed
+	 * @see https://andydavies.me/blog/2019/03/22/improving-perceived-performance-with-a-link-rel-equals-preconnect-http-header/
 	 */
-	public function filter_style_loader_tag( $html, $handle, $href, $media ) {
-		if ( 'zah-google-fonts' !== $handle ) {
-			return $html;
+	public function action_send_headers() {
+		if ( is_defined( 'RH_CDN_URL' ) && ! empty( RH_CDN_URL ) ) {
+			header( 'link: <' . esc_url( RH_CDN_URL ) . '>; rel=preconnect; crossorigin' );
 		}
-
-		return '<link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>' . PHP_EOL . $html;
 	}
 
 	/**
