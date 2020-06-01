@@ -1897,6 +1897,8 @@ h2 {
 
 .instagram p {
   margin-bottom: 0.3125em; }
+  .instagram p a + a {
+    margin-left: 0.44444em; }
 
 .post .title,
 .page .title {

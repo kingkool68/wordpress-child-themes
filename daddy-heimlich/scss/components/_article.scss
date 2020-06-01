@@ -53,6 +53,11 @@
 
 .instagram p {
     margin-bottom: em(5px);
+
+    // Make link tap targets farther apart
+    a+a {
+        margin-left: em(8px, 18px);
+    }
 }
 
 .post .title,
