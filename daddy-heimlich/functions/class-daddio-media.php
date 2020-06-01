@@ -203,6 +203,7 @@ class Daddio_Media {
 			'class'   => 'aligncenter from-instagram',
 			'alt'     => '',
 			'loading' => $loading,
+			'sizes' => '(min-width: 740px) 644px, calc(92.38vw - 21px)',
 		);
 		return wp_get_attachment_image( $featured_image_id, 'full', false, $img_attrs );
 	}
