@@ -33,13 +33,13 @@ var COMPATIBILITY = [
 var wpIncludesDir = '../../../wp-includes/js';
 var PATHS = {
 	javascript: [
-		wpIncludesDir + '/wp-embed.js',
+		// wpIncludesDir + '/wp-embed.js',
 		wpIncludesDir + '/mediaelement/mediaelement-and-player.js',
 		wpIncludesDir + '/mediaelement/mediaelement-migrate.js',
 		wpIncludesDir + '/mediaelement/wp-mediaelement.js',
 		'js/instantpage.js',
 		'js/menu.js',
-		'js/analytics.js',
+		// 'js/analytics.js',
 		'js/infinite-scroll.js'
 	],
 	scss: [
