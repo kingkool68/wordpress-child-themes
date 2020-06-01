@@ -81,7 +81,7 @@ class Daddio_Scripts_Styles {
 	 * @see https://andydavies.me/blog/2019/03/22/improving-perceived-performance-with-a-link-rel-equals-preconnect-http-header/
 	 */
 	public function action_send_headers() {
-		if ( is_defined( 'RH_CDN_URL' ) && ! empty( RH_CDN_URL ) ) {
+		if ( defined( 'RH_CDN_URL' ) && ! empty( RH_CDN_URL ) ) {
 			header( 'link: <' . esc_url( RH_CDN_URL ) . '>; rel=preconnect; crossorigin' );
 		}
 	}
