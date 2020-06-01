@@ -1522,7 +1522,7 @@ html {
   font-family: "Asap", Arial, Helvetica, sans-serif;
   font-weight: 300;
   background-color: #0f4c81;
-  background-image: url("../img/symphony-blue.png");
+  background-image: url("../img/symphony-blue.jpg");
   background-repeat: repeat;
   background-attachment: fixed; }
 
@@ -1675,7 +1675,7 @@ article.instagram .mejs-controls .mejs-time-rail .mejs-time-current {
 
 header {
   background-color: #fff;
-  background-image: url("../img/symphony.png");
+  background-image: url("../img/symphony.jpg");
   background-repeat: repeat;
   background-attachment: fixed;
   padding: 0.3125em 0;
@@ -1768,7 +1768,7 @@ header .childs-current-age {
   right: -25em;
   padding: 1em 1.25em 0;
   background-color: #0f4c81;
-  background-image: url("../img/symphony-blue.png");
+  background-image: url("../img/symphony-blue.jpg");
   background-repeat: repeat;
   -webkit-box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5);
           box-shadow: 0.625em 0 1.5625em 0.8125em rgba(0, 0, 0, 0.5); }
