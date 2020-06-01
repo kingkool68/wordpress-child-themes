@@ -118,10 +118,17 @@ class Daddio_Scripts_Styles {
 			// jQuery 3.x gets served to everyone else...
 			$jquery3_src         = apply_filters( 'script_loader_src', get_template_directory_uri() . '/js/jquery-3.min.js' );
 			$new_script_element .= '<!--[if (gte IE 9) | (!IE)]><!-->';
-			$new_script_element .= "<script type='text/javascript' src='" . $jquery3_src . "'></script>";
+			$new_script_element .= "<script type='text/javascript' src='" . $jquery3_src . "' defer></script>";
 			$new_script_element .= '<!--<![endif]-->';
 
 			return $new_script_element;
+		}
+
+		$defer_handles = array(
+			'daddio-global-scripts',
+		);
+		if ( in_array( $handle, $defer_handles, true ) ) {
+			$script_element = str_replace( ' src', ' defer src', $script_element );
 		}
 
 		return $script_element;
