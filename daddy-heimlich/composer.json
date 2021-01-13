@@ -2,11 +2,10 @@
 	"name": "kingkool68/wordpress-child-themes",
 	"description": "A WordPress theme for my kids",
 	"license": "MIT",
-	"require-dev": {
-		"wp-coding-standards/wpcs": "^2.2",
-		"dealerdirect/phpcodesniffer-composer-installer": "^0.5.0"
-	},
 	"require": {
-		"nojimage/twitter-text-php": "^3.0"
+		"nojimage/twitter-text-php": "^3.1",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+		"squizlabs/php_codesniffer": "^3.5",
+		"wp-coding-standards/wpcs": "^2.3"
 	}
 }
