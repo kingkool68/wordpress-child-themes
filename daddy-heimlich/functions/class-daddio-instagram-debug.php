@@ -42,7 +42,8 @@ class Daddio_Instagram_Debug {
 	}
 
 	public function handle_debug_instagram_submenu() {
-		$result = array();
+		$result              = array();
+		$instagram_permalink = '';
 		if (
 			! empty( $_POST['instagram-source'] )
 			&& check_admin_referer( static::$nonce_field_action )
@@ -129,6 +130,10 @@ class Daddio_Instagram_Debug {
 		$referer = true;
 		$echo    = false;
 
+		$text_area_value = '';
+		if ( ! empty( $_POST['instagram-source'] ) ) {
+			$text_area_value = wp_unslash( $_POST['instagram-source'] );
+		}
 		$context = array(
 			'instagram_permalink' => $instagram_permalink,
 			'result'              => implode( "\n", $result ),
@@ -139,7 +144,7 @@ class Daddio_Instagram_Debug {
 				$echo
 			),
 			'form_action_url'     => admin_url( 'edit.php?post_type=instagram&page=instagram-debug' ),
-			'text_area_value'     => wp_unslash( $_POST['instagram-source'] ),
+			'text_area_value'     => $text_area_value,
 			'submit_button'       => get_submit_button( 'Debug', 'primary' ),
 		);
 		Sprig::out( 'admin/instagram-debug-submenu.twig', $context );
