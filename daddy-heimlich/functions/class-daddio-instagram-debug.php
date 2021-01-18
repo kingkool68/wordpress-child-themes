@@ -74,7 +74,13 @@ class Daddio_Instagram_Debug {
 				}
 				$nodes     = array_merge( $top_posts, $other );
 				$page_type = 'tag';
+			}
 
+			// It's a Profile page
+			if ( isset( $json->entry_data->ProfilePage[0]->graphql->user ) ) {
+				$user      = $json->entry_data->ProfilePage[0]->graphql->user;
+				$nodes     = $user->edge_owner_to_timeline_media->edges;
+				$page_type = 'user';
 			}
 
 			// It's a single Post page

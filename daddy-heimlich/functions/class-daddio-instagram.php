@@ -272,6 +272,13 @@ class Daddio_Instagram {
 				$nodes = array_values( $deuped_nodes );
 			}
 
+			// It's a Profile page
+			if ( isset( $json->entry_data->ProfilePage[0]->graphql->user ) ) {
+				$user      = $json->entry_data->ProfilePage[0]->graphql->user;
+				$nodes     = $user->edge_owner_to_timeline_media->edges;
+				$page_type = 'user';
+			}
+
 			// It's a single Post page
 			if ( ! empty( $json->graphql->shortcode_media ) ) {
 				$post_page_node = $json->graphql->shortcode_media;
