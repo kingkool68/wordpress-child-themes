@@ -100,8 +100,8 @@ class Daddio_Instagram_Debug {
 			}
 
 			// It's a location page
-			if ( ! empty( $json->entry_data->LocationsPage[0]->graphql->location ) ) {
-				$location  = $json->entry_data->LocationsPage[0]->graphql->location;
+			if ( ! empty( $json->entry_data->LocationsPage[0]->native_location_data->location_info ) ) {
+				$location  = $json->entry_data->LocationsPage[0]->native_location_data->location_info;
 				$page_type = 'location';
 				if ( ! empty( $location->id ) ) {
 					$instagram_permalink = 'https://www.instagram.com/explore/locations/' . $location->id . '/';

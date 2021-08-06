@@ -448,20 +448,23 @@ class Daddio_Instagram_Locations {
 		}
 
 		// Check to make sure a raw Instagram JSON response isn't being passed in
-		if ( ! empty( $node->entry_data->LocationsPage[0]->graphql->location ) ) {
-			$node = $node->entry_data->LocationsPage[0]->graphql->location;
+		if ( ! empty( $node->entry_data->LocationsPage[0]->native_location_data->location_info ) ) {
+			$node = $node->entry_data->LocationsPage[0]->native_location_data->location_info;
 		}
 
 		// Map our node object properties to our output object properties
 		$mapping = array(
-			'id'      => 'location_id',
-			'name'    => 'name',
-			'slug'    => 'slug',
-			'blurb'   => 'blurb',
-			'website' => 'website',
-			'phone'   => 'phone',
-			'lat'     => 'latitude',
-			'lng'     => 'longitude',
+			'id'               => 'location_id',
+			'location_id'      => 'location_id',
+			'name'             => 'name',
+			'slug'             => 'slug',
+			'blurb'            => 'blurb',
+			'website'          => 'website',
+			'phone'            => 'phone',
+			'lat'              => 'latitude',
+			'lng'              => 'longitude',
+			'location_address' => 'street_address',
+			'location_zip'     => 'postcode',
 		);
 		foreach ( $mapping as $node_key => $output_key ) {
 			if ( ! empty( $node->{$node_key} ) ) {
@@ -664,7 +667,7 @@ class Daddio_Instagram_Locations {
 
 		$stale_location = false;
 		if ( empty( $location_data ) ) {
-			$location_data = static::get_location_data_by_location_id( $location_id );
+			$location_data  = static::get_location_data_by_location_id( $location_id );
 			$stale_location = true;
 		}
 
