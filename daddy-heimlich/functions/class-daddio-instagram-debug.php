@@ -86,13 +86,12 @@ class Daddio_Instagram_Debug {
 			}
 
 			// It's a single Post page
-			if ( ! empty( $json->graphql->shortcode_media ) ) {
-				$post_page_node = $json->graphql->shortcode_media;
-				$nodes          = array( $post_page_node );
-				$page_type      = 'post';
-				if ( ! empty( $post_page_node->shortcode ) ) {
-					$instagram_permalink = 'https://www.instagram.com/p/' . $post_page_node->shortcode . '/';
+			if ( ! empty( $json->items ) ) {
+				$nodes = array();
+				foreach ( $json->items as $item ) {
+					$nodes[] = $item;
 				}
+				$page_type = 'post';
 			}
 
 			if ( ! empty( $nodes ) ) {
