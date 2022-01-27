@@ -52,27 +52,29 @@ class Daddio_Instagram_Debug {
 			$json             = Daddio_Instagram::get_instagram_json_from_html( $instagram_source );
 			$page_type        = '';
 
+			// var_dump( $json );
+
 			// It's a Tag page
 			if ( isset( $json->entry_data->TagPage[0] ) ) {
-				$top_posts = array();
-				$other     = array();
-
-				if ( isset( $json->entry_data->TagPage[0]->tag ) ) {
-					$tag       = $json->entry_data->TagPage[0]->tag;
-					$top_posts = $tag->top_posts->nodes;
-					$other     = $tag->media->nodes;
+				$sections = array();
+				$nodes    = array();
+				if ( ! empty( $json->entry_data->TagPage[0]->data->top->sections ) ) {
+					$section  = $json->entry_data->TagPage[0]->data->top->sections;
+					$sections = array_merge( $section, $sections );
+				}
+				if ( ! empty( $json->entry_data->TagPage[0]->data->recent->sections ) ) {
+					$section  = $json->entry_data->TagPage[0]->data->recent->sections;
+					$sections = array_merge( $section, $sections );
 				}
 
-				// New format I detected on 01/02/2018
-				if ( isset( $json->entry_data->TagPage[0]->graphql->hashtag ) ) {
-					$tag       = $json->entry_data->TagPage[0]->graphql->hashtag;
-					$top_posts = $tag->edge_hashtag_to_top_posts->edges;
-					$other     = $tag->edge_hashtag_to_media->edges;
-					if ( ! empty( $tag->name ) ) {
-						$instagram_permalink = 'https://www.instagram.com/explore/tags/' . $tag->name . '/';
+				foreach ( $sections as $section ) {
+					if ( ! empty( $section->layout_content->medias ) ) {
+						$medias = $section->layout_content->medias;
+						foreach ( $medias as $item ) {
+							$nodes[] = $item->media;
+						}
 					}
 				}
-				$nodes     = array_merge( $top_posts, $other );
 				$page_type = 'tag';
 			}
 
