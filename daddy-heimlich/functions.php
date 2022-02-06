@@ -16,6 +16,7 @@ $files_to_require = array(
 	'class-daddio-pagination.php',
 	'class-daddio-menus.php',
 	'class-daddio-post-galleries.php',
+	'class-instagram-scraper.php',
 	'class-daddio-instagram.php',
 	'class-daddio-instagram-locations.php',
 	'class-daddio-instagram-debug.php',
