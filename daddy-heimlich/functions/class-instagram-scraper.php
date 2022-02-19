@@ -138,7 +138,7 @@ class Instagram_Scraper {
 			}
 
 			if ( ! empty( $root->recent->next_max_id ) ) {
-				$max_id = base64_decode( $root->recent->next_max_id );
+				$max_id                     = base64_decode( $root->recent->next_max_id );
 				$this->recent_next_page_url = add_query_arg(
 					array(
 						'__a'    => 1,
@@ -147,7 +147,7 @@ class Instagram_Scraper {
 					$this->page_url
 				);
 			}
-			// var_dump( $root );
+
 			$sections = array();
 			$output   = array();
 			$sections = array_merge( $root->top->sections, $sections );
@@ -205,18 +205,23 @@ class Instagram_Scraper {
 
 	public function normalize_node( $node ) {
 		$output = array(
-			'_normalized'     => true,
-			'id'              => '',
-			'code'            => '',
-			'instagram_url'   => '',
-			'caption'         => '',
-			'timestamp'       => '', // In GMT time
-			'owner_id'        => '',
-			'owner_username'  => '',
-			'owner_full_name' => '',
-			'location_id'     => '',
-			'location_name'   => '',
-			'media'           => array(),
+			'_normalized'      => true,
+			'id'               => '',
+			'code'             => '',
+			'instagram_url'    => '',
+			'caption'          => '',
+			'timestamp'        => '', // In GMT time
+			'owner_id'         => '',
+			'owner_username'   => '',
+			'owner_full_name'  => '',
+
+			'location_id'      => '',
+			'location_name'    => '',
+			'location_address' => '',
+			'location_city'    => '',
+			'latitude'         => '',
+			'longitude'        => '',
+			'media'            => array(),
 		);
 
 		if ( ! empty( $node->id ) ) {
@@ -248,12 +253,28 @@ class Instagram_Scraper {
 			$output['owner_full_name'] = $node->user->full_name;
 		}
 
+		if ( ! empty( $node->lat ) ) {
+			$output['latitude'] = $node->lat;
+		}
+
+		if ( ! empty( $node->lng ) ) {
+			$output['longitude'] = $node->lng;
+		}
+
 		if ( ! empty( $node->location->pk ) ) {
 			$output['location_id'] = $node->location->pk;
 		}
 
 		if ( ! empty( $node->location->name ) ) {
 			$output['location_name'] = $node->location->name;
+		}
+
+		if ( ! empty( $node->location->address ) ) {
+			$output['location_address'] = $node->location->address;
+		}
+
+		if ( ! empty( $node->location->city ) ) {
+			$output['location_city'] = $node->location->city;
 		}
 
 		// var_dump( $node );
