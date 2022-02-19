@@ -5,24 +5,20 @@
 		width: 95%;
 	}
 
-	.debug-node.level-1 {
-		border-bottom: 2px solid #ccc;
-		margin-bottom: 64px;
-	}
-
-	.debug-node .video-preview,
-	.debug-node .image-preview {
+	.debug-item .video-preview,
+	.debug-item .image-preview {
 		margin: 0 0 8px;
 		max-width: 250px;
 		height: auto;
 	}
 
-	.debug-node table {
+	.debug-item table {
 		margin-bottom: 32px;
 	}
 
-	.debug-node .debug-node {
-		padding-left: 64px;
+	.debug-item th {
+		text-align: right;
+		vertical-align: top;
 	}
 </style>
 
@@ -32,6 +28,8 @@
 			Debugging <a href="{{ instagram_permalink|esc_url }}" target="_blank">{{ instagram_permalink }}</a>
 		</h1>
 	{% endif %}
+	<p>{{ page_type }}</p>
+	{{ dump( page_info ) }}
 	{{ result }}
 
 	<h1>Instagram Debug</h1>

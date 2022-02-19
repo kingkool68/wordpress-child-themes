@@ -1,0 +1,40 @@
+<div class="debug-item">
+    <h2>{{ url }}</h2>
+    <table>
+        <tbody>
+            {% for label, value in items %}
+                <tr>
+                    <th>{{ label }}</th>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if medias %}
+        <p>{{ medias|length }} Media</p>
+
+        <table>
+            <tbody>
+                {% for media in medias %}
+
+                    <tr>
+                        <th>{{ loop.index }}</th>
+                        <td>
+                            {% if media.src %}
+                                <a href="{{ media.src|esc_url }}" target="_blank">Image</a>
+                            {% endif %}
+
+                            {% if media.video_src %}
+                                <br>
+                                <a href="{{ media.video_src|esc_url }}" target="_blank">Video</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+</div>
