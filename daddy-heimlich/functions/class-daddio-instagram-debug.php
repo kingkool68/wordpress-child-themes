@@ -67,8 +67,8 @@ class Daddio_Instagram_Debug {
 			$text_area_value = wp_unslash( $_POST['instagram-source'] );
 		}
 		$context = array(
-			'page_type' => $instagram->page_type,
-			'page_info' => $instagram->page_info,
+			'page_type'           => $instagram->page_type,
+			'page_info'           => $instagram->page_info,
 			'instagram_permalink' => $instagram_permalink,
 			'result'              => implode( "\n", $result ),
 			'nonce_field'         => wp_nonce_field(
@@ -99,6 +99,7 @@ class Daddio_Instagram_Debug {
 			'medias' => $item->media,
 			'items'  => array(
 				// Label => Value
+				'ID'             => $item->id,
 				'Caption'        => $item->caption,
 				'Date'           => $timestamp->format( 'F j, Y g:ia T' ),
 				'User'           => $item->owner_username,

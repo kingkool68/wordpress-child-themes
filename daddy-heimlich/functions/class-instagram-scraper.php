@@ -13,7 +13,6 @@ class Instagram_Scraper {
 
 	public function __construct( $html = '' ) {
 		$raw_json = $this->parse_from_html( $html );
-		// var_dump( $raw_json );
 
 		// Determine what kind of page this is
 		if ( ! empty( $raw_json->entry_data->LocationsPage ) ) {
@@ -277,8 +276,6 @@ class Instagram_Scraper {
 			$output['location_city'] = $node->location->city;
 		}
 
-		// var_dump( $node );
-
 		$items = array();
 		if ( ! empty( $node->image_versions2->candidates ) ) {
 			$items = array( $node );
@@ -289,10 +286,15 @@ class Instagram_Scraper {
 
 		foreach ( $items as $item ) {
 			$media_item = array(
+				'id'            => '',
 				'src'           => '',
 				'thumbnail_src' => '',
 				'video_src'     => '',
 			);
+
+			if ( ! empty( $item->id ) ) {
+				$media_item['id'] = $item->id;
+			}
 			if ( ! empty( $item->image_versions2->candidates ) ) {
 				$media_item['src'] = $item->image_versions2->candidates[0]->url;
 			}
@@ -301,7 +303,6 @@ class Instagram_Scraper {
 			}
 			$output['media'][] = $media_item;
 		}
-		// var_dump( $node );
 
 		return $output;
 	}
