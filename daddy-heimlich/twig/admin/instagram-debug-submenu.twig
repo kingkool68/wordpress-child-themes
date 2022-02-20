@@ -29,7 +29,10 @@
 		</h1>
 	{% endif %}
 	<p>{{ page_type }}</p>
-	{{ dump( page_info ) }}
+	{% if page_info %}
+		{{ dump( page_info ) }}
+	{% endif %}
+
 	{{ result }}
 
 	<h1>Instagram Debug</h1>
