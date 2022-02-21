@@ -169,23 +169,17 @@ class Instagram_Scraper {
 		}
 		$this->page_type = 'user-page';
 
-		$root = $raw_json->entry_data->ProfilePage[0]->graphql->user;
-		var_dump( $root->edge_owner_to_timeline_media->edges );
-		return;
+		$root                 = $raw_json->entry_data->ProfilePage[0]->graphql->user;
 		$media_posted_by_user = $root->edge_owner_to_timeline_media->edges;
+		$combined_posts       = $root->edge_felix_combined_post_uploads->edges;
 		$sections             = array();
 		$output               = array();
-		$sections             = array_merge( $root->top->sections, $sections );
-		$sections             = array_merge( $root->recent->sections, $sections );
+		$sections             = array_merge( $media_posted_by_user, $sections );
+		$sections             = array_merge( $combined_posts, $sections );
 		foreach ( $sections as $section ) {
-			if ( ! empty( $section->layout_content->medias ) ) {
-				$medias = $section->layout_content->medias;
-				foreach ( $medias as $item ) {
-					$node     = $item->media;
-					$output[] = $this->normalize_node( $node );
-				}
-			}
+			$output[] = $this->normalize_node( $section->node );
 		}
+		return $output;
 	}
 
 	public function parse_single_post_json( $raw_json = '' ) {
@@ -303,6 +297,97 @@ class Instagram_Scraper {
 			}
 			$output['media'][] = $media_item;
 		}
+		if ( ! empty( $node->__typename ) ) {
+			$output = static::normalize_old_node( $node, $output );
+		}
+		return $output;
+	}
+
+	public static function normalize_old_node( $node, $output ) {
+		if ( ! empty( $node->shortcode ) ) {
+			$output['code']          = $node->shortcode;
+			$output['instagram_url'] = 'https://instagram.com/p/' . $output['code'] . '/';
+		}
+
+		if ( ! empty( $node->id ) && ! empty( $node->owner->id ) ) {
+			$output['id'] = $node->id . '_' . $node->owner->id;
+		}
+
+		if ( ! empty( $node->taken_at_timestamp ) ) {
+			$output['timestamp'] = $node->taken_at_timestamp;
+		}
+
+		if ( ! empty( $node->edge_media_to_caption->edges[0]->node->text ) ) {
+			$output['caption'] = $node->edge_media_to_caption->edges[0]->node->text;
+		}
+
+		if ( ! empty( $node->owner->id ) ) {
+			$output['owner_id'] = $node->owner->id;
+		}
+
+		if ( ! empty( $node->owner->username ) ) {
+			$output['owner_username'] = $node->owner->username;
+		}
+
+		if ( ! empty( $node->location->id ) ) {
+			$output['location_id'] = $node->location->id;
+		}
+
+		$media_item = array(
+			'id'            => '',
+			'src'           => '',
+			'thumbnail_src' => '',
+			'video_src'     => '',
+		);
+
+		if ( ! empty( $node->id ) ) {
+			$media_item['id'] = $node->id . '_' . $node->owner->id;
+		}
+
+		if ( ! empty( $node->display_url ) ) {
+			$media_item['src'] = $node->display_url;
+		}
+
+		if ( ! empty( $node->video_url ) ) {
+			$media_item['video_src'] = $node->video_url;
+		}
+		$output['media'][] = $media_item;
+
+		if ( ! empty( $node->edge_sidecar_to_children ) ) {
+			// Reset media items since they are duplicated in this node
+			$output['media'] = array();
+
+			foreach ( $node->edge_sidecar_to_children as $child_nodes ) {
+				if ( ! empty( $child_nodes ) ) {
+					foreach ( $child_nodes as $child_node ) {
+						$child_node = $child_node->node;
+
+						$media_item = array(
+							'id'            => '',
+							'src'           => '',
+							'thumbnail_src' => '',
+							'video_src'     => '',
+						);
+
+						if ( ! empty( $child_node->id ) ) {
+							$media_item['id'] = $child_node->id . '_' . $child_node->owner->id;
+						}
+
+						if ( ! empty( $child_node->display_url ) ) {
+							$media_item['src'] = $child_node->display_url;
+						}
+
+						if ( ! empty( $child_node->video_url ) ) {
+							$media_item['video_src'] = $child_node->video_url;
+						}
+						$output['media'][] = $media_item;
+					}
+				}
+			}
+		}
+
+		// var_dump( $node );
+		// var_dump( $output );
 
 		return $output;
 	}
