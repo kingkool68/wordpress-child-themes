@@ -1,20 +1,52 @@
 <?php
+/**
+ * For scraping and normalizing Instagram data from a page's HTML
+ */
 class Instagram_Scraper {
 
+	/**
+	 * The type of page that is being scraped
+	 *
+	 * @var string
+	 */
 	public $page_type = '';
 
+	/**
+	 * Extra meta data about the given page
+	 *
+	 * @var array
+	 */
 	public $page_info = array();
 
+	/**
+	 * The URL of the current page being scraped
+	 *
+	 * @var string
+	 */
 	public $page_url = '';
 
+	/**
+	 * The URL to fetch the next page of results
+	 *
+	 * @var string
+	 */
 	public $recent_next_page_url = '';
 
+	/**
+	 * The items that were scraped
+	 *
+	 * @var array
+	 */
 	public $items = array();
 
+	/**
+	 * Determine what type of page should be processed
+	 *
+	 * @param string $html The HTLM of the page to process
+	 */
 	public function __construct( $html = '' ) {
 		$raw_json = $this->parse_from_html( $html );
 
-		// Determine what kind of page this is
 		if ( ! empty( $raw_json->entry_data->LocationsPage ) ) {
 			$this->items = $this->parse_location_page_json( $raw_json );
 		}
@@ -60,7 +92,12 @@ class Instagram_Scraper {
 		}
 	}
 
-	public function parse_location_page_json( $raw_json = '' ) {
+	/**
+	 * Process data from a location page
+	 *
+	 * @param object $raw_json The raw JSON data found on the page to be scraped
+	 */
+	public function parse_location_page_json( $raw_json ) {
 		if ( empty( $raw_json->entry_data->LocationsPage[0]->native_location_data ) ) {
 			wp_die( 'Bad Location Page Data' );
 		}
@@ -110,7 +147,12 @@ class Instagram_Scraper {
 		return $output;
 	}
 
-	public function parse_tag_page_json( $raw_json = '' ) {
+	/**
+	 * Process data from a tag page
+	 *
+	 * @param object $raw_json The raw JSON data found on the page to be scraped
+	 */
+	public function parse_tag_page_json( $raw_json ) {
 		if ( empty( $raw_json->entry_data->TagPage[0]->data ) ) {
 			wp_die( 'Bad Tag Page Data' );
 		}
@@ -137,6 +179,7 @@ class Instagram_Scraper {
 			}
 
 			if ( ! empty( $root->recent->next_max_id ) ) {
+				// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 				$max_id                     = base64_decode( $root->recent->next_max_id );
 				$this->recent_next_page_url = add_query_arg(
 					array(
@@ -163,7 +206,12 @@ class Instagram_Scraper {
 			return $output;
 	}
 
-	public function parse_tagged_user_page_json( $raw_json = '' ) {
+	/**
+	 * Process data from a user page
+	 *
+	 * @param object $raw_json The raw JSON data found on the page to be scraped
+	 */
+	public function parse_tagged_user_page_json( $raw_json ) {
 		if ( empty( $raw_json->entry_data->ProfilePage[0] ) ) {
 			wp_die( 'Bad Tagged User Page Data' );
 		}
@@ -182,6 +230,11 @@ class Instagram_Scraper {
 		return $output;
 	}
 
+	/**
+	 * Process data from a single page
+	 *
+	 * @param object $raw_json The raw JSON data found on the page to be scraped
+	 */
 	public function parse_single_post_json( $raw_json = '' ) {
 		if ( empty( $raw_json->items[0] ) ) {
 			wp_die( 'Bad Single Post Data' );
@@ -196,6 +249,11 @@ class Instagram_Scraper {
 		return $output;
 	}
 
+	/**
+	 * Normalize data from a single media node
+	 *
+	 * @param object $node The node data to process
+	 */
 	public function normalize_node( $node ) {
 		$output = array(
 			'_normalized'      => true,
@@ -303,7 +361,14 @@ class Instagram_Scraper {
 		return $output;
 	}
 
-	public static function normalize_old_node( $node, $output ) {
+	/**
+	 * Normalize data from a single media node in an old format
+	 * Currently this is only for user pages
+	 *
+	 * @param object $node The node data to process
+	 * @param array $output The current output format to return the data as
+	 */
+	public static function normalize_old_node( $node, $output = array() ) {
 		if ( ! empty( $node->shortcode ) ) {
 			$output['code']          = $node->shortcode;
 			$output['instagram_url'] = 'https://instagram.com/p/' . $output['code'] . '/';
@@ -385,10 +450,6 @@ class Instagram_Scraper {
 				}
 			}
 		}
-
-		// var_dump( $node );
-		// var_dump( $output );
-
 		return $output;
 	}
 }
