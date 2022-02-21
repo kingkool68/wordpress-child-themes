@@ -227,6 +227,16 @@ class Instagram_Scraper {
 		foreach ( $sections as $section ) {
 			$output[] = $this->normalize_node( $section->node );
 		}
+		// Dedupe
+		$unique_ids = array();
+		foreach ( $output as $key => $item ) {
+			$the_id = $item['id'];
+			if ( in_array( $the_id, $unique_ids, true ) ) {
+				unset( $output[ $key ] );
+			} else {
+				$unique_ids[] = $the_id;
+			}
+		}
 		return $output;
 	}
 
