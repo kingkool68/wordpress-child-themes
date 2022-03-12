@@ -104,3 +104,52 @@ function zah_add_locations() {
 	WP_CLI::success( 'All Done!' );
 }
 WP_CLI::add_command( 'zah-add-locations', 'zah_add_locations' );
+
+function zah_tag_posts_to_be_updated() {
+	// Make sure needs-to-be-updated term exists...
+	$args      = array(
+		'term_name' => 'Needs to be updated',
+		'taxonomy'  => 'maintenance',
+	);
+	$term      = get_term_by(
+		$field = 'name',
+		$args['term_name'],
+		$args['taxonomy']
+	);
+	if ( $term === false ) {
+		$term = wp_insert_term(
+			$args['term_name'],
+			$args['taxonomy'],
+		);
+		if ( is_wp_error( $term ) ) {
+			wp_die( $term );
+		}
+		$term = (object) $term;
+	}
+
+	// Get all Instagram posts
+	$args  = array(
+		'post_type'              => 'instagram',
+		'post_status'            => 'any',
+		'posts_per_page'         => -1,
+
+		// For performance
+		'no_found_rows'          => true,
+		'update_post_meta_cache' => false,
+		// 'update_post_term_cache' => false,
+		'fields'                 => 'ids',
+	);
+	$query = new WP_Query( $args );
+	foreach ( $query->posts as $post_id ) {
+		$result = wp_set_object_terms(
+			$post_id,
+			$term->term_id,
+			$term->taxonomy,
+			true
+		);
+	}
+	$count = count( $query->posts );
+	$count = number_format( $count );
+	WP_CLI::success( 'Associated with ' . $count . ' Instagram posts' );
+}
+WP_CLI::add_command( 'zah-tag-posts-to-be-updated', 'zah_tag_posts_to_be_updated' );

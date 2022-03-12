@@ -20,6 +20,7 @@ $files_to_require = array(
 	'class-daddio-instagram.php',
 	'class-daddio-instagram-locations.php',
 	'class-daddio-instagram-debug.php',
+	'class-daddio-instagram-maintenance.php',
 	'class-daddio-infinite-scroll.php',
 	'class-daddio-on-this-day.php',
 	'rsvp.php',
