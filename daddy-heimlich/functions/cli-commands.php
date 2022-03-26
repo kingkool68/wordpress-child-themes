@@ -129,7 +129,7 @@ function zah_tag_posts_to_be_updated() {
 
 	// Get all Instagram posts
 	$args  = array(
-		'post_type'              => 'instagram',
+		'post_type'              => Daddio_Instagram::$post_type,
 		'post_status'            => 'any',
 		'posts_per_page'         => -1,
 
