@@ -350,7 +350,6 @@ class Instagram_Scraper {
 			$media_item = array(
 				'id'            => '',
 				'src'           => '',
-				'thumbnail_src' => '',
 				'video_src'     => '',
 			);
 
@@ -411,7 +410,6 @@ class Instagram_Scraper {
 		$media_item = array(
 			'id'            => '',
 			'src'           => '',
-			'thumbnail_src' => '',
 			'video_src'     => '',
 		);
 
@@ -440,7 +438,6 @@ class Instagram_Scraper {
 						$media_item = array(
 							'id'            => '',
 							'src'           => '',
-							'thumbnail_src' => '',
 							'video_src'     => '',
 						);
 
