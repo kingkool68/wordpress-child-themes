@@ -17,12 +17,16 @@
 <div class="wrap">
     {{ result }}
 
-    <h1>Instagram Sync</h1>
-    <p>Paste the HTML source of the Instagram post to scrape and sync it with this site.</p>
+    {% if title %}
+        <h1>{{ title }}</h1>
+    {% endif %}
+
+   {{ description }}
     <form action="{{ form_action_url|esc_url }}" method="post">
-        {{ nonce_field }}
+        {{ form_content }}
         <label for="instagram-source">HTML Source</label>
-        <textarea id="instagram-source" name="instagram-source" rows="5"></textarea>
+        <textarea id="instagram-source" name="instagram-source" rows="5">{{ instagram_source }}</textarea>
+        {{ nonce_field }}
         {{ submit_button }}
     </form>
 
