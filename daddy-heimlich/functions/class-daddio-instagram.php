@@ -243,32 +243,16 @@ class Daddio_Instagram {
 	 */
 	public static function handle_sync_submenu() {
 
-		$result           = '';
-		$form_content     = '';
 		$instagram_source = '';
-
-		$title       = 'Instagram Sync';
-		$description = 'Paste the HTML source of the Instagram post to scrape and sync it with this site.';
-
-		if (
-			! empty( $_POST['instagram-source'] )
-			&& check_admin_referer( static::$sync_slug )
-		) {
+		if ( ! empty( $_POST['instagram-source'] ) && check_admin_referer( static::$sync_slug ) ) {
 			$instagram_source = wp_unslash( $_POST['instagram-source'] );
-			$picked           = array();
-			if ( ! empty( $_POST['picked'] ) ) {
-				$picked = wp_unslash( $_POST['picked'] );
-			}
-
-			if ( empty( $picked ) ) {
-				$title        = 'Pick which Instagram items to sync';
-				$description  = '';
-				$form_content = static::handle_sync_submenu_pick_step( $instagram_source );
-			} else {
-				$title        = 'Results';
-				$form_content = static::handle_sync_submenu_import_step( $instagram_source );
-			}
 		}
+
+		$selected_ids = array();
+		if ( ! empty( $_POST['selected-instagram-ids'] ) && check_admin_referer( static::$sync_slug ) ) {
+			$selected_ids = wp_unslash( $_POST['selected-instagram-ids'] );
+		}
+
 		$form_action_url = add_query_arg(
 			array(
 				'post_type' => static::$post_type,
@@ -276,30 +260,59 @@ class Daddio_Instagram {
 			),
 			admin_url( 'edit.php' )
 		);
-		$context         = array(
-			'result'           => $result,
-			'title'            => $title,
-			'description'      => apply_filters( 'the_content', $description ),
-			'form_action_url'  => $form_action_url,
-			'form_content'     => $form_content,
-			'instagram_source' => $instagram_source,
-			'submit_button'    => get_submit_button( 'Sync' ),
-			'nonce_field'      => wp_nonce_field(
-				static::$sync_slug,
-				$name = '_wpnonce',
-				$referer = true,
-				$echo = false
-			),
+
+		$nonce_field = wp_nonce_field(
+			static::$sync_slug,
+			$name    = '_wpnonce',
+			$referer = true,
+			$echo    = false
 		);
-		Sprig::out( 'admin/instagram-sync-submenu.twig', $context );
+
+		$args = array(
+			'instagram_source' => $instagram_source,
+			'selected_ids'     => $selected_ids,
+			'form_action_url'  => $form_action_url,
+			'nonce_field'      => $nonce_field,
+		);
+
+		if ( ! empty( $selected_ids ) && ! empty( $instagram_source ) ) {
+			echo static::render_sync_submenu_result( $args );
+		} elseif ( ! empty( $instagram_source ) ) {
+			echo static::render_sync_submenu_pick_step( $args );
+		} else {
+			echo static::render_initial_sync_submenu( $args );
+		}
+
 	}
 
-	public static function handle_sync_submenu_pick_step( $instagram_source = '' ) {
-		$instagram = new Instagram_Scraper( $instagram_source );
+	public static function render_initial_sync_submenu( $args = array() ) {
+
+		$defaults = array(
+			'form_action_url'  => '',
+			'instagram_source' => '',
+			'submit_button'    => get_submit_button( 'Sync' ),
+			'nonce_field'      => '',
+		);
+		$context  = wp_parse_args( $args, $defaults );
+		return Sprig::render( 'admin/instagram-sync-submenu.twig', $context );
+	}
+
+	public static function render_sync_submenu_pick_step( $args = array() ) {
+		$defaults = array(
+			'instagram_source' => '',
+			'form_action_url'  => '',
+			'submit_button'    => get_submit_button( 'Import' ),
+			'nonce_field'      => '',
+		);
+		$args     = wp_parse_args( $args, $defaults );
+		if ( empty( $args['instagram_source'] ) ) {
+			wp_die( 'No instagram source to parse' );
+		}
+		$instagram = new Instagram_Scraper( $args['instagram_source'] );
 		$output    = '';
 		if ( ! empty( $instagram->items ) ) :
 			foreach ( $instagram->items as $item ) :
-				var_dump( $item );
+				// var_dump( $item );
 				// Grab all of the IDs to run one SQL query and identify which ones have already been imported
 				$context = array(
 					'instagram_url' => $item['instagram_url'],
@@ -309,26 +322,24 @@ class Daddio_Instagram {
 			endforeach;
 		endif;
 
-		return $output;
+		$context = array(
+			'instagram_source' => $args['instagram_source'],
+			'nonce_field'      => $args['nonce_field'],
+			'submit_button'    => $args['submit_button'],
+		);
+		return Sprig::render( 'admin/instagram-sync-submenu--pick-step.twig', $context );
 	}
 
-	public static function handle_sync_submenu_import_step( $instagram_source = '' ) {
-		$instagram = new Instagram_Scraper( $instagram_source );
+	public static function render_sync_submenu_result( $args = array() ) {
 
-		/*
-		if ( ! empty( $instagram->items ) ) :
-			foreach ( $instagram->items as $item ) :
-				$found = static::does_instagram_permalink_exist( $item['instagram_url'] );
-				if ( $found ) {
-					continue;
-				}
-				$inserted = static::insert_instagram_post( $item, $post_args = array() );
-				$data     = static::handle_instagram_inserted_result( $inserted, $node );
-				$result  .= static::render_instagram_inserted_result( $data );
-			endforeach;
-		endif;
-		*/
-		return 'Here is where we will import the picked instagram posts';
+		$defaults = array(
+			'form_action_url'  => '',
+			'instagram_source' => '',
+			'nonce_field'      => '',
+		);
+		$context  = wp_parse_args( $args, $defaults );
+		var_dump( $context );
+		return Sprig::render( 'admin/instagram-sync-submenu--result.twig', $context );
 	}
 
 	/**

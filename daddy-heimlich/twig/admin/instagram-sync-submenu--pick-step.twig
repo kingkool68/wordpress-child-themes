@@ -8,11 +8,11 @@
 
 <div class="wrap">
     <h1>Instagram Sync</h1>
-    <p>Paste the HTML source of the Instagram post to scrape and sync it with this site.</p>
+    <p>Pick which items you want to import.</p>
 
     <form action="{{ form_action_url|esc_url }}" method="post">
-        {{ form_content }}
-        <label for="instagram-source">HTML Source</label>
+        <input type="checkbox" name="selected-instagram-ids[]" value="a">
+        <input type="checkbox" name="selected-instagram-ids[]" value="b">
         <textarea id="instagram-source" name="instagram-source" rows="5">{{ instagram_source }}</textarea>
         {{ nonce_field }}
         {{ submit_button }}
