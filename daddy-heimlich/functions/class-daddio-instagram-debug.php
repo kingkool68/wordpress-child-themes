@@ -100,6 +100,7 @@ class Daddio_Instagram_Debug {
 			'items'  => array(
 				// Label => Value
 				'ID'             => $item->id,
+				'Code'           => $item->code,
 				'Caption'        => $item->caption,
 				'Date'           => $timestamp->format( 'F j, Y g:ia T' ),
 				'User'           => $item->owner_username,
