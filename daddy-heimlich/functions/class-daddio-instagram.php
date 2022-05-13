@@ -344,6 +344,8 @@ class Daddio_Instagram {
 
 	/**
 	 * Handle requests to modify instagram posts (delete or set to draft)
+	 *
+	 * TODO: Delete this
 	 */
 	public static function handle_modify_instagram_post_submenu() {
 		if ( empty( $_GET['post_id'] ) ) {
@@ -380,6 +382,8 @@ class Daddio_Instagram {
 
 	/**
 	 * Display a result depending on the status of inserting an Instagram post during a sync
+	 *
+	 * TODO: Delete this
 	 *
 	 * @param  object|-1 $result The result of attempting to insert the Instagram post
 	 * @param  object $node   Normaized node data for reference
@@ -436,6 +440,8 @@ class Daddio_Instagram {
 
 	/**
 	 * Given an Instagram inserted result, render an output to the sync screen
+	 *
+	 * TODO: Delete this
 	 *
 	 * @param  array $data Insert data
 	 * @return string      HTML output
@@ -553,6 +559,8 @@ class Daddio_Instagram {
 	/**
 	 * Given an HTML page from Instagram, return a JSON of the data from that page
 	 *
+	 * TODO: Delete this
+	 *
 	 * @link https://github.com/raiym/instagram-php-scraper/blob/849f464bf53f84a93f86d1ecc6c806cc61c27fdc/src/InstagramScraper/Instagram.php#L32
 	 *
 	 * @param  string $html HTML from an Instagram URL
@@ -579,6 +587,8 @@ class Daddio_Instagram {
 
 	/**
 	 * Fetch a single Instagram page/data from a given code
+	 *
+	 * TODO: Delete this
 	 *
 	 * @param  string $code Instagram short URL code to fetch
 	 * @return JSON        JSON data from the tag page
@@ -759,6 +769,8 @@ class Daddio_Instagram {
 	/**
 	 * Makes sure the node data is from a single page otherwise it fetches a single page's data
 	 *
+	 * TODO: Delete this
+	 *
 	 * @param  object $node Instagram node data
 	 * @return object       Instagram node data
 	 */
@@ -782,6 +794,8 @@ class Daddio_Instagram {
 
 	/**
 	 * Given an Instagram node, insert a WordPress post
+	 *
+	 * TODO: Delete this
 	 *
 	 * @param  Object  $node                  Normalized Instagram data
 	 * @param  boolean $force_publish_status  Force the post to be published
