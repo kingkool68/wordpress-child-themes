@@ -5,5 +5,39 @@
         Be able to check the media items we want to import
         During import check if ID of media item is in the list of picked IDs
     #}
-    <p>{{ instagram_url }}</p>
+    <p>
+        <strong><a href="{{ url|esc_url }}" target="_blank">{{ username }}</a></strong>
+        {% if location  %}
+        &bull; {{ location }}
+        {% endif %}
+    </p>
+   {{ caption }}
+
+    {% if medias %}
+        <table>
+            <tbody>
+                {% for media in medias %}
+
+                    <tr>
+                        <th>{{ loop.index }}</th>
+                        <td>
+                            <input type="checkbox" name="selected-instagram-ids[]" value="{{ media.id|esc_attr }}">
+                        </td>
+                        <td>
+                            {% if media.src %}
+                                <a href="{{ media.src|esc_url }}" target="_blank">Image</a>
+                            {% endif %}
+
+                            {% if media.video_src %}
+                                &plus;
+                                <a href="{{ media.video_src|esc_url }}" target="_blank">Video</a>
+                            {% endif %}
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 </div>

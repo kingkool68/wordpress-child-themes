@@ -312,11 +312,25 @@ class Daddio_Instagram {
 		$output    = '';
 		if ( ! empty( $instagram->items ) ) :
 			foreach ( $instagram->items as $item ) :
-				// var_dump( $item );
+				$item        = (object) $item;
+				$location_id = '';
+				if ( ! empty( $item->location_id ) ) {
+					$location_id = '<a href="https://www.instagram.com/explore/locations/' . $item->location_id . '/" target="_blank">' . $item->location_id . '</a>';
+				}
+
+				$timestamp = new DateTime( '@' . $item->timestamp );
+				$timestamp->setTimezone( wp_timezone() );
+
 				// Grab all of the IDs to run one SQL query and identify which ones have already been imported
 				$context = array(
-					'instagram_url' => $item['instagram_url'],
-					'caption'       => $item['code'],
+					'url'         => $item->instagram_url,
+					'code'        => $item->code,
+					'caption'     => apply_filters( 'the_content', $item->caption ),
+					'date'        => $timestamp->format( 'F j, Y g:ia T' ),
+					'username'    => $item->owner_username,
+					'location'    => $item->location_name,
+					'location_id' => $item->location_id,
+					'medias'      => $item->media,
 				);
 				$output .= Sprig::render( 'admin/instagram-sync-submenu--pick-item.twig', $context );
 			endforeach;
@@ -324,6 +338,7 @@ class Daddio_Instagram {
 
 		$context = array(
 			'instagram_source' => $args['instagram_source'],
+			'instagram_items'  => $output,
 			'nonce_field'      => $args['nonce_field'],
 			'submit_button'    => $args['submit_button'],
 		);
