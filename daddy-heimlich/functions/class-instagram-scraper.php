@@ -348,9 +348,9 @@ class Instagram_Scraper {
 
 		foreach ( $items as $item ) {
 			$media_item = array(
-				'id'            => '',
-				'src'           => '',
-				'video_src'     => '',
+				'id'        => '',
+				'src'       => '',
+				'video_src' => '',
 			);
 
 			if ( ! empty( $item->id ) ) {
@@ -408,9 +408,9 @@ class Instagram_Scraper {
 		}
 
 		$media_item = array(
-			'id'            => '',
-			'src'           => '',
-			'video_src'     => '',
+			'id'        => '',
+			'src'       => '',
+			'video_src' => '',
 		);
 
 		if ( ! empty( $node->id ) ) {
@@ -436,9 +436,9 @@ class Instagram_Scraper {
 						$child_node = $child_node->node;
 
 						$media_item = array(
-							'id'            => '',
-							'src'           => '',
-							'video_src'     => '',
+							'id'        => '',
+							'src'       => '',
+							'video_src' => '',
 						);
 
 						if ( ! empty( $child_node->id ) ) {
