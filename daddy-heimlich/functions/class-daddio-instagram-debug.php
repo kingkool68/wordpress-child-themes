@@ -1,4 +1,7 @@
 <?php
+/**
+ * Handle an Instagram Debug tool to see what data we can actually parse
+ */
 class Daddio_Instagram_Debug {
 
 	/**
@@ -28,7 +31,7 @@ class Daddio_Instagram_Debug {
 	}
 
 	/**
-	 * Add Private Sync submenu
+	 * Add Debugger submenu
 	 */
 	public function action_admin_menu() {
 		add_submenu_page(
@@ -41,6 +44,9 @@ class Daddio_Instagram_Debug {
 		);
 	}
 
+	/**
+	 * Render the debugger submenu
+	 */
 	public function handle_debug_instagram_submenu() {
 		$result              = array();
 		$instagram_permalink = '';
@@ -84,6 +90,11 @@ class Daddio_Instagram_Debug {
 		Sprig::out( 'admin/instagram-debug-submenu.twig', $context );
 	}
 
+	/**
+	 * Render a given debug item from a given Instgram post
+	 *
+	 * @param Object $item An item from the results of a Instagram Scraper object
+	 */
 	public static function render_item( $item ) {
 		$item        = (object) $item;
 		$location_id = '';
