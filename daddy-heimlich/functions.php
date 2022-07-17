@@ -46,3 +46,33 @@ function daddio_google_analytics_debugging_flag( $class = array() ) {
 	return $class;
 }
 add_filter( 'body_class', 'daddio_google_analytics_debugging_flag' );
+
+if ( ! function_exists( 'str_starts_with' ) ) {
+	/**
+	 * Polyfill for PHP 8's str_starts_with
+	 *
+	 * @link https://php.watch/versions/8.0/str_starts_with-str_ends_with
+	 *
+	 * @param string $haystack The string to search in.
+	 * @param string $needle   The substring to search for in the haystack.
+	 * @return boolean
+	 */
+	function str_starts_with( string $haystack, string $needle ): bool {
+		return \strncmp( $haystack, $needle, \strlen( $needle ) ) === 0;
+	}
+}
+
+if ( ! function_exists( 'str_contains' ) ) {
+	/**
+	 * Polyfill for PHP8's str_contains
+	 *
+	 * @link https://php.watch/versions/8.0/str_contains
+	 *
+	 * @param string $haystack The string to search in.
+	 * @param string $needle   The substring to search for in the haystack.
+	 * @return boolean
+	 */
+	function str_contains( string $haystack, string $needle ): bool {
+		return '' === $needle || false !== strpos( $haystack, $needle );
+	}
+}
