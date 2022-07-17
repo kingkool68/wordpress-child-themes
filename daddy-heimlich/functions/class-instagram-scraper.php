@@ -42,11 +42,37 @@ class Instagram_Scraper {
 	/**
 	 * Determine what type of page should be processed
 	 *
-	 * @param string $html The HTLM of the page to process
+	 * @param string $url The Instagram URL to scrape
 	 */
-	public function __construct( $html = '' ) {
-		$raw_json = $this->parse_from_html( $html );
+	public function __construct( $url = '' ) {
+		$url_parts = parse_url( $url );
+		if ( empty( $url_parts['host'] ) || ! str_contains( $url_parts['host'], 'instagram' )  ) {
+			wp_die( esc_url( $url ) . ' is not an Instagram URL!' );
+		}
 
+		if ( ! empty( $url_parts['path'] ) && str_starts_with( $url_parts['path'], '/explore/locations/' ) ) {
+			// Location page
+		}
+
+		if ( ! empty( $url_parts['path'] ) && str_starts_with( $url_parts['path'], '/explore/tags/' ) ) {
+			// Tag page
+		}
+
+		if ( ! empty( $url_parts['path'] ) && str_starts_with( $url_parts['path'], '/p/' ) ) {
+			// Single post
+		}
+
+
+		// Can we parse a URL from a tagged user?
+
+		if ( ! empty( $url_parts['path'] ) && (
+			! str_starts_with( $url_parts['path'], '/explore/' ) &&
+			! str_starts_with( $url_parts['path'], '/p/' )
+		) ) {
+			// Profile page
+		}
+
+		/*
 		if ( ! empty( $raw_json->entry_data->LocationsPage ) ) {
 			$this->items = $this->parse_location_page_json( $raw_json );
 		}
@@ -63,33 +89,7 @@ class Instagram_Scraper {
 		if ( ! empty( $raw_json->items[0] ) ) {
 			$this->items = $this->parse_single_post_json( $raw_json );
 		}
-	}
-
-	/**
-	 * Given an HTML page from Instagram, return a JSON of the data from that page
-	 *
-	 * @link https://github.com/raiym/instagram-php-scraper/blob/849f464bf53f84a93f86d1ecc6c806cc61c27fdc/src/InstagramScraper/Instagram.php#L32
-	 *
-	 * @param  string $html HTML from an Instagram URL
-	 * @return json         Instagram data embedded in the page
-	 */
-	public function parse_from_html( $html = '' ) {
-		// Parse the page response and extract the JSON string
-		$arr = explode( 'window.__additionalDataLoaded(', $html );
-		if ( ! empty( $arr[1] ) ) {
-			$parts    = explode( "/',{", $arr[1] );
-			$json_str = '{' . $parts[1];
-			$json_str = explode( ');</script>', $json_str );
-			$json_str = $json_str[0];
-			return json_decode( $json_str );
-		}
-
-		$arr = explode( 'window._sharedData = ', $html );
-		if ( ! empty( $arr[1] ) ) {
-			$json = explode( ';</script>', $arr[1] );
-			$json = $json[0];
-			return json_decode( $json );
-		}
+		*/
 	}
 
 	/**

@@ -1,8 +1,10 @@
 <style>
-	#instagram-source {
+	.input {
 		display: block;
 		max-width: 800px;
 		width: 95%;
+		margin-bottom: 16px;
+		padding: 4px 8px;
 	}
 
 	.debug-item .video-preview,
@@ -36,11 +38,14 @@
 	{{ result }}
 
 	<h1>Instagram Debug</h1>
-	<p>Paste the HTML source of an Instagram page to display the parsed information.</p>
 	<form action="{{ form_action_url|esc_url }}" method="post">
 		{{ nonce_field }}
-		<label for="instagram-source">HTML Source</label>
-		<textarea name="instagram-source" id="instagram-source" rows="5">{{ text_area_value }}</textarea>
+		<label for="instagram-url">Instagram URL</label>
+		<input id="instagram-url" name="instagram-url" class="input" value="{{ instagram_url|esc_url }}">
+
+		<label for="instagram-sessionid">Instagram Session ID</label>
+		<input id="instagram-sessionid" name="instagram-sessionid" class="input" value="{{ instagram_sessionid|esc_attr }}">
+
 		{{ submit_button }}
 	</form>
 </div>

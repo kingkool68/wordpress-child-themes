@@ -49,13 +49,25 @@ class Daddio_Instagram_Debug {
 	 */
 	public function handle_debug_instagram_submenu() {
 		$result              = array();
+		$instagram_url       = '';
 		$instagram_permalink = '';
+
+		// Maybe update the Instagram Sessionid value in the database
+		$instagram_sessionid = '';
+		if ( ! empty( $_REQUEST['instagram-sessionid'] ) ) {
+			$instagram_sessionid = wp_unslash( $_REQUEST['instagram-sessionid'] );
+			$instagram_sessionid = sanitize_text_field( $instagram_sessionid );
+			update_option( 'instagram-sessionid', $instagram_sessionid, $autoload = false );
+		} else {
+			$instagram_sessionid = get_option( 'instagram-sessionid' );
+		}
+
 		if (
-			! empty( $_POST['instagram-source'] )
+			! empty( $_REQUEST['instagram-url'] )
 			&& check_admin_referer( static::$nonce_field_action )
 		) {
-			$instagram_source = wp_unslash( $_POST['instagram-source'] );
-			$instagram        = new Instagram_Scraper( $instagram_source );
+			$instagram_url = wp_unslash( $_REQUEST['instagram-url'] );
+			$instagram     = new Instagram_Scraper( $instagram_url );
 			if ( ! empty( $instagram->items ) ) {
 				foreach ( $instagram->items as $item ) {
 					$result[] = static::render_item( $item );
@@ -68,10 +80,6 @@ class Daddio_Instagram_Debug {
 		$referer = true;
 		$echo    = false;
 
-		$text_area_value = '';
-		if ( ! empty( $_POST['instagram-source'] ) ) {
-			$text_area_value = wp_unslash( $_POST['instagram-source'] );
-		}
 		$context = array(
 			'page_type'           => $instagram->page_type,
 			'page_info'           => $instagram->page_info,
@@ -84,7 +92,8 @@ class Daddio_Instagram_Debug {
 				$echo
 			),
 			'form_action_url'     => admin_url( 'edit.php?post_type=instagram&page=instagram-debug' ),
-			'text_area_value'     => $text_area_value,
+			'instagram_url'       => $instagram_url,
+			'instagram_sessionid' => $instagram_sessionid,
 			'submit_button'       => get_submit_button( 'Debug', 'primary' ),
 		);
 		Sprig::out( 'admin/instagram-debug-submenu.twig', $context );
