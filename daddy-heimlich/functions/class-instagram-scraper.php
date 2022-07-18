@@ -55,6 +55,8 @@ class Instagram_Scraper {
 			wp_die( esc_url( $url ) . ' is not an Instagram URL!' );
 		}
 		$path_parts = explode( '/', trim( $url_parts['path'], '/' ) );
+
+		// Location: https://www.instagram.com/explore/locations/503859773449516/facebook-headquarters/
 		if ( ! empty( $url_parts['path'] ) && str_starts_with( $url_parts['path'], '/explore/locations/' ) ) {
 			$location_id = $path_parts[2];
 			$this->items = $this->parse_location_url( $location_id );
@@ -114,9 +116,9 @@ class Instagram_Scraper {
 	}
 
 	/**
-	 * Process data from a location page
+	 * Process data from a location id
 	 *
-	 * @param object $raw_json The raw JSON data found on the page to be scraped
+	 * @param string $location_id The Instagram ID of the location
 	 */
 	public function parse_location_url( $location_id = '' ) {
 		if ( empty( $location_id ) ) {
@@ -124,50 +126,36 @@ class Instagram_Scraper {
 		}
 		$this->page_type = 'location';
 
-		$scraper = $this->get_scraper();
+		$scraper  = $this->get_scraper();
 		$location = $scraper->getLocationById( $location_id );
-		var_dump( $location );
-		return;
 
-		$page_info = array();
-		if ( ! empty( $root->location_info ) ) {
-			$location_info = $root->location_info;
-			// Map our location_info object properties to our page_info properties
-			$mapping = array(
-				'location_id'      => 'location_id',
-				'name'             => 'name',
-				'phone'            => 'phone',
-				'website'          => 'website',
-				'category'         => 'category',
-				'lat'              => 'latitude',
-				'lng'              => 'longitude',
-				'location_address' => 'street_address',
-				'location_city'    => 'city',
-				'location_region'  => 'region',
-				'location_zip'     => 'postcode',
-			);
-			foreach ( $mapping as $ig_key => $key ) {
-				$page_info[ $key ] = '';
-				if ( ! empty( $location_info->{$ig_key} ) ) {
-					$page_info[ $key ] = $location_info->{$ig_key};
-				}
-			}
-		}
-		$this->page_info = $page_info;
+		$this->page_info = array(
+			'location_id'        => $location_id,
+			'facebook_places_id' => $location->getFacebookPlacesId(),
+			'name'               => $location->getName(),
+			// 'phone'          => $location->getId(),
+			// 'website'        => $location->getId(),
+			// 'category'       => $location->getId(),
+			'latitude'           => $location->getLat(),
+			'longitude'          => $location->getLng(),
+			'street_address'     => $location->getAddress(),
+			'city'               => $location->getCity(),
+			// 'region'         => $location->getId(),
+			// 'postcode'       => $location->getId(),
+		);
 
-		$sections = array();
-		$output   = array();
-		$sections = array_merge( $root->ranked->sections, $sections );
-		$sections = array_merge( $root->recent->sections, $sections );
-		foreach ( $sections as $section ) {
-			if ( ! empty( $section->layout_content->medias ) ) {
-				$medias = $section->layout_content->medias;
-				foreach ( $medias as $item ) {
-					$node     = $item->media;
-					$output[] = $this->normalize_node( $node );
-				}
-			}
+		$output = array();
+		/*
+		 Broken at the moment
+		$top_media    = $scraper->getCurrentTopMediasByLocationId( $location_id );
+		$latest_media = $scraper->getMediasByLocationId( $location_id );
+		$medias       = array();
+		$medias       = array_merge( $top_media, $medias );
+		$medias       = array_merge( $latest_media, $medias );
+		foreach( $medias as $media ) {
+			$output[] = $this->normalize_media( $media );
 		}
+		*/
 		return $output;
 	}
 
