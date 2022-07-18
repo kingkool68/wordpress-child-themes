@@ -1,4 +1,6 @@
 <?php
+use InstagramScraper\Instagram;
+use GuzzleHttp\Client;
 /**
  * For scraping and normalizing Instagram data from a page's HTML
  */
@@ -39,19 +41,23 @@ class Instagram_Scraper {
 	 */
 	public $items = array();
 
+	private $scrapers = array();
+
 	/**
 	 * Determine what type of page should be processed
 	 *
 	 * @param string $url The Instagram URL to scrape
 	 */
-	public function __construct( $url = '' ) {
+	public function __construct( $url = '', $sessionid = '' ) {
+		// Figure out which way to parse the URL for data
 		$url_parts = parse_url( $url );
-		if ( empty( $url_parts['host'] ) || ! str_contains( $url_parts['host'], 'instagram' )  ) {
+		if ( empty( $url_parts['host'] ) || ! str_contains( $url_parts['host'], 'instagram' ) ) {
 			wp_die( esc_url( $url ) . ' is not an Instagram URL!' );
 		}
-
+		$path_parts = explode( '/', trim( $url_parts['path'], '/' ) );
 		if ( ! empty( $url_parts['path'] ) && str_starts_with( $url_parts['path'], '/explore/locations/' ) ) {
-			// Location page
+			$location_id = $path_parts[2];
+			$this->items = $this->parse_location_url( $location_id );
 		}
 
 		if ( ! empty( $url_parts['path'] ) && str_starts_with( $url_parts['path'], '/explore/tags/' ) ) {
@@ -61,7 +67,6 @@ class Instagram_Scraper {
 		if ( ! empty( $url_parts['path'] ) && str_starts_with( $url_parts['path'], '/p/' ) ) {
 			// Single post
 		}
-
 
 		// Can we parse a URL from a tagged user?
 
@@ -92,18 +97,37 @@ class Instagram_Scraper {
 		*/
 	}
 
+	public function get_scraper( $sessionid = '' ) {
+		if ( empty( $sessionid ) ) {
+			$sessionid = get_option( 'instagram-sessionid' );
+		}
+		if ( empty( $sessionid ) ) {
+			wp_die( 'No Instagram login sessionid provided to scraper' );
+		}
+		if ( ! empty( $this->scrapers[ $sessionid ] ) ) {
+			return $this->scrapers[ $sessionid ];
+		}
+		$instagram = Instagram::withCredentials( new Client(), '', '', null );
+		$instagram->loginWithSessionId( $sessionid );
+		$this->scrapers[ $sessionid ] = $instagram;
+		return $instagram;
+	}
+
 	/**
 	 * Process data from a location page
 	 *
 	 * @param object $raw_json The raw JSON data found on the page to be scraped
 	 */
-	public function parse_location_page_json( $raw_json ) {
-		if ( empty( $raw_json->entry_data->LocationsPage[0]->native_location_data ) ) {
-			wp_die( 'Bad Location Page Data' );
+	public function parse_location_url( $location_id = '' ) {
+		if ( empty( $location_id ) ) {
+			wp_die( 'Bad Location ID: ' . $location_id );
 		}
-		$this->page_type = 'location-page';
+		$this->page_type = 'location';
 
-		$root = $raw_json->entry_data->LocationsPage[0]->native_location_data;
+		$scraper = $this->get_scraper();
+		$location = $scraper->getLocationById( $location_id );
+		var_dump( $location );
+		return;
 
 		$page_info = array();
 		if ( ! empty( $root->location_info ) ) {
