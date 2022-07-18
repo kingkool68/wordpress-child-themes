@@ -66,8 +66,10 @@ class Instagram_Scraper {
 			// Tag page
 		}
 
+		// Post: https://www.instagram.com/p/BsOGulcndj-/
 		if ( ! empty( $url_parts['path'] ) && str_starts_with( $url_parts['path'], '/p/' ) ) {
-			// Single post
+			$this->parse_post_url( $url );
+			// $this->items = $this->parse_post_url( $url );
 		}
 
 		// Can we parse a URL from a tagged user?
@@ -253,20 +255,51 @@ class Instagram_Scraper {
 	}
 
 	/**
-	 * Process data from a single page
+	 * Process data from a post
 	 *
-	 * @param object $raw_json The raw JSON data found on the page to be scraped
+	 * @param string $url The Instagram URL of a post to be parsed
 	 */
-	public function parse_single_post_json( $raw_json = '' ) {
-		if ( empty( $raw_json->items[0] ) ) {
-			wp_die( 'Bad Single Post Data' );
+	public function parse_post_url( $url = '' ) {
+		if ( empty( $url ) ) {
+			wp_die( 'Bad Instagram URL: ' . $url );
 		}
-		$this->page_type = 'single-page';
+		$this->page_type = 'post';
+		$scraper         = $this->get_scraper();
 
-		$root   = $raw_json->items;
 		$output = array();
-		foreach ( $root as $node ) {
-			$output[] = $this->normalize_node( $node );
+		$media  = $scraper->getMediaByUrl( $url );
+		$medias = array( $media );
+		foreach ( $medias as $media ) {
+			$output = $this->normalize_media( $media );
+		}
+		return $output;
+	}
+
+	public function normalize_media( $media ) {
+		$owner = $media->getOwner();
+
+		$output = array(
+			'_normalized'      => true,
+			'id'               => $media->getId(),
+			'code'             => $media->getShortCode(),
+			'instagram_url'    => $media->getLink(),
+			'caption'          => $media->getCaption(),
+			'timestamp'        => $media->getCreatedTime(), // In GMT time
+			'owner_id'         => $media->getOwnerId(),
+			'owner_username'   => $owner->getUsername(),
+			'owner_full_name'  => $owner->getFullName(),
+
+			'location_id'      => $media->getLocationId(),
+			'location_name'    => $media->getLocationName(),
+			'location_address' => '',
+			'location_city'    => '',
+			'latitude'         => '',
+			'longitude'        => '',
+			'media'            => array(),
+		);
+		$address = $media->getLocationAddress();
+		if ( ! empty( $address ) ) {
+
 		}
 		return $output;
 	}
