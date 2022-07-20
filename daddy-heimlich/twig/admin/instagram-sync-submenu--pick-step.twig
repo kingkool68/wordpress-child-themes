@@ -1,0 +1,25 @@
+<style>
+    #instagram-source {
+        display: none;
+    }
+
+    .pick-item {
+        border-top: 1px solid #ccc;
+    }
+</style>
+
+<div class="wrap">
+    <h1>Instagram Sync</h1>
+    <p>Pick which items you want to import.</p>
+
+    <form action="{{ form_action_url|esc_url }}" method="post">
+
+        {{ instagram_items }}
+
+        {{ nonce_field }}
+        {{ submit_button }}
+
+        <textarea id="instagram-source" name="instagram-source" rows="5">{{ instagram_source }}</textarea>
+    </form>
+
+</div>

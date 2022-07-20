@@ -3,9 +3,19 @@
 	"description": "A WordPress theme for my kids",
 	"license": "MIT",
 	"require": {
+		"php": "^7.4||^8.0",
 		"nojimage/twitter-text-php": "^3.1",
+		"raiym/instagram-php-scraper": "^0.12.5",
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
 		"squizlabs/php_codesniffer": "^3.5",
-		"wp-coding-standards/wpcs": "^2.3"
+		"wp-coding-standards/wpcs": "^2.3",
+		"php-stubs/wordpress-stubs": "^5.5",
+		"guzzlehttp/guzzle": "^7.4",
+		"phpfastcache/phpfastcache": "*"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
 	}
 }
