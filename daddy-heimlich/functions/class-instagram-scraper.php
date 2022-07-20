@@ -59,17 +59,19 @@ class Instagram_Scraper {
 		// Location: https://www.instagram.com/explore/locations/503859773449516/facebook-headquarters/
 		if ( ! empty( $url_parts['path'] ) && str_starts_with( $url_parts['path'], '/explore/locations/' ) ) {
 			$location_id = $path_parts[2];
-			$this->items = $this->parse_location_url( $location_id );
+			$this->items = $this->parse_location_id( $location_id );
 		}
 
+		// Tag: https://www.instagram.com/explore/tags/selfie/
 		if ( ! empty( $url_parts['path'] ) && str_starts_with( $url_parts['path'], '/explore/tags/' ) ) {
-			// Tag page
+			$tag         = $path_parts[2];
+			$this->items = $this->parse_hashtag( $tag );
 		}
 
 		// Post: https://www.instagram.com/p/BsOGulcndj-/
 		if ( ! empty( $url_parts['path'] ) && str_starts_with( $url_parts['path'], '/p/' ) ) {
 			$this->parse_post_url( $url );
-			// $this->items = $this->parse_post_url( $url );
+			$this->items = $this->parse_post_url( $url );
 		}
 
 		// Can we parse a URL from a tagged user?
@@ -80,25 +82,6 @@ class Instagram_Scraper {
 		) ) {
 			// Profile page
 		}
-
-		/*
-		if ( ! empty( $raw_json->entry_data->LocationsPage ) ) {
-			$this->items = $this->parse_location_page_json( $raw_json );
-		}
-
-		if ( ! empty( $raw_json->entry_data->TagPage ) ) {
-			$this->items = $this->parse_tag_page_json( $raw_json );
-		}
-
-		// Tagged user / user post?
-		if ( ! empty( $raw_json->entry_data->ProfilePage ) ) {
-			$this->items = $this->parse_tagged_user_page_json( $raw_json );
-		}
-
-		if ( ! empty( $raw_json->items[0] ) ) {
-			$this->items = $this->parse_single_post_json( $raw_json );
-		}
-		*/
 	}
 
 	public function get_scraper( $sessionid = '' ) {
@@ -122,7 +105,7 @@ class Instagram_Scraper {
 	 *
 	 * @param string $location_id The Instagram ID of the location
 	 */
-	public function parse_location_url( $location_id = '' ) {
+	public function parse_location_id( $location_id = '' ) {
 		if ( empty( $location_id ) ) {
 			wp_die( 'Bad Location ID: ' . $location_id );
 		}
@@ -162,11 +145,41 @@ class Instagram_Scraper {
 	}
 
 	/**
+	 * Process data from a hashtag
+	 *
+	 * @param string $hashtag The hashtag to fetch data for
+	 */
+	public function parse_hashtag( $hashtag = '' ) {
+		if ( empty( $hashtag ) ) {
+			wp_die( 'Bad Hashtag: ' . $hashtag );
+		}
+
+		$scraper = $this->get_scraper();
+
+		$this->page_type = 'tag';
+		$this->page_info = array();
+
+		$output       = array();
+		/*
+		 Broken at the moment
+		$top_media    = $scraper->getCurrentTopMediasByTagName( $hashtag );
+		$latest_media = $scraper->getMediasByTag( $hashtag, 3 );
+		$medias       = array();
+		$medias       = array_merge( $top_media, $medias );
+		$medias       = array_merge( $latest_media, $medias );
+		foreach ( $medias as $media ) {
+			$output[] = $this->normalize_media( $media );
+		}
+		*/
+		return $output;
+	}
+
+	/**
 	 * Process data from a tag page
 	 *
 	 * @param object $raw_json The raw JSON data found on the page to be scraped
 	 */
-	public function parse_tag_page_json( $raw_json ) {
+	public function parse_hashtag_page_json( $raw_json ) {
 		if ( empty( $raw_json->entry_data->TagPage[0]->data ) ) {
 			wp_die( 'Bad Tag Page Data' );
 		}
@@ -225,7 +238,7 @@ class Instagram_Scraper {
 	 *
 	 * @param object $raw_json The raw JSON data found on the page to be scraped
 	 */
-	public function parse_tagged_user_page_json( $raw_json ) {
+	public function parse_hashtagged_user_page_json( $raw_json ) {
 		if ( empty( $raw_json->entry_data->ProfilePage[0] ) ) {
 			wp_die( 'Bad Tagged User Page Data' );
 		}
@@ -270,7 +283,7 @@ class Instagram_Scraper {
 		$media  = $scraper->getMediaByUrl( $url );
 		$medias = array( $media );
 		foreach ( $medias as $media ) {
-			$output = $this->normalize_media( $media );
+			$output[] = $this->normalize_media( $media );
 		}
 		return $output;
 	}
@@ -278,8 +291,7 @@ class Instagram_Scraper {
 	public function normalize_media( $media ) {
 		$owner = $media->getOwner();
 
-		$output = array(
-			'_normalized'      => true,
+		$output  = array(
 			'id'               => $media->getId(),
 			'code'             => $media->getShortCode(),
 			'instagram_url'    => $media->getLink(),
@@ -295,11 +307,30 @@ class Instagram_Scraper {
 			'location_city'    => '',
 			'latitude'         => '',
 			'longitude'        => '',
+
+			'type'             => $media->getType(),
 			'media'            => array(),
 		);
 		$address = $media->getLocationAddress();
 		if ( ! empty( $address ) ) {
 
+		}
+
+		$carousel_media = $media->getCarouselMedia();
+		if ( empty( $carousel_media ) ) {
+			$output['media'][] = array(
+				'id'        => $media->getId(),
+				'src'       => $media->getImageHighResolutionUrl(),
+				'video_src' => $media->getVideoStandardResolutionUrl(),
+			);
+		} else {
+			foreach ( $carousel_media as $child_media ) {
+				$output['media'][] = array(
+					'id'        => $child_media->getId(),
+					'src'       => $child_media->getImageHighResolutionUrl(),
+					'video_src' => $child_media->getVideoStandardResolutionUrl(),
+				);
+			}
 		}
 		return $output;
 	}
