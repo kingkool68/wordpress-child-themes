@@ -27,7 +27,7 @@ class Daddio_Scripts_Styles {
 	 * Hook in to WordPress via filters
 	 */
 	public function setup_filters() {
-		add_filter( 'script_loader_tag', array( $this, 'filter_script_loader_tag' ), 10, 3 );
+		// add_filter( 'script_loader_tag', array( $this, 'filter_script_loader_tag' ), 10, 3 );
 		add_filter( 'body_class', array( $this, 'filter_body_class' ), 10, 1 );
 	}
 
@@ -145,6 +145,7 @@ class Daddio_Scripts_Styles {
 	 * @return boolean
 	 */
 	public function maybe_use_global_script_file() {
+		return false;
 		if ( is_admin() ) {
 			return false;
 		}
