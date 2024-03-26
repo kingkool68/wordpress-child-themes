@@ -58,7 +58,7 @@ class Daddio_Scripts_Styles {
 		wp_dequeue_style( 'wp-block-library' );
 
 		if ( is_archive() || is_front_page() ) {
-			wp_enqueue_style( 'daddio-infinite-script' );
+			wp_enqueue_script( 'daddio-infinite-script' );
 		}
 	}
 
