@@ -41,7 +41,8 @@ class Daddio_Scripts_Styles {
 		}
 
 		// Global JavaScript files bundled into one that gets loaded on every single page
-		wp_register_script( 'daddio-global-scripts', get_template_directory_uri() . '/js/global' . self::get_js_suffix(), array( 'jquery' ), null, true );
+		wp_register_script( 'daddio-global-scripts', get_template_directory_uri() . '/js/global.min.js', array( 'jquery' ), null, true );
+		wp_register_script( 'daddio-infinite-script', get_template_directory_uri() . '/js/infinite-scroll.min.js', array( 'jquery' ), null, true );
 	}
 
 	/**
@@ -55,6 +56,10 @@ class Daddio_Scripts_Styles {
 
 		// Don't load the frontend Block Editor styles
 		wp_dequeue_style( 'wp-block-library' );
+
+		if ( is_archive() || is_front_page() ) {
+			wp_enqueue_style( 'daddio-infinite-script' );
+		}
 	}
 
 	/**
