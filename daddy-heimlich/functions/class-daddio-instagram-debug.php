@@ -1,4 +1,7 @@
 <?php
+/**
+ * Handle an Instagram Debug tool to see what data we can actually parse
+ */
 class Daddio_Instagram_Debug {
 
 	/**
@@ -28,7 +31,7 @@ class Daddio_Instagram_Debug {
 	}
 
 	/**
-	 * Add Private Sync submenu
+	 * Add Debugger submenu
 	 */
 	public function action_admin_menu() {
 		add_submenu_page(
@@ -41,93 +44,34 @@ class Daddio_Instagram_Debug {
 		);
 	}
 
+	/**
+	 * Render the debugger submenu
+	 */
 	public function handle_debug_instagram_submenu() {
 		$result              = array();
+		$instagram_url       = '';
 		$instagram_permalink = '';
+
+		// Maybe update the Instagram Sessionid value in the database
+		$instagram_sessionid = '';
+		if ( ! empty( $_REQUEST['instagram-sessionid'] ) ) {
+			$instagram_sessionid = wp_unslash( $_REQUEST['instagram-sessionid'] );
+			$instagram_sessionid = sanitize_text_field( $instagram_sessionid );
+			update_option( 'instagram-sessionid', $instagram_sessionid, $autoload = false );
+		} else {
+			$instagram_sessionid = get_option( 'instagram-sessionid' );
+		}
+
 		if (
-			! empty( $_POST['instagram-source'] )
+			! empty( $_REQUEST['instagram-url'] )
 			&& check_admin_referer( static::$nonce_field_action )
 		) {
-			$instagram_source = wp_unslash( $_POST['instagram-source'] );
-			$json             = Daddio_Instagram::get_instagram_json_from_html( $instagram_source );
-			$page_type        = '';
-
-			// It's a Tag page
-			if ( isset( $json->entry_data->TagPage[0] ) ) {
-				$top_posts = array();
-				$other     = array();
-
-				if ( isset( $json->entry_data->TagPage[0]->tag ) ) {
-					$tag       = $json->entry_data->TagPage[0]->tag;
-					$top_posts = $tag->top_posts->nodes;
-					$other     = $tag->media->nodes;
+			$instagram_url = wp_unslash( $_REQUEST['instagram-url'] );
+			$instagram     = new Instagram_Scraper( $instagram_url );
+			if ( ! empty( $instagram->items ) ) {
+				foreach ( $instagram->items as $item ) {
+					$result[] = static::render_item( $item );
 				}
-
-				// New format I detected on 01/02/2018
-				if ( isset( $json->entry_data->TagPage[0]->graphql->hashtag ) ) {
-					$tag       = $json->entry_data->TagPage[0]->graphql->hashtag;
-					$top_posts = $tag->edge_hashtag_to_top_posts->edges;
-					$other     = $tag->edge_hashtag_to_media->edges;
-					if ( ! empty( $tag->name ) ) {
-						$instagram_permalink = 'https://www.instagram.com/explore/tags/' . $tag->name . '/';
-					}
-				}
-				$nodes     = array_merge( $top_posts, $other );
-				$page_type = 'tag';
-			}
-
-			// It's a Profile page
-			if ( isset( $json->entry_data->ProfilePage[0]->graphql->user ) ) {
-				$user      = $json->entry_data->ProfilePage[0]->graphql->user;
-				$nodes     = $user->edge_owner_to_timeline_media->edges;
-				$page_type = 'user';
-			}
-
-			// It's a single Post page
-			if ( ! empty( $json->graphql->shortcode_media ) ) {
-				$post_page_node = $json->graphql->shortcode_media;
-				$nodes          = array( $post_page_node );
-				$page_type      = 'post';
-				if ( ! empty( $post_page_node->shortcode ) ) {
-					$instagram_permalink = 'https://www.instagram.com/p/' . $post_page_node->shortcode . '/';
-				}
-			}
-
-			if ( ! empty( $nodes ) ) {
-				foreach ( $nodes as $raw_node ) :
-					$result[] = static::render_raw_node_debug( $raw_node );
-				endforeach;
-			}
-
-			// It's a location page
-			if ( ! empty( $json->entry_data->LocationsPage[0]->native_location_data->location_info ) ) {
-				$location  = $json->entry_data->LocationsPage[0]->native_location_data->location_info;
-				$page_type = 'location';
-				if ( ! empty( $location->id ) ) {
-					$instagram_permalink = 'https://www.instagram.com/explore/locations/' . $location->id . '/';
-				}
-				$location_data = (array) Daddio_Instagram_Locations::normalize_location_data( $location );
-				foreach ( $location_data as $key => $val ) {
-					switch ( $key ) {
-
-						case 'website':
-							$val = make_clickable( $val );
-							break;
-
-						case 'term_last_updated':
-							$val = date( 'F j, Y g:i a', intval( $val ) );
-							break;
-
-					}
-					$location_data[ $key ] = $val;
-					if ( is_bool( $val ) ) {
-						$location_data[ $key ] = ( $val ) ? 'true' : 'false';
-					}
-				}
-				$context  = array(
-					'location' => $location_data,
-				);
-				$result[] = Sprig::render( 'admin/instagram-debug-node.twig', $context );
 			}
 		}
 
@@ -136,11 +80,9 @@ class Daddio_Instagram_Debug {
 		$referer = true;
 		$echo    = false;
 
-		$text_area_value = '';
-		if ( ! empty( $_POST['instagram-source'] ) ) {
-			$text_area_value = wp_unslash( $_POST['instagram-source'] );
-		}
 		$context = array(
+			'page_type'           => $instagram->page_type,
+			'page_info'           => $instagram->page_info,
 			'instagram_permalink' => $instagram_permalink,
 			'result'              => implode( "\n", $result ),
 			'nonce_field'         => wp_nonce_field(
@@ -150,67 +92,48 @@ class Daddio_Instagram_Debug {
 				$echo
 			),
 			'form_action_url'     => admin_url( 'edit.php?post_type=instagram&page=instagram-debug' ),
-			'text_area_value'     => $text_area_value,
+			'instagram_url'       => $instagram_url,
+			'instagram_sessionid' => $instagram_sessionid,
 			'submit_button'       => get_submit_button( 'Debug', 'primary' ),
 		);
 		Sprig::out( 'admin/instagram-debug-submenu.twig', $context );
 	}
 
-	public static function render_raw_node_debug( $raw_node, $level = 1 ) {
-		$node        = Daddio_Instagram::normalize_instagram_data( $raw_node );
-		$child_nodes = array();
-		if ( ! empty( $node->children ) ) {
-			$child_level = $level + 1;
-			foreach ( $node->children as $child_node ) {
-				$child_nodes[] = static::render_raw_node_debug( $child_node, $child_level );
-			}
+	/**
+	 * Render a given debug item from a given Instgram post
+	 *
+	 * @param Object $item An item from the results of a Instagram Scraper object
+	 */
+	public static function render_item( $item ) {
+		$item        = (object) $item;
+		$location_id = '';
+		if ( ! empty( $item->location_id ) ) {
+			$location_id = '<a href="https://www.instagram.com/explore/locations/' . $item->location_id . '/" target="_blank">' . $item->location_id . '</a>';
 		}
 
-		$node_arr = (array) $node;
-		unset( $node_arr['children'] );
-		unset( $node_arr['_normalized'] );
-		$node_arr['children_count'] = count( $node->children );
-		foreach ( $node_arr as $key => $val ) {
-			if ( is_bool( $val ) ) {
-				$node_arr[ $key ] = ( $val ) ? 'true' : 'false';
-			}
-		}
-
-		$location_arr = array();
-		if ( ! empty( $node->location_id ) ) {
-			$args          = array(
-				'update_term' => false, // Don't add or update term info when we're just debugging instagram data
-			);
-			$location_data = Daddio_Instagram_Locations::get_location_data_by_location_id( $node->location_id, $args );
-			foreach ( $location_data as $key => $val ) {
-				switch ( $key ) {
-
-					case 'website':
-						$val = make_clickable( $val );
-						break;
-
-					case 'term_last_updated':
-						$val = date( 'F j, Y g:i a', intval( $val ) );
-						break;
-
-				}
-				$location_arr[ $key ] = $val;
-				if ( is_bool( $val ) ) {
-					$location_arr[ $key ] = ( $val ) ? 'true' : 'false';
-				}
-			}
-			if ( $level > 1 ) {
-				$location_arr = array();
-			}
-		}
+		$timestamp = new DateTime( '@' . $item->timestamp );
+		$timestamp->setTimezone( wp_timezone() );
 
 		$context = array(
-			'level'       => $level,
-			'node'        => $node_arr,
-			'child_nodes' => implode( "\n", $child_nodes ),
-			'location'    => $location_arr,
+			'url'    => make_clickable( $item->instagram_url ),
+			'medias' => $item->media,
+			'items'  => array(
+				// Label => Value
+				'ID'             => $item->id,
+				'Code'           => $item->code,
+				'Caption'        => $item->caption,
+				'Date'           => $timestamp->format( 'F j, Y g:ia T' ),
+				'User'           => $item->owner_username,
+				'User Full Name' => $item->owner_full_name,
+				'Location'       => $item->location_name,
+				'Location ID'    => $location_id,
+				'Address'        => $item->location_address,
+				'City'           => $item->location_city,
+				'Latitude'       => $item->latitude,
+				'Longitude'      => $item->longitude,
+			),
 		);
-		return Sprig::render( 'admin/instagram-debug-node.twig', $context );
+		return Sprig::render( 'admin/instagram-debug-item.twig', $context );
 	}
 }
 Daddio_Instagram_Debug::get_instance();

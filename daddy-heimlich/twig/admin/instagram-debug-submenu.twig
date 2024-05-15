@@ -1,28 +1,26 @@
 <style>
-	#instagram-source {
+	.input {
 		display: block;
 		max-width: 800px;
 		width: 95%;
+		margin-bottom: 16px;
+		padding: 4px 8px;
 	}
 
-	.debug-node.level-1 {
-		border-bottom: 2px solid #ccc;
-		margin-bottom: 64px;
-	}
-
-	.debug-node .video-preview,
-	.debug-node .image-preview {
+	.debug-item .video-preview,
+	.debug-item .image-preview {
 		margin: 0 0 8px;
 		max-width: 250px;
 		height: auto;
 	}
 
-	.debug-node table {
+	.debug-item table {
 		margin-bottom: 32px;
 	}
 
-	.debug-node .debug-node {
-		padding-left: 64px;
+	.debug-item th {
+		text-align: right;
+		vertical-align: top;
 	}
 </style>
 
@@ -32,14 +30,22 @@
 			Debugging <a href="{{ instagram_permalink|esc_url }}" target="_blank">{{ instagram_permalink }}</a>
 		</h1>
 	{% endif %}
+	<p>{{ page_type }}</p>
+	{% if page_info %}
+		{{ dump( page_info ) }}
+	{% endif %}
+
 	{{ result }}
 
 	<h1>Instagram Debug</h1>
-	<p>Paste the HTML source of an Instagram page to display the parsed information.</p>
 	<form action="{{ form_action_url|esc_url }}" method="post">
 		{{ nonce_field }}
-		<label for="instagram-source">HTML Source</label>
-		<textarea name="instagram-source" id="instagram-source" rows="5">{{ text_area_value }}</textarea>
+		<label for="instagram-url">Instagram URL</label>
+		<input id="instagram-url" name="instagram-url" class="input" value="{{ instagram_url|esc_url }}">
+
+		<label for="instagram-sessionid">Instagram Session ID</label>
+		<input id="instagram-sessionid" name="instagram-sessionid" class="input" value="{{ instagram_sessionid|esc_attr }}">
+
 		{{ submit_button }}
 	</form>
 </div>

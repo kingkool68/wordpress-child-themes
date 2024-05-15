@@ -167,19 +167,5 @@ class Daddio_Helpers {
 			return $id;
 		}
 	}
-
-	/**
-	 * Get the value of a protected property of an object
-	 *
-	 * @link https://stackoverflow.com/a/27754169/1119655
-	 *
-	 * @param Object $obj  The object to extract the property from
-	 * @param string $name The name of the property to get
-	 */
-	public static function get_protected_object_property( $obj, $name = '' ) {
-		$array  = (array) $obj;
-		$prefix = chr( 0 ) . '*' . chr( 0 );
-		return $array[ $prefix . $name ];
-	}
 }
 Daddio_Helpers::get_instance();

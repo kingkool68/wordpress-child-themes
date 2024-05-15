@@ -3,6 +3,9 @@
 use \ForceUTF8\Encoding;
 use \Twitter\Text\Extractor;
 
+/**
+ * Handle WordPress Instgram integration
+ */
 class Daddio_Instagram {
 
 	/**
@@ -51,7 +54,10 @@ class Daddio_Instagram {
 	 */
 	public function setup_filters() {
 		add_filter( 'the_content', array( $this, 'filter_the_content' ) );
-		add_filter( 'manage_instagram_posts_columns', array( $this, 'filter_manage_instagram_posts_columns' ) );
+		add_filter(
+			'manage_instagram_posts_columns',
+			array( $this, 'filter_manage_instagram_posts_columns' )
+		);
 	}
 
 	/**
@@ -125,7 +131,8 @@ class Daddio_Instagram {
 			return;
 		}
 		foreach ( $query->posts as $attachment_id ) {
-			wp_delete_attachment( $attachment_id, $force_delete = true );
+			$force_delete = true;
+			wp_delete_attachment( $attachment_id, $force_delete );
 		}
 	}
 
@@ -211,7 +218,6 @@ class Daddio_Instagram {
 				echo '<a href="' . esc_url( $post->guid ) . '" target="_blank">@' . static::get_instagram_username() . '</a>';
 				break;
 		}
-
 	}
 
 	/**
@@ -237,86 +243,124 @@ class Daddio_Instagram {
 	 */
 	public static function handle_sync_submenu() {
 
-		$result = '';
-		if (
-			! empty( $_POST['instagram-source'] )
-			&& check_admin_referer( static::$sync_slug )
-		) {
+		$instagram_source = '';
+		if ( ! empty( $_POST['instagram-source'] ) && check_admin_referer( static::$sync_slug ) ) {
 			$instagram_source = wp_unslash( $_POST['instagram-source'] );
-			$json             = static::get_instagram_json_from_html( $instagram_source );
-
-			// It's a Tag page
-			if ( ! empty( $json->entry_data->TagPage[0] ) ) {
-				$tag_page  = $json->entry_data->TagPage[0];
-				$top_posts = array();
-				$other     = array();
-
-				if ( isset( $tag_page->tag ) ) {
-					$top_posts = $tag_page->tag->top_posts->nodes;
-					$other     = $tag_page->tag->media->nodes;
-				}
-
-				// New format I detected on 01/02/2018
-				if ( isset( $tag_page->graphql->hashtag ) ) {
-					$top_posts = $tag_page->graphql->hashtag->edge_hashtag_to_top_posts->edges;
-					$other     = $tag_page->graphql->hashtag->edge_hashtag_to_media->edges;
-				}
-
-				// Dedupe the nodes
-				$nodes        = array_merge( $top_posts, $other );
-				$deuped_nodes = array();
-				foreach ( $nodes as $node ) {
-					$key                  = $node->node->id;
-					$deuped_nodes[ $key ] = $node;
-				}
-				$nodes = array_values( $deuped_nodes );
-			}
-
-			// It's a Profile page
-			if ( isset( $json->entry_data->ProfilePage[0]->graphql->user ) ) {
-				$user      = $json->entry_data->ProfilePage[0]->graphql->user;
-				$nodes     = $user->edge_owner_to_timeline_media->edges;
-				$page_type = 'user';
-			}
-
-			// It's a single Post page
-			if ( ! empty( $json->graphql->shortcode_media ) ) {
-				$post_page_node = $json->graphql->shortcode_media;
-				$nodes          = array( $post_page_node );
-			}
-
-			if ( ! empty( $nodes ) ) :
-				foreach ( $nodes as $node ) :
-					$node           = static::normalize_instagram_data( $node );
-					$instagram_link = 'https://www.instagram.com/p/' . $node->code . '/';
-
-					$found = static::does_instagram_permalink_exist( $instagram_link );
-					if ( $found ) {
-						continue;
-					}
-
-					$inserted = static::insert_instagram_post( $node, $post_args = array() );
-					$data     = static::handle_instagram_inserted_result( $inserted, $node );
-					$result  .= static::render_instagram_inserted_result( $data );
-				endforeach;
-			endif;
 		}
-		$context = array(
-			'result'          => $result,
-			'form_action_url' => admin_url( 'edit.php?post_type=instagram&page=' . static::$sync_slug ),
-			'submit_button'   => get_submit_button( 'Sync' ),
-			'nonce_field'     => wp_nonce_field(
-				static::$sync_slug,
-				$name = '_wpnonce',
-				$referer = true,
-				$echo = false
+
+		$selected_ids = array();
+		if ( ! empty( $_POST['selected-instagram-ids'] ) && check_admin_referer( static::$sync_slug ) ) {
+			$selected_ids = wp_unslash( $_POST['selected-instagram-ids'] );
+		}
+
+		$form_action_url = add_query_arg(
+			array(
+				'post_type' => static::$post_type,
+				'page'      => static::$sync_slug,
 			),
+			admin_url( 'edit.php' )
 		);
-		Sprig::out( 'admin/instagram-sync-submenu.twig', $context );
+
+		$nonce_field = wp_nonce_field(
+			static::$sync_slug,
+			$name    = '_wpnonce',
+			$referer = true,
+			$echo    = false
+		);
+
+		$args = array(
+			'instagram_source' => $instagram_source,
+			'selected_ids'     => $selected_ids,
+			'form_action_url'  => $form_action_url,
+			'nonce_field'      => $nonce_field,
+		);
+
+		if ( ! empty( $selected_ids ) && ! empty( $instagram_source ) ) {
+			echo static::render_sync_submenu_result( $args );
+		} elseif ( ! empty( $instagram_source ) ) {
+			echo static::render_sync_submenu_pick_step( $args );
+		} else {
+			echo static::render_initial_sync_submenu( $args );
+		}
+
+	}
+
+	public static function render_initial_sync_submenu( $args = array() ) {
+
+		$defaults = array(
+			'form_action_url'  => '',
+			'instagram_source' => '',
+			'submit_button'    => get_submit_button( 'Sync' ),
+			'nonce_field'      => '',
+		);
+		$context  = wp_parse_args( $args, $defaults );
+		return Sprig::render( 'admin/instagram-sync-submenu.twig', $context );
+	}
+
+	public static function render_sync_submenu_pick_step( $args = array() ) {
+		$defaults = array(
+			'instagram_source' => '',
+			'form_action_url'  => '',
+			'submit_button'    => get_submit_button( 'Import' ),
+			'nonce_field'      => '',
+		);
+		$args     = wp_parse_args( $args, $defaults );
+		if ( empty( $args['instagram_source'] ) ) {
+			wp_die( 'No instagram source to parse' );
+		}
+		$instagram = new Instagram_Scraper( $args['instagram_source'] );
+		$output    = '';
+		if ( ! empty( $instagram->items ) ) :
+			foreach ( $instagram->items as $item ) :
+				$item        = (object) $item;
+				$location_id = '';
+				if ( ! empty( $item->location_id ) ) {
+					$location_id = '<a href="https://www.instagram.com/explore/locations/' . $item->location_id . '/" target="_blank">' . $item->location_id . '</a>';
+				}
+
+				$timestamp = new DateTime( '@' . $item->timestamp );
+				$timestamp->setTimezone( wp_timezone() );
+
+				// Grab all of the IDs to run one SQL query and identify which ones have already been imported
+				$context = array(
+					'url'         => $item->instagram_url,
+					'code'        => $item->code,
+					'caption'     => apply_filters( 'the_content', $item->caption ),
+					'date'        => $timestamp->format( 'F j, Y g:ia T' ),
+					'username'    => $item->owner_username,
+					'location'    => $item->location_name,
+					'location_id' => $item->location_id,
+					'medias'      => $item->media,
+				);
+				$output .= Sprig::render( 'admin/instagram-sync-submenu--pick-item.twig', $context );
+			endforeach;
+		endif;
+
+		$context = array(
+			'instagram_source' => $args['instagram_source'],
+			'instagram_items'  => $output,
+			'nonce_field'      => $args['nonce_field'],
+			'submit_button'    => $args['submit_button'],
+		);
+		return Sprig::render( 'admin/instagram-sync-submenu--pick-step.twig', $context );
+	}
+
+	public static function render_sync_submenu_result( $args = array() ) {
+
+		$defaults = array(
+			'form_action_url'  => '',
+			'instagram_source' => '',
+			'nonce_field'      => '',
+		);
+		$context  = wp_parse_args( $args, $defaults );
+		var_dump( $context );
+		return Sprig::render( 'admin/instagram-sync-submenu--result.twig', $context );
 	}
 
 	/**
 	 * Handle requests to modify instagram posts (delete or set to draft)
+	 *
+	 * TODO: Delete this
 	 */
 	public static function handle_modify_instagram_post_submenu() {
 		if ( empty( $_GET['post_id'] ) ) {
@@ -349,11 +393,12 @@ class Daddio_Instagram {
 				echo '<p>Post deleted.</p>';
 				break;
 		}
-
 	}
 
 	/**
 	 * Display a result depending on the status of inserting an Instagram post during a sync
+	 *
+	 * TODO: Delete this
 	 *
 	 * @param  object|-1 $result The result of attempting to insert the Instagram post
 	 * @param  object $node   Normaized node data for reference
@@ -410,6 +455,8 @@ class Daddio_Instagram {
 
 	/**
 	 * Given an Instagram inserted result, render an output to the sync screen
+	 *
+	 * TODO: Delete this
 	 *
 	 * @param  array $data Insert data
 	 * @return string      HTML output
@@ -527,6 +574,8 @@ class Daddio_Instagram {
 	/**
 	 * Given an HTML page from Instagram, return a JSON of the data from that page
 	 *
+	 * TODO: Delete this
+	 *
 	 * @link https://github.com/raiym/instagram-php-scraper/blob/849f464bf53f84a93f86d1ecc6c806cc61c27fdc/src/InstagramScraper/Instagram.php#L32
 	 *
 	 * @param  string $html HTML from an Instagram URL
@@ -553,6 +602,8 @@ class Daddio_Instagram {
 
 	/**
 	 * Fetch a single Instagram page/data from a given code
+	 *
+	 * TODO: Delete this
 	 *
 	 * @param  string $code Instagram short URL code to fetch
 	 * @return JSON        JSON data from the tag page
@@ -733,6 +784,8 @@ class Daddio_Instagram {
 	/**
 	 * Makes sure the node data is from a single page otherwise it fetches a single page's data
 	 *
+	 * TODO: Delete this
+	 *
 	 * @param  object $node Instagram node data
 	 * @return object       Instagram node data
 	 */
@@ -757,7 +810,9 @@ class Daddio_Instagram {
 	/**
 	 * Given an Instagram node, insert a WordPress post
 	 *
-	 * @param  Object  $node                  Instagram node
+	 * TODO: Delete this
+	 *
+	 * @param  Object  $node                  Normalized Instagram data
 	 * @param  boolean $force_publish_status  Force the post to be published
 	 * @return boolean                        Whether the post was inserted successfully or not
 	 */
@@ -765,32 +820,26 @@ class Daddio_Instagram {
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/admin.php';
 		}
-		$node      = static::get_instagram_data_from_node( $node );
-		$src       = $node->full_src;
-		$permalink = 'https://www.instagram.com/p/' . $node->code . '/';
-		$found     = static::does_instagram_permalink_exist( $permalink );
-		if ( $found ) {
-			return false;
+
+		if ( is_array( $node ) ) {
+			$node = (object) $node;
 		}
 
 		$posted = date( 'Y-m-d H:i:s', intval( $node->timestamp ) ); // In GMT time
-
-		$username  = $node->owner_username;
-		$full_name = $node->owner_full_name;
+		var_dump( $node );
+		$username = $node->owner_username;
 		if ( empty( $username ) ) {
 			return -1;
 		}
-		$caption = wp_encode_emoji( $node->caption );
-		$title   = preg_replace( '/\s#\w+/i', '', $caption );
 
 		$default_post_args = array(
-			'post_title'    => $title,
-			'post_content'  => $caption,
+			'post_title'    => $node->caption,
+			'post_content'  => $node->caption,
 			'post_status'   => 'publish',
 			'post_type'     => static::$post_type,
 			'post_date'     => get_date_from_gmt( $posted ),
 			'post_date_gmt' => $posted,
-			'guid'          => $permalink,
+			'guid'          => $node->instagram_url,
 			'post_parent'   => 0,
 			'meta_input'    => array(),
 		);
@@ -802,11 +851,22 @@ class Daddio_Instagram {
 			$post_args['post_name'] = $node->code;
 		}
 		$post_args['post_content'] = wp_encode_emoji( $post_args['post_content'] );
+		$post_args['post_title']   = wp_encode_emoji( $post_args['post_title'] );
+		// Strip hash tags out of the title
+		$post_args['post_title'] = preg_replace( '/\s#\w+/i', '', $post_args['post_title'] );
 
 		$post_args = apply_filters( 'daddio_pre_insert_instagram_post_args', $post_args, $node );
-		$inserted  = wp_insert_post( $post_args );
+		// $inserted  = wp_insert_post( $post_args );
 
 		// Handle children
+		foreach ( $node->media as $index => $media_item ) {
+			if ( $index === 0 ) {
+				// Download media and associate it with the inserted parent post
+			} else {
+				// Download and insert in new post that is a child of the parent post
+			}
+		}
+		/*
 		$inserted_child_ids = array();
 		if ( ! empty( $node->children ) ) {
 			foreach ( $node->children as $child_node ) {
@@ -829,13 +889,7 @@ class Daddio_Instagram {
 				}
 			}
 		}
-
-		if ( ! $inserted ) {
-			// Maybe it's because of bad characters in the caption and title? Try again.
-			$post_args['post_content'] = Encoding::fixUTF8( $post_args['post_content'] );
-			$post_args['post_title']   = Encoding::fixUTF8( $post_args['post_title'] );
-			$inserted                  = wp_insert_post( $post_args );
-		}
+		*/
 
 		if ( ! $inserted ) {
 			// Welp... we tried.
